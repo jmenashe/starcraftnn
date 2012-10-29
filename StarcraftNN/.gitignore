@@ -1,0 +1,7 @@
+Lib/*
+Debug/*
+Release/*
+Include/*
+*.ncb
+*.suo
+*.user
