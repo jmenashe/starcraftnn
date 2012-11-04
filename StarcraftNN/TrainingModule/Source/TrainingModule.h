@@ -12,9 +12,10 @@ class TrainingModule : public BWAPI::AIModule {
     virtual void onUnitDestroy(BWAPI::Unit*);
     virtual void onUnitCreate(BWAPI::Unit*);
     virtual void onEnd(bool);
-    void finishRound();
-    void loadGenomes();
-    void saveGenomes();
+    void beginRound();
+    void endRound();
+    void loadPopulation();
+    void savePopulation();
   private:
     int _frameCount;  
     int _maxEnemyUnits, _maxAllyUnits;

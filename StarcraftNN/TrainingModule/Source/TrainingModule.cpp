@@ -15,23 +15,18 @@ void TrainingModule::onStart() {
   _maxAllyUnits = Broodwar->self()->getUnits().size();
   _maxEnemyUnits = Broodwar->enemy()->getUnits().size();
   _resetting = false;
+  loadPopulation();
 }
 
 void TrainingModule::onFrame() {
   _frameCount++;
-	Position target(700,270);
-	if (Broodwar->getFrameCount()%30==0) {
-    for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++) {
-      Unit* unit = *i;
-      if(unit->getType().isFlyer()) continue;
-      unit->attack(target);
-      Position p = unit->getPosition();
-    }
-  }
 }
 
 void TrainingModule::onUnitCreate(BWAPI::Unit* unit) {
-  _resetting = false;
+  if(_resetting && unit->getPlayer() == Broodwar->self() && Broodwar->self()->getUnits().size() == _maxAllyUnits) {
+    _resetting = false;
+    beginRound();
+  }
 }
 
 void TrainingModule::onUnitDestroy(BWAPI::Unit* unit) {
@@ -40,11 +35,21 @@ void TrainingModule::onUnitDestroy(BWAPI::Unit* unit) {
   int survivors = Broodwar->self()->getUnits().size();
   int opponents = Broodwar->enemy()->getUnits().size();
   if(survivors == 0 || opponents == 0) {
-    finishRound();
+    endRound();
   }
 }
 
-void TrainingModule::finishRound() {
+void TrainingModule::beginRound() {
+  Position target(700,270);
+  Broodwar->printf("round beginning");
+  for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++) {
+    Unit* unit = *i;
+    if(unit->getType().isFlyer()) continue;
+    unit->attack(target);
+  }
+}
+
+void TrainingModule::endRound() {
   _resetting = true;
   int survivors = Broodwar->self()->getUnits().size();
   int opponents = Broodwar->enemy()->getUnits().size();
@@ -52,15 +57,15 @@ void TrainingModule::finishRound() {
   _frameCount = 0;
   double score = survivors - opponents;
   score *= 200.0 / frames;
-  Broodwar->printf("%i survivors, %i opponents, %i frames, score of %2.4f", survivors, opponents, frames, score);
+  Broodwar->printf("%i survivors, %i opponents, %i frames, score: %2.4f", survivors, opponents, frames, score);
 }
 
 void TrainingModule::onEnd(bool isWinner) {
-  saveGenomes();
+  savePopulation();
 }
 
-void TrainingModule::loadGenomes() {
+void TrainingModule::loadPopulation() {
 }
 
-void TrainingModule::saveGenomes() {
+void TrainingModule::savePopulation() {
 }
