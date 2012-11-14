@@ -2,11 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="TrainingModule"
-	ProjectGUID="{2E63AE74-758A-4607-9DE4-D28E814A6E13}"
-	RootNamespace="ExampleAIModule"
+	Name="tester"
+	ProjectGUID="{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}"
+	RootNamespace="tester"
 	Keyword="Win32Proj"
-	AssemblyReferenceSearchPaths="&quot;..\Neat&quot;"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -21,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -42,8 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../Neat"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,10 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../lib/BWAPId.lib ../lib/BWTAd.lib ../lib/tinyxmld.lib ../lib/CGAL-vc90-mt-gd.lib ../lib/libboost_thread-vc90-mt-gd-1_40.lib ../lib/gmp-vc90-mt-gd.lib ../lib/mpfr-vc90-mt-gd.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -88,15 +85,13 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\StarCraft\bwapi-data\AI\$(TargetFileName)&quot;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			UseOfMFC="0"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -119,8 +114,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../include;../Neat"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;_SECURE_SCL 0"
+				AdditionalIncludeDirectories="../Neat"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -138,10 +133,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../lib/BWAPI.lib ../lib/BWTA.lib ../lib/tinyxml.lib ../lib/CGAL-vc90-mt.lib ../lib/libboost_thread-vc90-mt-1_40.lib ../lib/gmp-vc90-mt.lib ../lib/mpfr-vc90-mt.lib ../$(ConfigurationName)/Neat.lib"
-				LinkIncremental="2"
-				GenerateDebugInformation="false"
-				SubSystem="2"
+				AdditionalDependencies="..\$(ConfigurationName)\Neat.lib"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -166,7 +161,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\StarCraft\bwapi-data\AI\$(TargetFileName)&quot;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -179,23 +173,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\BroodwarPopulation.cpp"
+				RelativePath=".\stdafx.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Dll.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OrganismInterface.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TrainingModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Utils.cpp"
+				RelativePath=".\tester.cpp"
 				>
 			</File>
 		</Filter>
@@ -205,23 +187,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\BroodwarPopulation.h"
+				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Macros.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OrganismInterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TrainingModule.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Utils.h"
+				RelativePath=".\targetver.h"
 				>
 			</File>
 		</Filter>
@@ -231,6 +201,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
+		<File
+			RelativePath=".\ReadMe.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

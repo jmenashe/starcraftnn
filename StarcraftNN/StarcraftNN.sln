@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrainingModule", "TrainingM
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neat", "Neat\Neat.vcproj", "{7E066A45-9290-458E-8E9A-1F9A90FD5887}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tester", "tester\tester.vcproj", "{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{7E066A45-9290-458E-8E9A-1F9A90FD5887}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{7E066A45-9290-458E-8E9A-1F9A90FD5887}.Release|Win32.ActiveCfg = Release|Win32
 		{7E066A45-9290-458E-8E9A-1F9A90FD5887}.Release|Win32.Build.0 = Release|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Debug|Win32.Build.0 = Debug|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Release|Win32.ActiveCfg = Release|Win32
+		{F201F8DA-CD21-4D5E-A7C9-73644F3E9F67}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
