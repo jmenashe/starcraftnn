@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <genome.h>
 
-#include "OrganismInterface.h"
+#include "BasicInterface.h"
 #include "BroodwarPopulation.h"
 #include "Macros.h"
 #include "Utils.h"

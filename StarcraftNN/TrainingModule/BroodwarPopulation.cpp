@@ -15,7 +15,7 @@ BroodwarPopulation::~BroodwarPopulation(void) {
 }
 
 void BroodwarPopulation::beginIteration() {
-  _iface->updateUnits();
+  _iface->updateUnits(_population->organisms[_currentOrganism]);
 }
 
 void BroodwarPopulation::performStep() {
@@ -29,7 +29,7 @@ void BroodwarPopulation::performStep() {
   }
   Organism* organism = _population->organisms[_currentOrganism];
   _iface->sendInputs(organism);
-  _iface->applyOutputs();
+  _iface->applyOutputs(organism);
 }
 
 void BroodwarPopulation::endIteration(double fitness) {
@@ -37,7 +37,6 @@ void BroodwarPopulation::endIteration(double fitness) {
   Organism* organism = _population->organisms[_currentOrganism];
   organism->fitness = fitness;
   _currentOrganism++;
-  //BWAPI::Broodwar->printf("epoch, cur org: %i, popsize: %i", _currentOrganism, _popsize);
   if(_currentOrganism == _popsize) {
     _generation++;
     _population->epoch(_generation);

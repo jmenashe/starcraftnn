@@ -18,7 +18,7 @@ void TrainingModule::onStart() {
   _resetting = false;
   _resetLocation = 0;
   setupResetCenter();
-  _population = new BroodwarPopulation(new OrganismInterface());
+  _population = new BroodwarPopulation(new BasicInterface());
   beginRound();
 }
 

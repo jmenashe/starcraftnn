@@ -187,10 +187,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OrganismInterface.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ScoredUnit.cpp"
 				>
 			</File>
@@ -202,6 +198,18 @@
 				RelativePath=".\Utils.cpp"
 				>
 			</File>
+			<Filter
+				Name="OrganismInterfaces"
+				>
+				<File
+					RelativePath=".\BasicInterface.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\OrganismInterface.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -217,10 +225,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OrganismInterface.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ScoredUnit.h"
 				>
 			</File>
@@ -232,6 +236,18 @@
 				RelativePath=".\Utils.h"
 				>
 			</File>
+			<Filter
+				Name="OrganismInterfaces"
+				>
+				<File
+					RelativePath=".\BasicInterface.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OrganismInterface.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

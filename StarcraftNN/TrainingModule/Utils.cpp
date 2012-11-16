@@ -24,3 +24,12 @@ bool unitExists(BWAPI::Unit* unit) {
   unit = BWAPI::Broodwar->getUnit(unit->getID());
   return unit != NULL;
 }
+
+BWAPI::Position getCentroid(std::vector<BWAPI::Unit*> units) {
+  int x = 0, y = 0;
+  for(int i = 0; i < units.size(); i++) {
+    x += units[i]->getPosition().x();
+    y += units[i]->getPosition().y();
+  }
+  return BWAPI::Position(x,y);
+}
