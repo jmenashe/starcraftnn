@@ -4,7 +4,7 @@ using namespace BWAPI;
 #define RESET_LOCATION_COUNT 8
 
 void TrainingModule::onStart() {
-  Broodwar->setLocalSpeed(20);
+  Broodwar->setLocalSpeed(0);
   Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 
   if (!Broodwar->isReplay()) {
@@ -73,7 +73,7 @@ void TrainingModule::endRound() {
   _frameCount = 0;
   double score = survivors - opponents;
   score *= 200.0 / frames;
-  Broodwar->printf("ending round");
+  Broodwar->printf("fitness: %2.2f", score);
   _population->endIteration(score);
 }
 
@@ -103,5 +103,5 @@ void TrainingModule::signalCompletion() {
 }
 
 void TrainingModule::onEnd(bool isWinner) {
-  //_population->save();
+  _population->save();
 }

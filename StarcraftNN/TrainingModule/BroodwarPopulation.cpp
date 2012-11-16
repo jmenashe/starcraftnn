@@ -1,13 +1,14 @@
 #include "BroodwarPopulation.h"
 
 BroodwarPopulation::BroodwarPopulation(OrganismInterface* iface) : _iface(iface), _population(0) {
+  _popsize = 5;
   if(!load()) {
     BWAPI::Broodwar->printf("creating new population");
     Genome* g = _iface->createGenome();
-    _population = new Population(g, POPULATION_SIZE);
+    _population = new Population(g, _popsize);
   }
   _currentOrganism = 0;
-  _generation = 0;
+  _generation = 1;
 }
 
 BroodwarPopulation::~BroodwarPopulation(void) {
@@ -32,15 +33,18 @@ void BroodwarPopulation::performStep() {
 }
 
 void BroodwarPopulation::endIteration(double fitness) {
-  return;
   if(_population->organisms.size() <= _currentOrganism) return;
   Organism* organism = _population->organisms[_currentOrganism];
   organism->fitness = fitness;
-  if(_currentOrganism == POPULATION_SIZE) {
-    _population->epoch(_generation);
+  _currentOrganism++;
+  //BWAPI::Broodwar->printf("epoch, cur org: %i, popsize: %i", _currentOrganism, _popsize);
+  if(_currentOrganism == _popsize) {
     _generation++;
+    _population->epoch(_generation);
+    _currentOrganism = 0;
+    _popsize =  _population->organisms.size();
+    BWAPI::Broodwar->printf("epoch, organisms: %i", _popsize);
   }
-  _currentOrganism = (_currentOrganism + 1) % POPULATION_SIZE;
 }
 
 bool BroodwarPopulation::save() {
@@ -56,7 +60,7 @@ bool BroodwarPopulation::save() {
 bool BroodwarPopulation::load() {
   char * base_path = getenv("USERPROFILE");
   if(!base_path) return false;
-  std::string popfile = std::string(base_path) + "\\starcraftnn\\populations\\" + POPULATION_FILE;
+  std::string popfile = std::string(base_path) + "\\" + POPULATION_FILE;
   std::ifstream i(popfile.c_str());
   bool valid = i.good();
   i.close();
@@ -64,5 +68,8 @@ bool BroodwarPopulation::load() {
   BWAPI::Broodwar->printf("file is good!: %s", popfile.c_str());
   if(_population) delete _population;
   _population = new Population(popfile.c_str());
+  for(int i = 0; i < _population->organisms.size(); i++) {
+    BWAPI::Broodwar->printf("organism recovered w/ fitness %2.2f", _population->organisms[i]->fitness);
+  }
   return true;
 }

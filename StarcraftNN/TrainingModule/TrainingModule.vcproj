@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ScoredUnit.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TrainingModule.cpp"
 				>
 			</File>
@@ -214,6 +218,10 @@
 			</File>
 			<File
 				RelativePath=".\OrganismInterface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScoredUnit.h"
 				>
 			</File>
 			<File

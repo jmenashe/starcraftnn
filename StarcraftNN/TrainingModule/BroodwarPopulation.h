@@ -4,7 +4,6 @@
 #include <windows.h>
 #include "OrganismInterface.h"
 
-#define POPULATION_SIZE 5
 #define POPULATION_FILE "population"
 
 using namespace NEAT;
@@ -21,5 +20,5 @@ public:
 private:
   OrganismInterface* _iface;
   Population* _population;
-  int _currentOrganism, _generation;
+  int _currentOrganism, _generation, _popsize;
 };

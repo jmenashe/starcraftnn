@@ -150,7 +150,6 @@ Genome::Genome(int id, std::ifstream &iFile) {
 		//Ignore genomestart if it hasn't been gobbled yet
 		else if (strcmp(curword,"genomestart")==0) {
 			++curwordnum;
-			//cout<<"genomestart"<<endl;
 		}
 
 		//Ignore comments surrounded by - they get printed to screen
@@ -878,10 +877,7 @@ void Genome::print_to_file(std::ostream &outFile) {
 	std::vector<NNode*>::iterator curnode;
 	std::vector<Gene*>::iterator curgene;
 
-	//char tempbuf[128];
-	//sprintf(tempbuf, "genomestart %d\n", genome_id);
-	//outFile.write(strlen(tempbuf), tempbuf);
-    outFile<<"genomestart "<<genome_id<<std::endl;
+  outFile<<"genomestart "<<genome_id<<std::endl;
 
 	//Output the traits
 	for(curtrait=traits.begin();curtrait!=traits.end();++curtrait) {

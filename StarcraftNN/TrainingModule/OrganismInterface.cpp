@@ -1,8 +1,9 @@
 #include "OrganismInterface.h"
 
 OrganismInterface::OrganismInterface(void) {
-  for(int i = 0; i < 3; i++)
-    _lastAttack.push_back(-1);
+  UNIT_COUNT = 3;
+  for(int i = 0; i < UNIT_COUNT; i++)
+    _lastAttack.push_back(0);
 }
 
 OrganismInterface::~OrganismInterface(void) {
@@ -43,38 +44,33 @@ void OrganismInterface::sendInputs(Organism* organism) {
 }
 
 void OrganismInterface::applyOutputs() {
-  //BWAPI::Broodwar->printf("applying outputs");
   std::vector<NNode*> outputs = _organism->net->outputs;
-  for(int i = 0; i < 3; i++) {
-    double attack1 = outputs[i * 3]->activation;
-    double attack2 = outputs[i * 3 + 1]->activation;
-    double attack3 = outputs[i * 3 + 2]->activation;
-    int max = maxIndex(3, attack1, attack2, attack3);
-    BWAPI::Broodwar->printf("attacks are %2.2f, %2.2f, %2.2f (max %i)", attack1, attack2, attack3, max);
+  std::vector<ScoredUnit> _sunits;
+  for(int i = 0; i < UNIT_COUNT; i++) {
+    for(int j = 0; j < UNIT_COUNT; j++) {
+      double attack = outputs[i * UNIT_COUNT + j]->activation;
+      _sunits.push_back(ScoredUnit(_enemies[j], attack));
+    }
+    sort(_sunits.begin(), _sunits.end(), ScoredUnit::compare);
+    
     BWAPI::Unit* ally = _allies[i];
-    if(_lastAttack[i] != max) {
-      //ally->attack(_enemies[max]);
-      _lastAttack[i] = max;
+    if(unitExists(ally)) {
+      for(int j = 0; j < _sunits.size(); j++) {
+        BWAPI::Unit* enemy = _sunits[j].unit;
+        if(unitExists(enemy)) {
+          if(_lastAttack[i] != enemy) {
+            //BWAPI::Broodwar->printf("%i attacks %i (scores: %2.2f, %2.2f, %2.2f)", i, enemy, _sunits[0].score, _sunits[1].score, _sunits[2].score);
+            ally->attack(enemy);
+            _lastAttack[i] = enemy;
+          }
+          break;
+        }
+      }
     }
   }
-}
-
-int OrganismInterface::maxIndex(int count, ... ) {
-  va_list values;
-  va_start(values, count); 
-  double max = 0;
-  int index = -1;
-  for(int i = 0; i < count; ++i ) {
-    double val = va_arg(values, double);
-    if(max < val) {
-      max = val;
-      index = i;
-    }
-  }
-  return index;
 }
 
 Genome* OrganismInterface::createGenome() {
-  Genome* g = new Genome(1, Sensors::SENSOR_COUNT, Effectors::EFFECTOR_COUNT, 1, 100, true, .5);
+  Genome* g = new Genome(1, Sensors::SENSOR_COUNT, Effectors::EFFECTOR_COUNT, 5, 100, true, .5);
   return g;
 }

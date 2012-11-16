@@ -19,3 +19,8 @@ std::vector<BWAPI::Unit*> getEnemies() {
   }
   return units;
 }
+
+bool unitExists(BWAPI::Unit* unit) {
+  unit = BWAPI::Broodwar->getUnit(unit->getID());
+  return unit != NULL;
+}

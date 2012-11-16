@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "Macros.h"
 #include "Utils.h"
+#include "ScoredUnit.h"
 
 using namespace NEAT;
 
@@ -19,10 +20,10 @@ public:
   void updateUnits();
 protected:
   BWAPI::Position getCentroid(std::vector<BWAPI::Unit*>);
-  int maxIndex(int,...);
   Organism* _organism;
   std::vector<BWAPI::Unit*> _allies, _enemies;
-  std::vector<int> _lastAttack;
+  std::vector<BWAPI::Unit*> _lastAttack;
+  int UNIT_COUNT;
   enum Sensors {
     ENEMY1_DISTANCE,
     ENEMY1_ANGLE,

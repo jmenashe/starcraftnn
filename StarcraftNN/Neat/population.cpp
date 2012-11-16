@@ -100,7 +100,10 @@ Population::Population(const char *filename) {
 	char curline[1024]; //max line size of 1024 characters
 	char delimiters[] = " \n";
 
-	Genome *new_genome;
+  Species *new_species = 0;
+	Genome *new_genome = 0;
+  double new_fitness = 0;
+  int new_generation = 1;
 
 	winnergen=0;
 
@@ -122,17 +125,21 @@ Population::Population(const char *filename) {
 		bool md = false;
 		char metadata[128];
 		//Loop until file is finished, parsing each line
-		while (!iFile.eof()) 
-		{
+		while (!iFile.eof()) {
 			iFile.getline(curline, sizeof(curline));
-            std::stringstream ss(curline);
-			//strcpy(curword, NEAT::getUnit(curline, 0, delimiters));
-            ss >> curword;
-            //std::cout << curline << std::endl;
+      std::stringstream ss(curline);
+      ss >> curword;
 
-			//Check for next
-			if (strcmp(curword,"genomestart")==0) 
-			{
+      if (strcmp(curword,"specstart")==0) {
+        int id;
+        ss >> id;
+        new_species = new Species(id);
+      }
+      else if (strcmp(curword,"orgstart")==0) {
+          ss >> new_fitness;
+          ss >> new_generation;
+      }
+			else if (strcmp(curword,"genomestart")==0) {
 				//strcpy(curword, NEAT::getUnit(curline, 1, delimiters));
 				//int idcheck = atoi(curword);
 
@@ -146,7 +153,10 @@ Population::Population(const char *filename) {
 				md = false;
 
 				new_genome=new Genome(idcheck,iFile);
-				organisms.push_back(new Organism(0,new_genome,1, metadata));
+        Organism* organism = new Organism(new_fitness,new_genome,new_generation, metadata);
+				organisms.push_back(organism);
+        //if(new_species) new_species->add_Organism(organism);
+        new_fitness = 0;
 				if (cur_node_id<(new_genome->get_last_node_id()))
 					cur_node_id=new_genome->get_last_node_id();
 
@@ -365,12 +375,15 @@ bool Population::print_to_file_by_species(char *filename) {
     return false;
   }
 
-
+  double total = 0;
   //Step through the Species and print them to the file
   for(curspecies=species.begin();curspecies!=species.end();++curspecies) {
-    (*curspecies)->print_to_file(outFile);
+    Species* s = (*curspecies);
+    s->print_to_file(outFile);
+    total += s->compute_average_fitness();
   }
-
+  double avg = total / species.size();
+  outFile << "/* Average Fitness: " << avg << " */" << std::endl;
   outFile.close();
 
   return true;
@@ -403,6 +416,11 @@ bool Population::print_to_file_by_species(std::ostream& outFile) {
 }
 
 bool Population::epoch(int generation) {
+
+  for(int i = 0; i < organisms.size(); i++) {
+    double f = organisms[i]->fitness;
+    std::cout << "org fitness: " << f << "\n";
+	}
 
 	std::vector<Species*>::iterator curspecies;
 	std::vector<Species*>::iterator deadspecies;  //For removing empty Species
@@ -503,14 +521,21 @@ bool Population::epoch(int generation) {
 	//within a species.
 	//Then, within each Species, mark for death 
 	//those below survival_thresh*average
+	for(curorg=organisms.begin();curorg!=organisms.end();++curorg) {
+    double f = (*curorg)->fitness;
+    std::cout << "org fitness: " << f << "\n";
+	}
 	for(curspecies=species.begin();curspecies!=species.end();++curspecies) {
-		(*curspecies)->adjust_fitness();
+		//(*curspecies)->adjust_fitness();
+    // JMENASHE 11/15/2012 - this was setting all fitnesses to 0 and causing the function to crash. need to figure out what the actual problem is.
 	}
 
 	//Go through the organisms and add up their fitnesses to compute the
 	//overall average
 	for(curorg=organisms.begin();curorg!=organisms.end();++curorg) {
 		total+=(*curorg)->fitness;
+    double f = (*curorg)->fitness;
+    std::cout << "org fitness: " << f << "\n";
 	}
 	overall_average=total/total_organisms;
 	std::cout<<"Generation "<<generation<<": "<<"overall_average = "<<overall_average<<std::endl;

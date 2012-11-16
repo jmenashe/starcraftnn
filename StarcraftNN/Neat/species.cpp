@@ -111,45 +111,6 @@ bool Species::remove_org(Organism *org) {
 Organism *Species::first() {
 	return *(organisms.begin());
 }
-/*
-bool Species::print_to_file(std::ostream &outFile) {
-	std::vector<Organism*>::iterator curorg;
-
-	//Print a comment on the Species info
-	//outFile<<endl<<"/* Species #"<<id<<" : (Size "<<organisms.size()<<") (AF "<<ave_fitness<<") (Age "<<age<<")  *///"<<endl<<endl;
-	//char tempbuf[1024];
-	//sprintf(tempbuf, sizeof(tempbuf), "/* Species #%d : (Size %d) (AF %f) (Age %d)  */\n\n", id, organisms.size(), average_est, age);
-	//sprintf(tempbuf, sizeof(tempbuf), "/* Species #%d : (Size %d) (AF %f) (Age %d)  */\n\n", id, organisms.size(), ave_fitness, age);
-	//outFile.write(strlen(tempbuf), tempbuf);
-
-	//Show user what's going on
-	//cout<<endl<<"/* Species #"<<id<<" : (Size "<<organisms.size()<<") (AF "<<ave_fitness<<") (Age "<<age<<")  */"<<endl;
-
-	//Print all the Organisms' Genomes to the outFile
-	//for(curorg=organisms.begin();curorg!=organisms.end();++curorg) {
-
-		//Put the fitness for each organism in a comment
-		//outFile<<endl<<"/* Organism #"<<((*curorg)->gnome)->genome_id<<" Fitness: "<<(*curorg)->fitness<<" Error: "<<(*curorg)->error<<" */"<<endl;
-
-	//	char tempbuf2[1024];
-	//	sprintf(tempbuf2, sizeof(tempbuf2), "/* Organism #%d Fitness: %f Error: %f */\n", ((*curorg)->gnome)->genome_id, (*curorg)->fitness, (*curorg)->error);
-	//	outFile.write(strlen(tempbuf2), tempbuf2);
-
-		//If it is a winner, mark it in a comment
-	//	if ((*curorg)->winner) {
-	//		char tempbuf3[1024];
-	//		sprintf(tempbuf3, sizeof(tempbuf3), "/* ##------$ WINNER %d SPECIES #%d $------## */\n", ((*curorg)->gnome)->genome_id, id);
-			//outFile<<"/* ##------$ WINNER "<<((*curorg)->gnome)->genome_id<<" SPECIES #"<<id<<" $------## */"<<endl;
-	//	}
-
-	//	((*curorg)->gnome)->print_to_file(outFile);
-		//We can confirm by writing the genome #'s to the screen
-		//cout<<((*curorg)->gnome)->genome_id<<endl;
-	//}
-
-	//return true;
-
-//}*/
 
 //Print Species to a file outFile
 bool Species::print_to_file(std::ofstream &outFile) {
@@ -166,6 +127,8 @@ bool Species::print_to_file(std::ofstream &outFile) {
 
     //Put the fitness for each organism in a comment
     outFile<<std::endl<<"/* Organism #"<<((*curorg)->gnome)->genome_id<<" Fitness: "<<(*curorg)->fitness<<" Error: "<<(*curorg)->error<<" */"<<std::endl;
+
+    outFile << "orgstart " << (*curorg)->fitness << " " << (*curorg)->generation << std::endl;
 
     //If it is a winner, mark it in a comment
     if ((*curorg)->winner) outFile<<"/* ##------$ WINNER "<<((*curorg)->gnome)->genome_id<<" SPECIES #"<<id<<" $------## */"<<std::endl;
@@ -208,7 +171,7 @@ bool Species::print_to_file(std::ostream &outFile) {
 			sprintf(tempbuf3, "/* ##------$ WINNER %d SPECIES #%d $------## */\n", ((*curorg)->gnome)->genome_id, id);
 			//outFile<<"/* ##------$ WINNER "<<((*curorg)->gnome)->genome_id<<" SPECIES #"<<id<<" $------## */"<<std::endl;
 		}
-
+    outFile << "orgstart " << (*curorg)->fitness << " " << (*curorg)->generation << std::endl;
 		((*curorg)->gnome)->print_to_file(outFile);
 		//We can confirm by writing the genome #'s to the screen
 		//std::cout<<((*curorg)->gnome)->genome_id<<std::endl;
