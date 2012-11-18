@@ -733,7 +733,7 @@ namespace SharpNeat.EvolutionAlgorithms
 
             _stats._maxComplexity = _genomeList.Max(x => x.Complexity);
             _stats._meanComplexity = _genomeList.Average(x => x.Complexity);
-            _stats._meanComplexity = _genomeList.StdDev(x => x.Complexity);
+            _stats._stdDevComplexity = _genomeList.StdDev(x => x.Complexity);
 
             _stats._meanSpecieChampFitness = _specieList.Average(x => x.GenomeList[0].EvaluationInfo.Fitness);
             _stats._stdDevSpecieChampFitness = _specieList.StdDev(x => x.GenomeList[0].EvaluationInfo.Fitness);
