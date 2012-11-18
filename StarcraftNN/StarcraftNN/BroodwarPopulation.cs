@@ -61,7 +61,7 @@ namespace StarcraftNN
             if (_currentGenome == BroodwarPopulation.PopulationSize)
             {
                 _algorithm.UpdateStats();
-                Console.WriteLine("Epoch, Avg Fitness: {0:f}", _algorithm.Statistics._meanFitness);
+                Console.WriteLine("Epoch, Avg Fitness: {0:f}, Max Fitness: {0:f}", _algorithm.Statistics._meanFitness, _algorithm.Statistics._maxFitness);
                 _algorithm.StartContinue();
                 _currentGenome = 0;
             }

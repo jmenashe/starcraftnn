@@ -29,3 +29,38 @@
 11/17/2012 8:30:22 PM 8772 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
 11/17/2012 8:30:22 PM 8772 ApplyPatch for W-MODE 1.02
 11/17/2012 8:30:22 PM 8772 Starting Starcraft completed
+11/17/2012 8:53:06 PM 8772 Startbutton
+11/17/2012 8:53:06 PM 8772 Starting Game Starcraft 1.16.1 C:\Program Files (x86)\StarCraft\\StarCraft.exe
+11/17/2012 8:53:06 PM 8772 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+11/17/2012 8:53:06 PM 8772 W-MODE 1.02 Version 1.0.2 Compatible
+11/17/2012 8:53:06 PM 8772 Obtained DebugPrivilege
+11/17/2012 8:53:06 PM 8772 CreateProcess
+11/17/2012 8:53:06 PM 8772 Call ScSuspended for all active Plugins
+11/17/2012 8:53:06 PM 8772 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+11/17/2012 8:53:06 PM 8772 ApplyPatchSuspended for W-MODE 1.02
+11/17/2012 8:53:06 PM 8772 ResumeThread
+11/17/2012 8:53:06 PM 8772 WaitForInputIdle
+11/17/2012 8:53:06 PM 8772 Call ScWindowCreated for all active Plugins
+11/17/2012 8:53:06 PM 8772 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+11/17/2012 8:53:06 PM 8772 ApplyPatch for W-MODE 1.02
+11/17/2012 8:53:06 PM 8772 Starting Starcraft completed
+11/17/2012 9:41:25 PM 8772 Startbutton
+11/17/2012 9:41:25 PM 8772 Starting Game Starcraft 1.16.1 C:\Program Files (x86)\StarCraft\\StarCraft.exe
+11/17/2012 9:41:25 PM 8772 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+11/17/2012 9:41:25 PM 8772 W-MODE 1.02 Version 1.0.2 Compatible
+11/17/2012 9:41:25 PM 8772 Obtained DebugPrivilege
+11/17/2012 9:41:25 PM 8772 CreateProcess
+11/17/2012 9:41:25 PM 8772 Call ScSuspended for all active Plugins
+11/17/2012 9:41:25 PM 8772 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+11/17/2012 9:41:25 PM 8772 ApplyPatchSuspended for W-MODE 1.02
+11/17/2012 9:41:25 PM 8772 ResumeThread
+11/17/2012 9:41:25 PM 8772 WaitForInputIdle
+11/17/2012 9:41:25 PM 8772 Call ScWindowCreated for all active Plugins
+11/17/2012 9:41:25 PM 8772 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+11/17/2012 9:41:25 PM 8772 ApplyPatch for W-MODE 1.02
+11/17/2012 9:41:25 PM 8772 Starting Starcraft completed
+11/17/2012 9:41:39 PM 8772 Finishing
+11/17/2012 9:41:39 PM 8772 Unloading Plugin BWAPI Injector (1.16.1) RELEASE
+11/17/2012 9:41:39 PM 8772 Unloading Plugin BWAPI Injector (1.16.1) DEBUG
+11/17/2012 9:41:39 PM 8772 Unloading Plugin W-MODE 1.02
+11/17/2012 9:41:39 PM 8772 Logging ended

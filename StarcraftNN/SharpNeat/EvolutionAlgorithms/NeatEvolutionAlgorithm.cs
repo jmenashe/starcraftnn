@@ -227,11 +227,6 @@ namespace SharpNeat.EvolutionAlgorithms
             }
             Debug.Assert(!TestForEmptySpecies(_specieList), "Speciation resulted in one or more empty species.");
 
-            // Sort the genomes in each specie. Fittest first (secondary sort - youngest first).
-            SortSpecieGenomes();
-             
-            // Update stats and store reference to best genome.
-            UpdateBestGenome();
             UpdateStats();
 
             // Determine the complexity regulation mode and switch over to the appropriate set of evolution
@@ -693,6 +688,8 @@ namespace SharpNeat.EvolutionAlgorithms
         /// </summary>
         public void UpdateStats()
         {
+            SortSpecieGenomes();
+            UpdateBestGenome();
             _stats._generation = _currentGeneration;
             _stats._totalEvaluationCount = _genomeListEvaluator.EvaluationCount;
 
@@ -752,7 +749,7 @@ namespace SharpNeat.EvolutionAlgorithms
         /// <summary>
         /// Sorts the genomes within each species fittest first, secondary sorts on age.
         /// </summary>
-        private void SortSpecieGenomes()
+        protected void SortSpecieGenomes()
         {
             int minSize = _specieList[0].GenomeList.Count;
             int maxSize = minSize;

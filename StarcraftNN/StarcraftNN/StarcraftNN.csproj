@@ -49,9 +49,9 @@
   <ItemGroup>
     <Compile Include="BroodwarPopulation.cs" />
     <Compile Include="OrganismInterfaces\BasicInterface.cs" />
+    <Compile Include="OrganismInterfaces\MarineFirebat12v12.cs" />
     <Compile Include="OrganismInterfaces\IOrganismInterface.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramOrig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundManager.cs" />
     <Compile Include="Utils.cs" />

@@ -25,13 +25,13 @@ namespace StarcraftNN
         /// </summary>
         private static void advanceFrames()
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 10; i++)
                 bwapiclient.BWAPIClient.update();
         }
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population = new BroodwarPopulation(new BasicInterface());
+            BroodwarPopulation population = new BroodwarPopulation(new MarineFirebat12v12());
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
@@ -47,22 +47,23 @@ namespace StarcraftNN
                         reconnect();
                     }
                 }
-                bwapi.Broodwar.setLocalSpeed(0);
+                bwapi.Broodwar.setLocalSpeed(10);
                 RoundManager manager = new RoundManager(population);
                 while (bwapi.Broodwar.isInGame())
                 {
                     bwapiclient.BWAPIClient.update();
                     manager.HandleFrame();
-                    foreach (Event e in bwapi.Broodwar.getEvents().ToList())
+                    List<Event> events = bwapi.Broodwar.getEvents().ToList();
+                    if (events.Any(x => x.type == EventType_Enum.UnitDestroy))
+                        advanceFrames();
+                    foreach (Event e in events)
                     {
                         switch(e.type)
                         {
                             case EventType_Enum.UnitCreate:
-                                advanceFrames();
                                 manager.HandleUnitCreate(e.unit);
                                 break;
                             case EventType_Enum.UnitDestroy:
-                                advanceFrames();
                                 manager.HandleUnitDestroy(e.unit);
                                 break;
                         }

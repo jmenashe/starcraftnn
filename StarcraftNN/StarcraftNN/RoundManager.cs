@@ -112,8 +112,10 @@ namespace StarcraftNN
 
         private double computeFitness()
         {
-            double score = Utils.getAllies().Count;
+            double minimum = -100;
+            double score = Utils.getAllies().Count - Utils.getEnemies().Count;
             score *= 200.0 / _frameCount;
+            score -= minimum;
             return score;
         }
     }
