@@ -11,5 +11,6 @@ namespace StarcraftNN.OrganismInterfaces
         NeatGenomeFactory CreateGenomeFactory();
         void InputActivate(NeatGenome genome);
         void UpdateState();
+        string SaveFile { get; }
     }
 }

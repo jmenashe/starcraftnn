@@ -13,6 +13,14 @@ namespace StarcraftNN.OrganismInterfaces
         private List<Unit> _allies, _enemies, _lastAttack;
         private static int UnitCount = 3;
 
+        public string SaveFile
+        {
+            get
+            {
+                return "basic";
+            }
+        }
+
         private struct ScoredUnit
         {
             public Unit unit;

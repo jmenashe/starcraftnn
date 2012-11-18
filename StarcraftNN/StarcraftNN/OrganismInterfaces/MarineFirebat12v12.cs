@@ -15,6 +15,15 @@ namespace StarcraftNN.OrganismInterfaces
         private static int FirebatCount = 6;
         private static int MarineCount = 6;
         private static int UnitCount = FirebatCount + MarineCount;
+        private static double MaxDistance = 750;
+
+        public string SaveFile
+        {
+            get
+            {
+                return "marineFirebat12v12";
+            }
+        }
 
         private struct ScoredUnit
         {
@@ -46,7 +55,7 @@ namespace StarcraftNN.OrganismInterfaces
 
         public NeatGenomeFactory CreateGenomeFactory()
         {
-            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 3), UnitCount * (UnitCount + 3));
+            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 1), UnitCount * (UnitCount + 3));
             return factory;
         }
 
@@ -56,17 +65,20 @@ namespace StarcraftNN.OrganismInterfaces
             var allyPosition = Utils.getCentroid(_allies);
             NeatGenomeDecoder decoder = new NeatGenomeDecoder(SharpNeat.Decoders.NetworkActivationScheme.CreateCyclicFixedTimestepsScheme(1));
             var blackbox = decoder.Decode(genome);
-            foreach (var ally in _allies)
+            foreach (var enemy in _enemies) 
             {
-                foreach (var enemy in _enemies)
+                foreach (var ally in _allies)
                 {
                     Position difference = enemy.getPosition().opSubtract(ally.getPosition());
                     double distance = ally.getPosition().getDistance(enemy.getPosition());
+                    distance /= MaxDistance;
                     double angle = Math.Atan2(difference.yConst(), difference.xConst());
+                    if (angle < 0) angle += 2 * Math.PI;
+                    angle /= 2 * Math.PI;
                     blackbox.InputSignalArray[sensor++] = distance;
                     blackbox.InputSignalArray[sensor++] = angle;
-                    blackbox.InputSignalArray[sensor++] = enemy.getHitPoints();
                 }
+                blackbox.InputSignalArray[sensor++] = (double)enemy.getHitPoints() / enemy.getType().maxHitPoints();
             }
             blackbox.Activate();
             for (int i = 0; i < UnitCount; i++)
@@ -83,12 +95,12 @@ namespace StarcraftNN.OrganismInterfaces
                     scoredUnits.Add(su);
                 }
                 double moveScore = blackbox.OutputSignalArray[i * UnitCount + UnitCount];
-                int moveX = (int)blackbox.OutputSignalArray[i * UnitCount + UnitCount + 1] * 10;
-                int moveY = (int)blackbox.OutputSignalArray[i * UnitCount + UnitCount + 2] * 10;
+                int moveX = (int)blackbox.OutputSignalArray[i * UnitCount + UnitCount + 1] * 1000 - 500;
+                int moveY = (int)blackbox.OutputSignalArray[i * UnitCount + UnitCount + 2] * 1000 - 500;
                 scoredUnits.Sort((x, y) => { return y.score.CompareTo(x.score); });
-                if (moveScore > scoredUnits[0].score)
+                if (moveScore >= scoredUnits[0].score)
                 {
-                    if (_lastAction[i].Type != ActionTypes.Move || _lastAction[i].Arg1 != moveX || _lastAction[i].Arg2 != moveY)
+                    if (_lastAction[i].Type != ActionTypes.Move || !ally.isMoving())
                     {
                         _lastAction[i].Type = ActionTypes.Move;
                         Position target = new Position(ally.getPosition().xConst() + moveX, ally.getPosition().yConst() + moveY);
@@ -118,8 +130,8 @@ namespace StarcraftNN.OrganismInterfaces
 
         public void UpdateState()
         {
-            _allies = Utils.getAllies();
-            _enemies = Utils.getEnemies();
+            _allies = Utils.getAllies().OrderBy(x => x.getType().getID()).ToList();
+            _enemies = Utils.getEnemies().OrderBy(x => x.getType().getID()).ToList();
             foreach (var a in _lastAction)
                 a.Type = ActionTypes.None;
         }
