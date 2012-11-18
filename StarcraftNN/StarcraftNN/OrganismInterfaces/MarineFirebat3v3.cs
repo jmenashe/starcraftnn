@@ -5,11 +5,11 @@ using System.Text;
 
 namespace StarcraftNN.OrganismInterfaces
 {
-    public class MarineFirebat12v12 : HeteroAttackMoveInterface
+    public class MarineFirebat3v3 : HeteroAttackMoveInterface
     {
         public override int UnitCount
         {
-            get { return 12; }
+            get { return 3; }
         }
     }
 }

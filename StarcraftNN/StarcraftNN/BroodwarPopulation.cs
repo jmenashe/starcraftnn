@@ -21,7 +21,13 @@ namespace StarcraftNN
         private static readonly int PopulationSize = 20;
         uint _generation = 0;
 
-        public string SaveFile
+        public string GenomeFile
+        {
+            get;
+            private set;
+        }
+
+        public string StatsFile
         {
             get;
             private set;
@@ -45,7 +51,8 @@ namespace StarcraftNN
         {
             _iface = iface;
             NeatGenomeFactory factory = _iface.CreateGenomeFactory();
-            this.SaveFile = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "sc_populations", _iface.SaveFile);
+            this.GenomeFile = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "sc_populations", _iface.SaveFile + ".xml");
+            this.StatsFile = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "sc_populations", _iface.SaveFile + ".csv");
             _algorithm = new NeatEvolutionAlgorithm<NeatGenome>();
             _algorithm.UpdateScheme = new UpdateScheme(1);
             _algorithm.UpdateEvent += (sender, e) =>
@@ -54,12 +61,13 @@ namespace StarcraftNN
                 {
                     _generation = _algorithm.CurrentGeneration;
                     Console.WriteLine("Epoch, Avg Fitness: {0:f}, Max Fitness: {1:f}", _algorithm.Statistics._meanFitness, _algorithm.Statistics._maxFitness);
-                    Save();
+                    WriteStats();
+                    SaveGenomes();
                 }
             };
             Thread t = new Thread(() =>
                 {
-                    if (File.Exists(this.SaveFile))
+                    if (File.Exists(this.GenomeFile))
                     {
                         var genomes = Load(factory);
                         _algorithm.Initialize(this, factory, genomes);
@@ -102,19 +110,46 @@ namespace StarcraftNN
             throw new NotImplementedException();
         }
 
-        public List<NeatGenome> Load(NeatGenomeFactory factory)
+        protected List<NeatGenome> Load(NeatGenomeFactory factory)
         {
             XmlDocument document = new XmlDocument();
-            document.Load(this.SaveFile);
+            document.Load(this.GenomeFile);
             List<NeatGenome> genomes = NeatGenomeXmlIO.LoadCompleteGenomeList(document, true, factory);
             return genomes;
         }
 
-        public void Save()
+        protected void SaveGenomes()
         {
             XmlDocument document = NeatGenomeXmlIO.SaveComplete(_algorithm.GenomeList, true);
-            Directory.CreateDirectory(Path.GetDirectoryName(this.SaveFile));
-            document.Save(this.SaveFile);
+            Directory.CreateDirectory(Path.GetDirectoryName(this.GenomeFile));
+            document.Save(this.GenomeFile);
+        }
+
+        protected void WriteStats()
+        {
+            if (!File.Exists(this.StatsFile))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(this.StatsFile));
+                using (StreamWriter writer = new StreamWriter(this.StatsFile))
+                {
+                    writer.WriteLine(
+                        "MaxFitness,MeanFitness,StdDevFitness," + 
+                        "MaxComplexity,MeanComplexity,StdDevComplexity," + 
+                        "MeanSpeciesChampFitness,StdDevSpeciesChampFitness," + 
+                        "MinSpeciesSize,MaxSpeciesSize,SpeciesCount," + 
+                        "Generation");
+                }
+            }
+            using (StreamWriter writer = new StreamWriter(this.StatsFile, true))
+            {
+                writer.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",
+                    _algorithm.Statistics._maxFitness, _algorithm.Statistics._meanFitness, _algorithm.Statistics._stdDevFitness,
+                    _algorithm.Statistics._maxComplexity, _algorithm.Statistics._meanComplexity, _algorithm.Statistics._stdDevComplexity,
+                    _algorithm.Statistics._meanSpecieChampFitness, _algorithm.Statistics._stdDevSpecieChampFitness,
+                    _algorithm.Statistics._minSpecieSize, _algorithm.Statistics._maxSpecieSize, _algorithm.Statistics._speciesCount,
+                    _algorithm.Statistics._generation
+                );
+            }
         }
     }
 }

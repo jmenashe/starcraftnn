@@ -114,6 +114,7 @@ namespace StarcraftNN
         {
             double minimum = -100;
             double score = Utils.getAllies().Count - Utils.getEnemies().Count;
+            score *= Math.Abs(score);
             score *= 200.0 / _frameCount;
             score -= minimum;
             return score;

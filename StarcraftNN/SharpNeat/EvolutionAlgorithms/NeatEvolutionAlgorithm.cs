@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using SharpNeat.Core;
 using SharpNeat.DistanceMetrics;
@@ -683,6 +684,21 @@ namespace SharpNeat.EvolutionAlgorithms
             _bestSpecieIdx = bestSpecieIdx;
         }
 
+        private double CalculateStdDev(IEnumerable<double> values)
+        {
+            double ret = 0;
+            if (values.Count() > 0)
+            {
+                //Compute the Average      
+                double avg = values.Average();
+                //Perform the Sum of (value-avg)_2_2      
+                double sum = values.Sum(d => Math.Pow(d - avg, 2));
+                //Put it all together      
+                ret = Math.Sqrt((sum) / (values.Count() - 1));
+            }
+            return ret;
+        }
+
         /// <summary>
         /// Updates the NeatAlgorithmStats object.
         /// </summary>
@@ -710,30 +726,18 @@ namespace SharpNeat.EvolutionAlgorithms
             }
 
             // Fitness and complexity stats.
-            double totalFitness = _genomeList[0].EvaluationInfo.Fitness;
-            double totalComplexity = _genomeList[0].Complexity;
-            double maxComplexity = totalComplexity;
 
-            int count = _genomeList.Count;
-            for(int i=1; i<count; i++) {
-                totalFitness += _genomeList[i].EvaluationInfo.Fitness;
-                totalComplexity += _genomeList[i].Complexity;
-                maxComplexity = Math.Max(maxComplexity, _genomeList[i].Complexity);
-            }
+            _stats._maxFitness = _genomeList.Max(x => x.EvaluationInfo.Fitness);
+            _stats._meanFitness = _genomeList.Average(x => x.EvaluationInfo.Fitness);
+            _stats._stdDevFitness = _genomeList.StdDev(x => x.EvaluationInfo.Fitness);
 
-            _stats._maxFitness = _currentBestGenome.EvaluationInfo.Fitness;
-            _stats._meanFitness = totalFitness / count;
+            _stats._maxComplexity = _genomeList.Max(x => x.Complexity);
+            _stats._meanComplexity = _genomeList.Average(x => x.Complexity);
+            _stats._meanComplexity = _genomeList.StdDev(x => x.Complexity);
 
-            _stats._maxComplexity = maxComplexity;
-            _stats._meanComplexity = totalComplexity / count;
-
-            // Specie champs mean fitness.
-            double totalSpecieChampFitness = _specieList[0].GenomeList[0].EvaluationInfo.Fitness;
-            int specieCount = _specieList.Count;
-            for(int i=1; i<specieCount; i++) {
-                totalSpecieChampFitness += _specieList[i].GenomeList[0].EvaluationInfo.Fitness;
-            }
-            _stats._meanSpecieChampFitness = totalSpecieChampFitness / specieCount;
+            _stats._meanSpecieChampFitness = _specieList.Average(x => x.GenomeList[0].EvaluationInfo.Fitness);
+            _stats._stdDevSpecieChampFitness = _specieList.StdDev(x => x.GenomeList[0].EvaluationInfo.Fitness);
+            _stats._speciesCount = _specieList.Count;
 
             // Moving averages.
             _stats._prevBestFitnessMA = _stats._bestFitnessMA.Mean;

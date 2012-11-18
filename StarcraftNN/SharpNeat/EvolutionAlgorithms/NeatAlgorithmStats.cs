@@ -66,6 +66,9 @@ namespace SharpNeat.EvolutionAlgorithms
         /// </summary>
         public double _meanSpecieChampFitness;
 
+        public double _stdDevFitness;
+        public double _stdDevSpecieChampFitness;
+
         #endregion
 
         #region Complexity Stats
@@ -78,6 +81,8 @@ namespace SharpNeat.EvolutionAlgorithms
         /// The mean genome complexity.
         /// </summary>
         public double _meanComplexity;
+
+        public double _stdDevComplexity;
 
         #endregion
 
@@ -113,6 +118,8 @@ namespace SharpNeat.EvolutionAlgorithms
         /// The number of genomes in the largest specie.
         /// </summary>
         public int _maxSpecieSize;
+
+        public int _speciesCount;
 
         #endregion
 
