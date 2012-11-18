@@ -91,8 +91,8 @@ namespace StarcraftNN.OrganismInterfaces
                     scoredUnits.Add(su);
                 }
                 double moveScore = blackbox.OutputSignalArray[i * UnitCount + UnitCount];
-                int moveX = (int)blackbox.OutputSignalArray[i * UnitCount + UnitCount + 1] * 1000 - 500;
-                int moveY = (int)blackbox.OutputSignalArray[i * UnitCount + UnitCount + 2] * 1000 - 500;
+                int moveX = (int)(blackbox.OutputSignalArray[i * UnitCount + UnitCount + 1] * 1000 - 500);
+                int moveY = (int)(blackbox.OutputSignalArray[i * UnitCount + UnitCount + 2] * 1000 - 500);
                 scoredUnits.Sort((x, y) => { return y.score.CompareTo(x.score); });
                 if (moveScore >= scoredUnits[0].score)
                 {
