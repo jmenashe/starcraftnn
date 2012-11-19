@@ -5,10 +5,11 @@ using System.Text;
 using SWIG.BWAPI;
 using SharpNeat.Genomes.Neat;
 using SharpNeat.Decoders.Neat;
+using SharpNeat.Phenomes;
 
 namespace StarcraftNN.OrganismInterfaces
 {
-    public abstract class HeteroAttackMoveInterface : IOrganismInterface
+    public abstract class HeteroAttackMoveInterface : ISquad
     {
         private List<Unit> _allies, _enemies;
         private List<Action> _lastAction;
@@ -39,7 +40,13 @@ namespace StarcraftNN.OrganismInterfaces
         {
             public ActionTypes Type { get; set; }
             public int Arg1 { get; set; }
-            public int Arg2 { get; set; }
+            public bool Arg2 { get; set; }
+        }
+
+        public NeatGenomeDecoder Decoder
+        {
+            get;
+            protected set;
         }
 
         public HeteroAttackMoveInterface()
@@ -47,21 +54,29 @@ namespace StarcraftNN.OrganismInterfaces
             _lastAction = new List<Action>();
             for (int i = 0; i < UnitCount; i++)
                 _lastAction.Add(new Action { Type = ActionTypes.None });
+            this.Decoder = new NeatGenomeDecoder(SharpNeat.Decoders.NetworkActivationScheme.CreateCyclicFixedTimestepsScheme(10));
         }
 
         public NeatGenomeFactory CreateGenomeFactory()
         {
-            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 1), UnitCount * (UnitCount + 3));
+            NeatGenomeParameters param = new NeatGenomeParameters();
+            param.AddConnectionMutationProbability = 0.1;
+            param.AddNodeMutationProbability = 0.1;
+            param.ConnectionWeightMutationProbability = 0.8;
+            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 2), UnitCount * (UnitCount + 4), param);
             return factory;
         }
 
-        public void InputActivate(NeatGenome genome)
+        protected IBlackBox Input(NeatGenome genome)
         {
             int sensor = 0;
             var allyPosition = Utils.getCentroid(_allies);
-            NeatGenomeDecoder decoder = new NeatGenomeDecoder(SharpNeat.Decoders.NetworkActivationScheme.CreateCyclicFixedTimestepsScheme(1));
-            var blackbox = decoder.Decode(genome);
-            foreach (var enemy in _enemies) 
+            var blackbox = this.Decoder.Decode(genome);
+            foreach (var ally in _allies)
+                blackbox.InputSignalArray[sensor++] = (double)ally.getHitPoints() / ally.getType().maxHitPoints();
+            foreach (var enemy in _enemies)
+                blackbox.InputSignalArray[sensor++] = (double)enemy.getHitPoints() / enemy.getType().maxHitPoints();
+            foreach (var enemy in _enemies)
             {
                 foreach (var ally in _allies)
                 {
@@ -74,8 +89,12 @@ namespace StarcraftNN.OrganismInterfaces
                     blackbox.InputSignalArray[sensor++] = distance;
                     blackbox.InputSignalArray[sensor++] = angle;
                 }
-                blackbox.InputSignalArray[sensor++] = (double)enemy.getHitPoints() / enemy.getType().maxHitPoints();
             }
+            return blackbox;
+        }
+
+        protected void Activate(IBlackBox blackbox)
+        {
             blackbox.Activate();
             for (int i = 0; i < UnitCount; i++)
             {
@@ -91,19 +110,24 @@ namespace StarcraftNN.OrganismInterfaces
                     scoredUnits.Add(su);
                 }
                 double moveScore = blackbox.OutputSignalArray[i * UnitCount + UnitCount];
-                int moveX = (int)(blackbox.OutputSignalArray[i * UnitCount + UnitCount + 1] * 1000 - 500);
-                int moveY = (int)(blackbox.OutputSignalArray[i * UnitCount + UnitCount + 2] * 1000 - 500);
+                double moveDistance = blackbox.OutputSignalArray[i * UnitCount + UnitCount + 1] * 100;
+                int moveTheta = (int)(blackbox.OutputSignalArray[i * UnitCount + UnitCount + 2] * Math.PI);
+                bool moveFlip = blackbox.OutputSignalArray[i * UnitCount + UnitCount + 3] > 0.5;
                 scoredUnits.Sort((x, y) => { return y.score.CompareTo(x.score); });
                 if (moveScore >= scoredUnits[0].score)
                 {
                     if (_lastAction[i].Type != ActionTypes.Move || !ally.isMoving())
                     {
                         _lastAction[i].Type = ActionTypes.Move;
-                        Position target = new Position(ally.getPosition().xConst() + moveX, ally.getPosition().yConst() + moveY);
+                        if (moveFlip)
+                            moveTheta = -moveTheta;
+                        int dx = (int)(moveDistance * Math.Cos(moveTheta));
+                        int dy = (int)(moveDistance * Math.Sin(moveTheta));
+                        Position target = new Position(ally.getPosition().xConst() + dx, ally.getPosition().yConst() + dy);
                         ally.move(target);
                         _lastAction[i].Type = ActionTypes.Move;
-                        _lastAction[i].Arg1 = moveX;
-                        _lastAction[i].Arg2 = moveY;
+                        _lastAction[i].Arg1 = moveTheta;
+                        _lastAction[i].Arg2 = moveFlip;
                         continue;
                     }
                 }
@@ -124,12 +148,34 @@ namespace StarcraftNN.OrganismInterfaces
             }
         }
 
-        public void UpdateState()
+        public void InputActivate(NeatGenome genome)
         {
-            _allies = Utils.getAllies().OrderBy(x => x.getType().getID()).ToList();
-            _enemies = Utils.getEnemies().OrderBy(x => x.getType().getID()).ToList();
+            var blackbox = this.Input(genome);
+            this.Activate(blackbox);
+        }
+
+        public void UpdateState(IEnumerable<Unit> allies, IEnumerable<Unit> enemies)
+        {
+            _allies = allies.OrderBy(x => x.getType().getID()).ToList();
+            _enemies = enemies.OrderBy(x => x.getType().getID()).ToList();
             foreach (var a in _lastAction)
                 a.Type = ActionTypes.None;
+        }
+
+        public void UpdateState()
+        {
+            this.UpdateState(Utils.getAllies(), Utils.getEnemies());
+        }
+
+        public double ComputeFitness(int frameCount)
+        {
+            double maxScale = 4;
+            double minimum = -(UnitCount * UnitCount) * maxScale;
+            double score = Utils.getAllies().Count - Utils.getEnemies().Count;
+            score *= Math.Abs(score);
+            score *= 200.0 / frameCount;
+            score -= minimum;
+            return score;
         }
     }
 }

@@ -17,6 +17,7 @@
  * along with SharpNEAT.  If not, see <http://www.gnu.org/licenses/>.
  */
 using SharpNeat.Network;
+using System.Diagnostics;
 
 // Disable missing comment warnings for non-private variables.
 #pragma warning disable 1591
@@ -172,7 +173,11 @@ namespace SharpNeat.Phenomes.NeuralNets
                 // Loop connections. Get each connection's input signal, apply the weight and add the result to 
                 // the preactivation signal of the target neuron.
                 for(int j=0; j<_connectionArray.Length; j++) {
-                    _preActivationArray[_connectionArray[j]._tgtNeuronIdx] += _postActivationArray[_connectionArray[j]._srcNeuronIdx] * _connectionArray[j]._weight;
+                    int tgtIndex = _connectionArray[j]._tgtNeuronIdx;
+                    int srcIndex = _connectionArray[j]._srcNeuronIdx;
+                    double value = _postActivationArray[srcIndex] * _connectionArray[j]._weight;
+                    _preActivationArray[tgtIndex] += value;
+                    Debug.Assert(value != double.NaN, "Activation value must be a valid number.");
                 }
 
                 // Loop the neurons. Pass each neuron's pre-activation signals through its activation function

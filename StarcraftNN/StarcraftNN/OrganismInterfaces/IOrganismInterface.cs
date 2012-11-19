@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SharpNeat.Genomes.Neat;
+using SWIG.BWAPI;
 
 namespace StarcraftNN.OrganismInterfaces
 {
@@ -12,5 +13,6 @@ namespace StarcraftNN.OrganismInterfaces
         void InputActivate(NeatGenome genome);
         void UpdateState();
         string SaveFile { get; }
+        double ComputeFitness(int frameCount);
     }
 }

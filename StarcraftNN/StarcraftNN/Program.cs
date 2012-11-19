@@ -31,13 +31,13 @@ namespace StarcraftNN
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population = new BroodwarPopulation(new MarineFirebat3v3());
+            BroodwarPopulation population = new BroodwarPopulation(new MarineFirebat4v4());
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
+            int speed = 0;
             while (true)
             {
-                System.Console.WriteLine("waiting to enter match\n");
                 while (!bwapi.Broodwar.isInGame())
                 {
                     bwapiclient.BWAPIClient.update();
@@ -47,7 +47,7 @@ namespace StarcraftNN
                         reconnect();
                     }
                 }
-                bwapi.Broodwar.setLocalSpeed(10);
+                bwapi.Broodwar.setLocalSpeed(speed);
                 RoundManager manager = new RoundManager(population);
                 while (bwapi.Broodwar.isInGame())
                 {

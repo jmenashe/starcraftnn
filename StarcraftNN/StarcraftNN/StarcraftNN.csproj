@@ -49,10 +49,14 @@
   <ItemGroup>
     <Compile Include="BroodwarPopulation.cs" />
     <Compile Include="OrganismInterfaces\BasicInterface.cs" />
+    <Compile Include="OrganismInterfaces\ISquad.cs" />
+    <Compile Include="OrganismInterfaces\MarineFirebat4v4.cs" />
     <Compile Include="OrganismInterfaces\HeteroAttackMoveInterface.cs" />
     <Compile Include="OrganismInterfaces\IOrganismInterface.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat12v12.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat3v3.cs" />
+    <Compile Include="OrganismInterfaces\MarineFirebatSquads12v12.cs" />
+    <Compile Include="OrganismInterfaces\Squad.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundManager.cs" />

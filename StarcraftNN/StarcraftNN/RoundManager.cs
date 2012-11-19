@@ -67,8 +67,7 @@ namespace StarcraftNN
         {
             _resetting = true;
             _completionSignaled = false;
-            double fitness = computeFitness();
-            _population.EndIteration(fitness);
+            _population.EndIteration(_frameCount);
             signalCompletion();
         }
 
@@ -108,16 +107,6 @@ namespace StarcraftNN
                 return true;
             }
             return false;
-        }
-
-        private double computeFitness()
-        {
-            double minimum = -100;
-            double score = Utils.getAllies().Count - Utils.getEnemies().Count;
-            score *= Math.Abs(score);
-            score *= 200.0 / _frameCount;
-            score -= minimum;
-            return score;
         }
     }
 }

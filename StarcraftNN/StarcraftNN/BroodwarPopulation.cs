@@ -19,6 +19,8 @@ namespace StarcraftNN
         NeatEvolutionAlgorithm<NeatGenome> _algorithm;
         private NeatGenome _currentGenome;
         private static readonly int PopulationSize = 20;
+        private static readonly int FitnessTrials = 5;
+        private List<double> _fitnessResults = new List<double>();
         uint _generation = 0;
 
         public string GenomeFile
@@ -60,7 +62,7 @@ namespace StarcraftNN
                 if (_algorithm.CurrentGeneration != _generation)
                 {
                     _generation = _algorithm.CurrentGeneration;
-                    Console.WriteLine("Epoch, Avg Fitness: {0:f}, Max Fitness: {1:f}", _algorithm.Statistics._meanFitness, _algorithm.Statistics._maxFitness);
+                    Console.WriteLine("-------------Epoch, Avg Fitness: {0:f}, Max Fitness: {1:f}", _algorithm.Statistics._meanFitness, _algorithm.Statistics._maxFitness);
                     WriteStats();
                     SaveGenomes();
                 }
@@ -89,16 +91,22 @@ namespace StarcraftNN
             _iface.UpdateState();
         }
 
-        public void EndIteration(double fitness)
+        public void EndIteration(int frameCount)
         {
-            _currentGenome.EvaluationInfo.SetFitness(fitness);
-            Console.WriteLine("Fitness: {0:f}", _currentGenome.EvaluationInfo.Fitness);
+            double fitness = _iface.ComputeFitness(frameCount);
+            _fitnessResults.Add(fitness);
+            if (_fitnessResults.Count == FitnessTrials)
+            {
+                _currentGenome.EvaluationInfo.SetFitness(_fitnessResults.Average());
+                Console.WriteLine("Fitness Avg: {0:f} Max: {1:f} Min: {2:f}", _currentGenome.EvaluationInfo.Fitness, _fitnessResults.Max(), _fitnessResults.Min());
+            }
         }
 
         public void Evaluate(IList<NeatGenome> genomeList)
         {
             foreach (var genome in genomeList)
             {
+                _fitnessResults.Clear();
                 _currentGenome = genome;
                 while (!_currentGenome.EvaluationInfo.IsEvaluated)
                     Thread.Sleep(250);

@@ -90,5 +90,16 @@ namespace StarcraftNN.OrganismInterfaces
             _allies = Utils.getAllies();
             _enemies = Utils.getEnemies();
         }
+
+        public double ComputeFitness(int frameCount)
+        {
+            double maxScale = 4;
+            double minimum = -(UnitCount * UnitCount) * maxScale;
+            double score = Utils.getAllies().Count - Utils.getEnemies().Count;
+            score *= Math.Abs(score);
+            score *= 200.0 / frameCount;
+            score -= minimum;
+            return score;
+        }
     }
 }
