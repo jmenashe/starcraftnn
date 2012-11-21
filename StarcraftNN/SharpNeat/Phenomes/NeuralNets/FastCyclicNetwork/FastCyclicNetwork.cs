@@ -175,9 +175,10 @@ namespace SharpNeat.Phenomes.NeuralNets
                 for(int j=0; j<_connectionArray.Length; j++) {
                     int tgtIndex = _connectionArray[j]._tgtNeuronIdx;
                     int srcIndex = _connectionArray[j]._srcNeuronIdx;
-                    double value = _postActivationArray[srcIndex] * _connectionArray[j]._weight;
+                    double weight = _connectionArray[j]._weight;
+                    double value = _postActivationArray[srcIndex] * weight;
                     _preActivationArray[tgtIndex] += value;
-                    Debug.Assert(value != double.NaN, "Activation value must be a valid number.");
+                    Debug.Assert(!double.IsNaN(value), "Activation value must be a valid number.");
                 }
 
                 // Loop the neurons. Pass each neuron's pre-activation signals through its activation function

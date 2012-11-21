@@ -18,7 +18,7 @@ namespace StarcraftNN
         private IOrganismInterface _iface;
         NeatEvolutionAlgorithm<NeatGenome> _algorithm;
         private NeatGenome _currentGenome;
-        private static readonly int PopulationSize = 20;
+        private static readonly int PopulationSize = 100;
         private static readonly int FitnessTrials = 5;
         private List<double> _fitnessResults = new List<double>();
         uint _generation = 0;

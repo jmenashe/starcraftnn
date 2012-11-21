@@ -31,10 +31,23 @@ namespace StarcraftNN
             return new Position(avgX, avgY);
         }
 
-        public static bool unitExists(Unit unit)
+        public static bool isShortRange(Unit unit)
         {
-            unit = bwapi.Broodwar.getUnit(unit.getID());
-            return unit != null;
+            return unit.getType().getID().In(
+                bwapi.UnitTypes_Terran_SCV.getID(),
+                bwapi.UnitTypes_Terran_Vulture.getID(),
+                bwapi.UnitTypes_Protoss_Zealot.getID(),
+                bwapi.UnitTypes_Zerg_Zergling.getID()
+            );
+        }
+
+        public static bool isLongRange(Unit unit)
+        {
+            return unit.getType().getID().In(
+                bwapi.UnitTypes_Terran_Marine.getID(),
+                bwapi.UnitTypes_Terran_Ghost.getID(),
+                bwapi.UnitTypes_Terran_Wraith.getID()
+            );
         }
     }
 }
