@@ -48,7 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BroodwarPopulation.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="OrganismInterfaces\BasicInterface.cs" />
+    <Compile Include="OrganismInterfaces\IndividualControlInterface.cs" />
     <Compile Include="OrganismInterfaces\ISquad.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat4v4.cs" />
     <Compile Include="OrganismInterfaces\HeteroAttackMoveInterface.cs" />
