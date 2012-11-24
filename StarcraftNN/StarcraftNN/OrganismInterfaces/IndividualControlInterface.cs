@@ -7,17 +7,25 @@ using SharpNeat.Genomes.Neat;
 using SharpNeat.Decoders.Neat;
 using SharpNeat.Phenomes;
 using StarcraftNN;
+using System.Diagnostics;
 
 namespace StarcraftNN.OrganismInterfaces
 {
     public abstract class IndividualControlInterface : IOrganismInterface
     {
         private List<Unit> _allies, _enemies;
-        int _startEnemyCount;
+        int _startEnemyHealth;
         private Dictionary<Unit, Action> _lastAction;
-        private static int ThetaBins = 6;
-        private static int DistanceBins = 3;
-        private static int DistanceRange = 50;
+        protected static readonly int ThetaBins = 9;
+        private static double[] DistanceRanges = { 0, 30, 100, 500, double.PositiveInfinity };
+
+        protected static int DistanceBins
+        {
+            get
+            {
+                return DistanceRanges.Length - 1;
+            }
+        }
 
 
         public string SaveFile
@@ -25,18 +33,24 @@ namespace StarcraftNN.OrganismInterfaces
             get { return this.GetType().Name; }
         }
 
-        private struct ScoredUnit
-        {
-            public Unit unit;
-            public double score;
-            public int index;
-        }
-
         private enum ActionTypes
         {
-            Attack,
+            AttackShort,
+            AttackLong,
             Move,
             None
+        }
+
+        private struct ScoredAction
+        {
+            public ActionTypes action;
+            public double score;
+        }
+
+        private struct ScoredBin
+        {
+            public int bin;
+            public double score;
         }
 
         private class Action
@@ -66,141 +80,146 @@ namespace StarcraftNN.OrganismInterfaces
             // input: 
                 // single: is short range
                 // per bin:
-                    // ally/enemy hit points over max
-                    // ally/enemy count out of all
-                    // ally count / enemy count
+                    // enemy hit points over max in bin
+                    // enemy count out of all
                     // has short range
-                    // has long range
             // output (all per bin): 
                 // move to bin
                 // attack short range
                 // attack long range
-            NeatGenomeFactory factory = new NeatGenomeFactory(DistanceBins * ThetaBins * 7 + 1, DistanceBins * ThetaBins * 3, param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(DistanceBins * ThetaBins * 3 + 1, 4 + DistanceBins * ThetaBins, param);
             return factory;
         }
 
-        protected IBlackBox Input(Unit ally, NeatGenome genome)
+        protected void Input(Unit ally, IBlackBox blackbox)
         {
             int sensor = 0;
-            var blackbox = this.Decoder.Decode(genome);
-            var binnedAllies = getUnitsInBins(ally, true);
-            var binnedEnemies = getUnitsInBins(ally, false);
+            var binnedEnemies = getUnitsInBins(ally);
+            var allEnemyCount = _enemies.Where(x => x.exists()).Count();
             blackbox.InputSignalArray[sensor++] = Utils.isShortRange(ally) ? 1 : -1;
             for (int bin = 0; bin < ThetaBins * DistanceBins; bin++)
             {
-                var allies = binnedAllies[bin];
                 var enemies = binnedEnemies[bin];
-                int allyHP = allies.Sum(x => x.getHitPoints());
-                int allyMaxHP = allies.Sum(x => x.getType().maxHitPoints());
                 int enemyHP = enemies.Sum(x => x.getHitPoints());
                 int enemyMaxHP = enemies.Sum(x => x.getType().maxHitPoints());
                 bool hasShortRange = enemies.Any(x => Utils.isShortRange(x));
-                bool hasLongRange = enemies.Any(x => Utils.isLongRange(x));
-                blackbox.InputSignalArray[sensor++] = (double)allyHP / allyMaxHP;
-                blackbox.InputSignalArray[sensor++] = (double)enemyHP / enemyMaxHP;
-                blackbox.InputSignalArray[sensor++] = (double)allies.Count / _allies.Count;
-                blackbox.InputSignalArray[sensor++] = (double)enemies.Count / _enemies.Count;
-                blackbox.InputSignalArray[sensor++] = (double)allies.Count / enemies.Count;
+                blackbox.InputSignalArray[sensor++] = enemies.Count == 0 ? 0 : (double)enemyHP / enemyMaxHP;
+                blackbox.InputSignalArray[sensor++] = (double)enemies.Count / allEnemyCount;
                 blackbox.InputSignalArray[sensor++] = hasShortRange ? 1 : -1;
-                blackbox.InputSignalArray[sensor++] = hasLongRange ? 1 : -1;
             }
-            return blackbox;
         }
 
         protected void Activate(Unit ally, IBlackBox blackbox)
         {
             blackbox.Activate();
-            double maxScore = 0;
-            int maxBin = 0, maxIndex = 0;
+            List<ScoredBin> sbins = new List<ScoredBin>();
+            int signal = 0;
+            List<ScoredAction> sactions = new List<ScoredAction>();
+            double moveDistance = blackbox.OutputSignalArray[signal++];
+            for (int i = 0; i < 3; i++)
+            {
+                ScoredAction sa;
+                sa.score = blackbox.OutputSignalArray[signal++];
+                switch(i)
+                {
+                    case 0: sa.action = ActionTypes.Move; break;
+                    case 1: sa.action = ActionTypes.AttackLong; break;
+                    case 2: sa.action = ActionTypes.AttackShort; break;
+                    default: sa.action = ActionTypes.None; break;
+                }
+                sactions.Add(sa);
+            }
+            sactions = sactions.OrderByDescending(x => x.score).ToList();
             for (int bin = 0; bin < ThetaBins * DistanceBins; bin++)
             {
-                for (int i = 0; i < 3; i++)
-                {
-                    double score = blackbox.InputSignalArray[3 * bin + i];
-                    if (score > maxScore)
-                    {
-                        maxBin = bin;
-                        maxIndex = i;
-                        maxScore = score;
-                    }
-                }
+                ScoredBin sbin;
+                sbin.bin = bin;
+                sbin.score = blackbox.OutputSignalArray[signal++];
+                sbins.Add(sbin);
             }
-            var enemyBins = getUnitsInBins(ally, false);
-            var enemies = enemyBins[maxBin];
-            Unit weakest;
-            switch(maxIndex)
+            var enemyBins = getUnitsInBins(ally);
+            sbins = sbins.OrderByDescending(x => x.score).ToList();
+            ActionTypes action = sactions[0].action;
+            foreach (var sbin in sbins)
             {
-                case 0:
-                    if (_lastAction[ally].Type != ActionTypes.Move || !ally.isMoving())
-                    {
-                        Position center = getCenter(ally, maxBin);
-                        ally.move(center);
-                        _lastAction[ally].Type = ActionTypes.Move;
-                    }
-                    break;
-                case 1:
-                case 2:
-                    if (_lastAction[ally].Type != ActionTypes.Attack)
-                    {
-                        weakest = enemies
-                            .Where(x => maxIndex != 1 ||  Utils.isShortRange(x))
-                            .Where(x => maxIndex != 2 || Utils.isLongRange(x))
-                            .Where(x => x.getHitPoints() == enemyBins[maxBin].Min(y => y.getHitPoints())).First();
-                        if (_lastAction[ally].Target != weakest || !ally.isAttacking())
-                            ally.attack(weakest);
-                        _lastAction[ally].Type = ActionTypes.Attack;
-                        _lastAction[ally].Target = weakest;
-                    }
-                    break;
+                var enemies = enemyBins[sbin.bin];
+                if (enemies.Count == 0) continue;
+                switch (action)
+                {
+                    case ActionTypes.Move:
+                        if (_lastAction[ally].Type != ActionTypes.Move || !ally.isMoving())
+                        {
+                            Position center = getMovePosition(ally, sbin.bin, moveDistance);
+                            ally.move(center);
+                            _lastAction[ally].Type = ActionTypes.Move;
+                        }
+                        break;
+                    case ActionTypes.AttackLong:
+                    case ActionTypes.AttackShort:
+                        if (_lastAction[ally].Type != action)
+                        {
+                            IEnumerable<Unit> subgroup = null;
+                            switch (action)
+                            {
+                                case  ActionTypes.AttackShort:
+                                    subgroup = enemies.Where(x => Utils.isShortRange(x));
+                                    break;
+                                case ActionTypes.AttackLong:
+                                    subgroup = enemies.Where(x => Utils.isLongRange(x));
+                                    break;
+                            }
+                            Debug.Assert(subgroup != null);
+                            if (!subgroup.Any()) break;
+                            var selection = subgroup
+                                .Where(x => x.getID() == subgroup.Min(y => y.getID())).Single();
+                            if (_lastAction[ally].Target != selection || !ally.isAttacking())
+                                ally.attack(selection);
+                            _lastAction[ally].Type = action;
+                            _lastAction[ally].Target = selection;
+                        }
+                        break;
+                }
+                break;
             }
         }
 
         protected void getLogPolarBounds(int bin, out double d0, out double d1, out double t0, out double t1)
         {
-            //distance bins: 0-50, 50-150, 150-350, 350-750
+            Debug.Assert(0 <= bin && bin < DistanceBins * ThetaBins);
             d0 = 0;
-            d1 = DistanceRange;
-            double dRange = DistanceRange;
-            int b = 0;
-            for (int dbin = 0; dbin < DistanceBins; dbin++)
-            {
-                for (int tbin = 0; tbin < ThetaBins; tbin++)
-                {
-                    if (b == bin)
-                    {
-                        double tRange = Math.PI / (ThetaBins / 2);
-                        t0 = (dbin - (double)ThetaBins / 2) * tRange;
-                        t1 = ((dbin + 1) - (double)ThetaBins / 2) * tRange;
-                        return;
-                    }
-                    b++;
-                }
-                d0 = d1; d1 += (dRange *= 2);
-            }
-            throw new Exception(string.Format("Bins must be between zero and {0}.", DistanceBins * ThetaBins));
+
+            int tbin = bin % ThetaBins;
+            double tRange = 2 * Math.PI / ThetaBins;
+            t0 = tRange * tbin;
+            t1 = tRange * (tbin + 1);
+
+            int dbin = (bin - tbin) / ThetaBins;
+            d0 = DistanceRanges[dbin];
+            d1 = DistanceRanges[dbin + 1];
         }
 
-        protected Position getCenter(Unit ally, int bin)
+        protected Position getMovePosition(Unit ally, int bin, double moveDistance)
         {
             double d0, d1, t0, t1;
             getLogPolarBounds(bin, out d0, out d1, out t0, out t1);
-            double dAvg = (d0 + d1) / 2;
+            double distance = Math.Pow(10, moveDistance * 3);
             double tAvg = (t0 + t1) / 2;
 
-            int dx = (int)(dAvg * Math.Cos(tAvg));
-            int dy = (int)(dAvg * Math.Sin(tAvg));
+            int dx = (int)(distance * Math.Cos(tAvg));
+            int dy = (int)(distance * Math.Sin(tAvg));
             Position center = new Position(ally.getPosition().xConst() + dx, ally.getPosition().yConst() + dy);
             return center;
         }
 
-        protected List<List<Unit>> getUnitsInBins(Unit referenceUnit, bool allies)
+        protected List<List<Unit>> getUnitsInBins(Unit referenceUnit, bool allies = false)
         {
-            IEnumerable<Unit> allUnits = allies ? Utils.getAllies() : Utils.getEnemies();
+            IEnumerable<Unit> allUnits = allies ? _allies : _enemies;
             List<List<Unit>> binnedUnits = new List<List<Unit>>();
             for (int bin = 0; bin < DistanceBins * ThetaBins; bin++)
             {
-                binnedUnits.Add(new List<Unit>());
-                foreach (var unit in allUnits)
+                List<Unit> last = new List<Unit>();
+                binnedUnits.Add(last);
+                foreach (var unit in allUnits.Where(x => x.exists()))
                 {
                     double d0, d1, t0, t1;
                     getLogPolarBounds(bin, out d0, out d1, out t0, out t1);
@@ -209,7 +228,7 @@ namespace StarcraftNN.OrganismInterfaces
                     Position difference = unit.getPosition().opSubtract(referenceUnit.getPosition());
                     double theta = Math.Atan2(difference.yConst(), difference.xConst());
                     if (d0 <= distance && d1 > distance && t0 <= theta && t1 > theta)
-                        binnedUnits.Last().Add(unit);
+                        last.Add(unit);
                 }
             }
             return binnedUnits;
@@ -217,9 +236,10 @@ namespace StarcraftNN.OrganismInterfaces
 
         public void InputActivate(NeatGenome genome)
         {
+            var blackbox = this.Decoder.Decode(genome);
             foreach (var ally in _allies)
             {
-                var blackbox = this.Input(ally, genome);
+                this.Input(ally, blackbox);
                 this.Activate(ally, blackbox);
             }
         }
@@ -228,7 +248,7 @@ namespace StarcraftNN.OrganismInterfaces
         {
             _allies = allies.OrderBy(x => x.getType().getID()).ToList();
             _enemies = enemies.OrderBy(x => x.getType().getID()).ToList();
-            _startEnemyCount = _enemies.Count;
+            _startEnemyHealth = _enemies.Sum(x => x.getType().maxHitPoints());
             _lastAction.Clear();
             foreach (var ally in allies)
             {
@@ -245,8 +265,8 @@ namespace StarcraftNN.OrganismInterfaces
         public double ComputeFitness(int frameCount)
         {
             double maxScale = 4;
-            double minimum = -(_startEnemyCount * _startEnemyCount) * maxScale;
-            double score = Utils.getAllies().Count - Utils.getEnemies().Count;
+            double minimum = -(_startEnemyHealth * _startEnemyHealth) * maxScale;
+            double score = _allies.Sum(x => x.getHitPoints()) - _enemies.Sum(x => x.getHitPoints());
             score *= Math.Abs(score);
             score *= 200.0 / frameCount;
             score -= minimum;

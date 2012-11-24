@@ -31,7 +31,7 @@ namespace StarcraftNN
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population = new BroodwarPopulation(new MarineFirebat4v4());
+            BroodwarPopulation population = new BroodwarPopulation(new MarineFirebatIndividual4v4());
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
@@ -65,6 +65,9 @@ namespace StarcraftNN
                                 break;
                             case EventType_Enum.UnitDestroy:
                                 manager.HandleUnitDestroy(e.unit);
+                                break;
+                            case EventType_Enum.MatchEnd:
+                                manager.HandleMatchEnd();
                                 break;
                         }
                     }

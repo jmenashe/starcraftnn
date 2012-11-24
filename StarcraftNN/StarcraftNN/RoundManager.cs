@@ -108,5 +108,10 @@ namespace StarcraftNN
             }
             return false;
         }
+
+        public void HandleMatchEnd()
+        {
+            _population.EndIteration(_frameCount);
+        }
     }
 }

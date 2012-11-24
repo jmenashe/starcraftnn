@@ -18,7 +18,7 @@ namespace StarcraftNN
         private IOrganismInterface _iface;
         NeatEvolutionAlgorithm<NeatGenome> _algorithm;
         private NeatGenome _currentGenome;
-        private static readonly int PopulationSize = 100;
+        private static readonly int PopulationSize = 50;
         private static readonly int FitnessTrials = 5;
         private List<double> _fitnessResults = new List<double>();
         uint _generation = 0;
@@ -98,7 +98,7 @@ namespace StarcraftNN
             if (_fitnessResults.Count == FitnessTrials)
             {
                 _currentGenome.EvaluationInfo.SetFitness(_fitnessResults.Average());
-                Console.WriteLine("Fitness Avg: {0:f} Max: {1:f} Min: {2:f}", _currentGenome.EvaluationInfo.Fitness, _fitnessResults.Max(), _fitnessResults.Min());
+                Console.WriteLine("Fitness Avg: {0:N0} Max: {1:N0} Min: {2:N0}", _currentGenome.EvaluationInfo.Fitness, _fitnessResults.Max(), _fitnessResults.Min());
             }
         }
 
