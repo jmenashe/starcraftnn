@@ -6,6 +6,7 @@ using SWIG.BWAPI;
 using SharpNeat.Genomes.Neat;
 using SharpNeat.Decoders.Neat;
 using SharpNeat.Phenomes;
+using System.Diagnostics;
 
 namespace StarcraftNN.OrganismInterfaces
 {
@@ -73,9 +74,21 @@ namespace StarcraftNN.OrganismInterfaces
             var allyPosition = Utils.getCentroid(_allies);
             var blackbox = this.Decoder.Decode(genome);
             foreach (var ally in _allies)
-                blackbox.InputSignalArray[sensor++] = (double)ally.getHitPoints() / ally.getType().maxHitPoints();
+            {
+                double health;
+                if (ally.exists())
+                    health = (double)ally.getHitPoints() / ally.getType().maxHitPoints();
+                else health = 0;
+                blackbox.InputSignalArray[sensor++] = health;
+            }
             foreach (var enemy in _enemies)
-                blackbox.InputSignalArray[sensor++] = (double)enemy.getHitPoints() / enemy.getType().maxHitPoints();
+            {
+                double health;
+                if (enemy.exists())
+                    health = (double)enemy.getHitPoints() / enemy.getType().maxHitPoints();
+                else health = 0;
+                blackbox.InputSignalArray[sensor++] = health;
+            }
             foreach (var enemy in _enemies)
             {
                 foreach (var ally in _allies)

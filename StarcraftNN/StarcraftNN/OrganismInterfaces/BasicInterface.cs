@@ -67,11 +67,11 @@ namespace StarcraftNN.OrganismInterfaces
                     scoredUnits.Add(su);
                 }
                 scoredUnits.Sort((x, y) => { return y.score.CompareTo(x.score); });
-                if (Utils.unitExists(ally))
+                if (ally.exists())
                 {
                     foreach (var enemy in _enemies)
                     {
-                        if (Utils.unitExists(enemy))
+                        if (enemy.exists())
                         {
                             if (_lastAttack[i] != enemy)
                             {
