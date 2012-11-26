@@ -49,5 +49,35 @@ namespace StarcraftNN
                 bwapi.UnitTypes_Terran_Wraith.getID()
             );
         }
+
+        public static bool isAir(Unit unit)
+        {
+            return unit.getType().getID().In(
+                bwapi.UnitTypes_Terran_Battlecruiser.getID(),
+                bwapi.UnitTypes_Terran_Wraith.getID(),
+                bwapi.UnitTypes_Terran_Valkyrie.getID()
+            );
+        }
+
+        public static bool hasAttackAirBonus(Unit unit)
+        {
+            return unit.getType().getID().In(
+                bwapi.UnitTypes_Terran_Valkyrie.getID(),
+                bwapi.UnitTypes_Terran_Goliath.getID()
+            );
+        }
+
+        public static bool isMachine(Unit unit)
+        {
+            return unit.getType().getID().In(
+                bwapi.UnitTypes_Terran_Battlecruiser.getID(),
+                bwapi.UnitTypes_Terran_Wraith.getID(),
+                bwapi.UnitTypes_Terran_Valkyrie.getID(),
+                bwapi.UnitTypes_Terran_Siege_Tank_Siege_Mode.getID(),
+                bwapi.UnitTypes_Terran_Siege_Tank_Tank_Mode.getID(),
+                bwapi.UnitTypes_Terran_SCV.getID(),
+                bwapi.UnitTypes_Terran_Goliath.getID()
+            );
+        }
     }
 }

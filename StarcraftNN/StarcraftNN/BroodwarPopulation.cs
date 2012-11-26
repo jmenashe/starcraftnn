@@ -98,7 +98,7 @@ namespace StarcraftNN
             if (_fitnessResults.Count == FitnessTrials)
             {
                 _currentGenome.EvaluationInfo.SetFitness(_fitnessResults.Average());
-                Console.WriteLine("Fitness Avg: {0:N0} Max: {1:N0} Min: {2:N0}", _currentGenome.EvaluationInfo.Fitness, _fitnessResults.Max(), _fitnessResults.Min());
+                Console.WriteLine("Fitness Avg: {0:f3} Max: {1:f3} Min: {2:f3}", _currentGenome.EvaluationInfo.Fitness, _fitnessResults.Max(), _fitnessResults.Min());
             }
         }
 

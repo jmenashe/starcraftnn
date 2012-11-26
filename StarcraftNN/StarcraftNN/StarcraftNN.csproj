@@ -50,6 +50,8 @@
     <Compile Include="BroodwarPopulation.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="OrganismInterfaces\BasicInterface.cs" />
+    <Compile Include="OrganismInterfaces\HeteroIndividual20v20.cs" />
+    <Compile Include="OrganismInterfaces\MarineFirebatIndividual12v12.cs" />
     <Compile Include="OrganismInterfaces\LogPolarBinInterface.cs" />
     <Compile Include="OrganismInterfaces\IndividualControlInterface.cs" />
     <Compile Include="OrganismInterfaces\ISquad.cs" />

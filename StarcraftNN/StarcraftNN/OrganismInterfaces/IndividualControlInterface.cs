@@ -8,6 +8,7 @@ using SharpNeat.Decoders.Neat;
 using SharpNeat.Phenomes;
 using StarcraftNN;
 using System.Diagnostics;
+using BwapiPosition = SWIG.BWAPI.Position;
 
 namespace StarcraftNN.OrganismInterfaces
 {
@@ -16,8 +17,9 @@ namespace StarcraftNN.OrganismInterfaces
         private List<Unit> _allies, _enemies;
         int _startEnemyHealth;
         private Dictionary<Unit, Action> _lastAction;
-        protected static readonly int ThetaBins = 9;
-        private static double[] DistanceRanges = { 0, 30, 100, 500, double.PositiveInfinity };
+        private Dictionary<Unit, Position> _currentPositions = new Dictionary<Unit,Position>();
+        protected static readonly int ThetaBins = 7;
+        private static double[] DistanceRanges = { 0, 100, double.PositiveInfinity };
 
         protected static int DistanceBins
         {
@@ -33,8 +35,9 @@ namespace StarcraftNN.OrganismInterfaces
             get { return this.GetType().Name; }
         }
 
-        private enum ActionTypes
+        private enum ActionType
         {
+            AttackAir,
             AttackShort,
             AttackLong,
             Move,
@@ -43,7 +46,7 @@ namespace StarcraftNN.OrganismInterfaces
 
         private struct ScoredAction
         {
-            public ActionTypes action;
+            public ActionType action;
             public double score;
         }
 
@@ -53,9 +56,25 @@ namespace StarcraftNN.OrganismInterfaces
             public double score;
         }
 
+        protected struct Position
+        {
+            public Position(int x, int y) { this.x = x; this.y = y; }
+            public int x;
+            public int y;
+            public double distanceTo(Position other)
+            {
+                return Math.Sqrt(Math.Pow(this.x - other.x, 2) + Math.Pow(this.y - other.y, 2));
+            }
+            public static Position operator-(Position left, Position right)
+            {
+                Position difference = new Position(left.x - right.x, left.y - right.y);
+                return difference;
+            }
+        }
+
         private class Action
         {
-            public ActionTypes Type { get; set; }
+            public ActionType Type { get; set; }
             public Unit Target { get; set; }
         }
 
@@ -87,7 +106,7 @@ namespace StarcraftNN.OrganismInterfaces
                 // move to bin
                 // attack short range
                 // attack long range
-            NeatGenomeFactory factory = new NeatGenomeFactory(DistanceBins * ThetaBins * 3 + 1, 4 + DistanceBins * ThetaBins, param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(3 + DistanceBins * ThetaBins * 5, 5 + DistanceBins * ThetaBins, param);
             return factory;
         }
 
@@ -97,15 +116,21 @@ namespace StarcraftNN.OrganismInterfaces
             var binnedEnemies = getUnitsInBins(ally);
             var allEnemyCount = _enemies.Where(x => x.exists()).Count();
             blackbox.InputSignalArray[sensor++] = Utils.isShortRange(ally) ? 1 : -1;
+            blackbox.InputSignalArray[sensor++] = Utils.isAir(ally) ? 1 : -1;
+            blackbox.InputSignalArray[sensor++] = Utils.hasAttackAirBonus(ally) ? 1 : -1;
             for (int bin = 0; bin < ThetaBins * DistanceBins; bin++)
             {
                 var enemies = binnedEnemies[bin];
                 int enemyHP = enemies.Sum(x => x.getHitPoints());
                 int enemyMaxHP = enemies.Sum(x => x.getType().maxHitPoints());
                 bool hasShortRange = enemies.Any(x => Utils.isShortRange(x));
+                bool hasAir = enemies.Any(x => Utils.isAir(x));
+                bool hasAttackAirBonus = enemies.Any(x => Utils.hasAttackAirBonus(x));
                 blackbox.InputSignalArray[sensor++] = enemies.Count == 0 ? 0 : (double)enemyHP / enemyMaxHP;
-                blackbox.InputSignalArray[sensor++] = (double)enemies.Count / allEnemyCount;
+                blackbox.InputSignalArray[sensor++] = allEnemyCount == 0 ? 0 : (double)enemies.Count / allEnemyCount;
                 blackbox.InputSignalArray[sensor++] = hasShortRange ? 1 : -1;
+                blackbox.InputSignalArray[sensor++] = hasAir ? 1 : -1;
+                blackbox.InputSignalArray[sensor++] = hasAttackAirBonus ? 1 : -1;
             }
         }
 
@@ -116,16 +141,17 @@ namespace StarcraftNN.OrganismInterfaces
             int signal = 0;
             List<ScoredAction> sactions = new List<ScoredAction>();
             double moveDistance = blackbox.OutputSignalArray[signal++];
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
                 ScoredAction sa;
                 sa.score = blackbox.OutputSignalArray[signal++];
                 switch(i)
                 {
-                    case 0: sa.action = ActionTypes.Move; break;
-                    case 1: sa.action = ActionTypes.AttackLong; break;
-                    case 2: sa.action = ActionTypes.AttackShort; break;
-                    default: sa.action = ActionTypes.None; break;
+                    case 0: sa.action = ActionType.Move; break;
+                    case 1: sa.action = ActionType.AttackLong; break;
+                    case 2: sa.action = ActionType.AttackShort; break;
+                    case 3: sa.action = ActionType.AttackAir; break;
+                    default: sa.action = ActionType.None; break;
                 }
                 sactions.Add(sa);
             }
@@ -139,33 +165,36 @@ namespace StarcraftNN.OrganismInterfaces
             }
             var enemyBins = getUnitsInBins(ally);
             sbins = sbins.OrderByDescending(x => x.score).ToList();
-            ActionTypes action = sactions[0].action;
+            ActionType action = sactions[0].action;
             foreach (var sbin in sbins)
             {
                 var enemies = enemyBins[sbin.bin];
                 if (enemies.Count == 0) continue;
                 switch (action)
                 {
-                    case ActionTypes.Move:
-                        if (_lastAction[ally].Type != ActionTypes.Move || !ally.isMoving())
+                    case ActionType.None: break;
+                    case ActionType.Move:
+                        if (_lastAction[ally].Type != ActionType.Move || !ally.isMoving())
                         {
                             Position center = getMovePosition(ally, sbin.bin, moveDistance);
-                            ally.move(center);
-                            _lastAction[ally].Type = ActionTypes.Move;
+                            ally.move(new BwapiPosition(center.x, center.y));
+                            _lastAction[ally].Type = ActionType.Move;
                         }
                         break;
-                    case ActionTypes.AttackLong:
-                    case ActionTypes.AttackShort:
-                        if (_lastAction[ally].Type != action)
+                    default:
+                        if (_lastAction[ally].Type != action || !ally.isAttacking())
                         {
                             IEnumerable<Unit> subgroup = null;
                             switch (action)
                             {
-                                case  ActionTypes.AttackShort:
+                                case  ActionType.AttackShort:
                                     subgroup = enemies.Where(x => Utils.isShortRange(x));
                                     break;
-                                case ActionTypes.AttackLong:
+                                case ActionType.AttackLong:
                                     subgroup = enemies.Where(x => Utils.isLongRange(x));
+                                    break;
+                                case ActionType.AttackAir:
+                                    subgroup = enemies.Where(x => Utils.isAir(x));
                                     break;
                             }
                             Debug.Assert(subgroup != null);
@@ -207,7 +236,8 @@ namespace StarcraftNN.OrganismInterfaces
 
             int dx = (int)(distance * Math.Cos(tAvg));
             int dy = (int)(distance * Math.Sin(tAvg));
-            Position center = new Position(ally.getPosition().xConst() + dx, ally.getPosition().yConst() + dy);
+            Position allyPos = _currentPositions[ally];
+            Position center = new Position(allyPos.x + dx, allyPos.y + dy);
             return center;
         }
 
@@ -223,10 +253,9 @@ namespace StarcraftNN.OrganismInterfaces
                 {
                     double d0, d1, t0, t1;
                     getLogPolarBounds(bin, out d0, out d1, out t0, out t1);
-
-                    double distance = referenceUnit.getPosition().getDistance(unit.getPosition());
-                    Position difference = unit.getPosition().opSubtract(referenceUnit.getPosition());
-                    double theta = Math.Atan2(difference.yConst(), difference.xConst());
+                    double distance = _currentPositions[referenceUnit].distanceTo(_currentPositions[unit]);
+                    Position difference = _currentPositions[unit] - _currentPositions[referenceUnit];
+                    double theta = Math.Atan2(difference.y, difference.x);
                     if (d0 <= distance && d1 > distance && t0 <= theta && t1 > theta)
                         last.Add(unit);
                 }
@@ -237,6 +266,12 @@ namespace StarcraftNN.OrganismInterfaces
         public void InputActivate(NeatGenome genome)
         {
             var blackbox = this.Decoder.Decode(genome);
+            _currentPositions.Clear();
+            foreach (var unit in _allies.Union(_enemies))
+            { 
+                var bpos = unit.getPosition();
+                _currentPositions.Add(unit, new Position(bpos.xConst(), bpos.yConst()));
+            }
             foreach (var ally in _allies)
             {
                 this.Input(ally, blackbox);
@@ -253,7 +288,7 @@ namespace StarcraftNN.OrganismInterfaces
             foreach (var ally in allies)
             {
                 _lastAction[ally] = new Action();
-                _lastAction[ally].Type = ActionTypes.None;
+                _lastAction[ally].Type = ActionType.None;
             }
         }
 
@@ -265,11 +300,20 @@ namespace StarcraftNN.OrganismInterfaces
         public double ComputeFitness(int frameCount)
         {
             double maxScale = 4;
-            double minimum = -(_startEnemyHealth * _startEnemyHealth) * maxScale;
-            double score = _allies.Sum(x => x.getHitPoints()) - _enemies.Sum(x => x.getHitPoints());
+            double minimum = -(_enemies.Count * _enemies.Count) * maxScale;
+            double allyScore = _allies.Count(x => x.exists());
+            double enemyScore = _enemies.Count(x => x.exists());
+            double score = allyScore - enemyScore;
             score *= Math.Abs(score);
-            score *= 200.0 / frameCount;
-            score -= minimum;
+            if (frameCount == 0)
+                score = 1;
+            else
+            {
+                score *= 300.0 / frameCount;
+                score -= minimum;
+                score /= Math.Abs(minimum);
+            }
+            Debug.Assert(!double.IsNaN(score) && score > 0);
             return score;
         }
     }

@@ -31,7 +31,7 @@ namespace StarcraftNN
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population = new BroodwarPopulation(new MarineFirebatIndividual4v4());
+            BroodwarPopulation population = new BroodwarPopulation(new HeteroIndividual20v20());
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
