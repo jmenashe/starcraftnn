@@ -40,7 +40,7 @@ namespace StarcraftNN
                 _initialized = true;
             }
             _frameCount++;
-            if(!_resetting && _population != null)
+            if(!_resetting && _population != null && _frameCount % 5 == 0)
             {
                 _population.PerformStep();
             }

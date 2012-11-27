@@ -18,8 +18,8 @@ namespace StarcraftNN.OrganismInterfaces
         int _startEnemyHealth;
         private Dictionary<Unit, Action> _lastAction;
         private Dictionary<Unit, Position> _currentPositions = new Dictionary<Unit,Position>();
-        protected static readonly int ThetaBins = 7;
-        private static double[] DistanceRanges = { 0, 100, double.PositiveInfinity };
+        protected static readonly int ThetaBins = 12;
+        private static double[] DistanceRanges = { 0, 50, 300, double.PositiveInfinity };
 
         protected static int DistanceBins
         {
@@ -37,9 +37,10 @@ namespace StarcraftNN.OrganismInterfaces
 
         private enum ActionType
         {
-            AttackAir,
+            AttackAir ,
             AttackShort,
             AttackLong,
+            AttackAirBonus,
             Move,
             None
         }
@@ -106,7 +107,7 @@ namespace StarcraftNN.OrganismInterfaces
                 // move to bin
                 // attack short range
                 // attack long range
-            NeatGenomeFactory factory = new NeatGenomeFactory(3 + DistanceBins * ThetaBins * 5, 5 + DistanceBins * ThetaBins, param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(3 + DistanceBins * ThetaBins * 7, 6 + DistanceBins * ThetaBins, param);
             return factory;
         }
 
@@ -114,20 +115,27 @@ namespace StarcraftNN.OrganismInterfaces
         {
             int sensor = 0;
             var binnedEnemies = getUnitsInBins(ally);
-            var allEnemyCount = _enemies.Where(x => x.exists()).Count();
+            var binnedAllies = getUnitsInBins(ally, true);
+            var allEnemyCount = _enemies.Count(x => x.exists());
+            var allAllyCount = _allies.Count(x => x.exists());
             blackbox.InputSignalArray[sensor++] = Utils.isShortRange(ally) ? 1 : -1;
             blackbox.InputSignalArray[sensor++] = Utils.isAir(ally) ? 1 : -1;
             blackbox.InputSignalArray[sensor++] = Utils.hasAttackAirBonus(ally) ? 1 : -1;
             for (int bin = 0; bin < ThetaBins * DistanceBins; bin++)
             {
                 var enemies = binnedEnemies[bin];
+                var allies = binnedAllies[bin];
                 int enemyHP = enemies.Sum(x => x.getHitPoints());
                 int enemyMaxHP = enemies.Sum(x => x.getType().maxHitPoints());
+                int allyHP = allies.Sum(x => x.getHitPoints());
+                int allyMaxHP = allies.Sum(x => x.getType().maxHitPoints());
                 bool hasShortRange = enemies.Any(x => Utils.isShortRange(x));
                 bool hasAir = enemies.Any(x => Utils.isAir(x));
                 bool hasAttackAirBonus = enemies.Any(x => Utils.hasAttackAirBonus(x));
                 blackbox.InputSignalArray[sensor++] = enemies.Count == 0 ? 0 : (double)enemyHP / enemyMaxHP;
                 blackbox.InputSignalArray[sensor++] = allEnemyCount == 0 ? 0 : (double)enemies.Count / allEnemyCount;
+                blackbox.InputSignalArray[sensor++] = allies.Count == 0 ? 0 : (double)allyHP / allyMaxHP;
+                blackbox.InputSignalArray[sensor++] = allAllyCount == 0 ? 0 : (double)allies.Count / allAllyCount;
                 blackbox.InputSignalArray[sensor++] = hasShortRange ? 1 : -1;
                 blackbox.InputSignalArray[sensor++] = hasAir ? 1 : -1;
                 blackbox.InputSignalArray[sensor++] = hasAttackAirBonus ? 1 : -1;
@@ -141,18 +149,12 @@ namespace StarcraftNN.OrganismInterfaces
             int signal = 0;
             List<ScoredAction> sactions = new List<ScoredAction>();
             double moveDistance = blackbox.OutputSignalArray[signal++];
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 ScoredAction sa;
                 sa.score = blackbox.OutputSignalArray[signal++];
-                switch(i)
-                {
-                    case 0: sa.action = ActionType.Move; break;
-                    case 1: sa.action = ActionType.AttackLong; break;
-                    case 2: sa.action = ActionType.AttackShort; break;
-                    case 3: sa.action = ActionType.AttackAir; break;
-                    default: sa.action = ActionType.None; break;
-                }
+                sa.action = (ActionType)i;
+
                 sactions.Add(sa);
             }
             sactions = sactions.OrderByDescending(x => x.score).ToList();
@@ -195,6 +197,9 @@ namespace StarcraftNN.OrganismInterfaces
                                     break;
                                 case ActionType.AttackAir:
                                     subgroup = enemies.Where(x => Utils.isAir(x));
+                                    break;
+                                case ActionType.AttackAirBonus:
+                                    subgroup = enemies.Where(x => Utils.hasAttackAirBonus(x));
                                     break;
                             }
                             Debug.Assert(subgroup != null);
@@ -301,8 +306,10 @@ namespace StarcraftNN.OrganismInterfaces
         {
             double maxScale = 4;
             double minimum = -(_enemies.Count * _enemies.Count) * maxScale;
-            double allyScore = _allies.Count(x => x.exists());
-            double enemyScore = _enemies.Count(x => x.exists());
+            int allyScore = _allies.Count(x => x.exists());
+            int enemyScore = _enemies.Count(x => x.exists());
+            if (enemyScore == 0 && allyScore == 0)
+                return 0;
             double score = allyScore - enemyScore;
             score *= Math.Abs(score);
             if (frameCount == 0)
