@@ -93,6 +93,7 @@ namespace StarcraftNN
 
         public void EndIteration(int frameCount)
         {
+            if (frameCount == 0) return;
             double fitness = _iface.ComputeFitness(frameCount);
             _fitnessResults.Add(fitness);
             if (_fitnessResults.Count == FitnessTrials)

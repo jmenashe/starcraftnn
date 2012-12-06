@@ -35,7 +35,7 @@ namespace StarcraftNN
         {
             return unit.getType().getID().In(
                 bwapi.UnitTypes_Terran_SCV.getID(),
-                bwapi.UnitTypes_Terran_Vulture.getID(),
+                bwapi.UnitTypes_Terran_Firebat.getID(),
                 bwapi.UnitTypes_Protoss_Zealot.getID(),
                 bwapi.UnitTypes_Zerg_Zergling.getID()
             );
@@ -46,7 +46,8 @@ namespace StarcraftNN
             return unit.getType().getID().In(
                 bwapi.UnitTypes_Terran_Marine.getID(),
                 bwapi.UnitTypes_Terran_Ghost.getID(),
-                bwapi.UnitTypes_Terran_Wraith.getID()
+                bwapi.UnitTypes_Terran_Wraith.getID(),
+                bwapi.UnitTypes_Terran_Goliath.getID()
             );
         }
 

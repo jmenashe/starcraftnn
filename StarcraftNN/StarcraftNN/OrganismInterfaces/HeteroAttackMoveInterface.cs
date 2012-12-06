@@ -14,6 +14,7 @@ namespace StarcraftNN.OrganismInterfaces
     {
         private List<Unit> _allies, _enemies;
         private List<Action> _lastAction;
+        private int _startEnemyHealth;
         private static double MaxDistance = 750;
 
         public abstract int UnitCount { get; }
@@ -171,6 +172,7 @@ namespace StarcraftNN.OrganismInterfaces
         {
             _allies = allies.OrderBy(x => x.getType().getID()).ToList();
             _enemies = enemies.OrderBy(x => x.getType().getID()).ToList();
+            _startEnemyHealth = enemies.Sum(x => x.getType().maxHitPoints());
             foreach (var a in _lastAction)
                 a.Type = ActionTypes.None;
         }
@@ -183,8 +185,8 @@ namespace StarcraftNN.OrganismInterfaces
         public double ComputeFitness(int frameCount)
         {
             double maxScale = 4;
-            double minimum = -(UnitCount * UnitCount) * maxScale;
-            double score = Utils.getAllies().Count - Utils.getEnemies().Count;
+            double minimum = -(_startEnemyHealth * _startEnemyHealth) * maxScale;
+            double score = _allies.Sum(x => x.getHitPoints()) - _enemies.Sum(x => x.getHitPoints());
             score *= Math.Abs(score);
             score *= 200.0 / frameCount;
             score -= minimum;

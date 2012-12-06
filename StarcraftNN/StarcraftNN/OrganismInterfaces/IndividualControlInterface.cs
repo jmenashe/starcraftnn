@@ -107,7 +107,7 @@ namespace StarcraftNN.OrganismInterfaces
                 // move to bin
                 // attack short range
                 // attack long range
-            NeatGenomeFactory factory = new NeatGenomeFactory(3 + DistanceBins * ThetaBins * 7, 6 + DistanceBins * ThetaBins, param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(3 + DistanceBins * ThetaBins * 8, 6 + DistanceBins * ThetaBins, param);
             return factory;
         }
 
@@ -132,6 +132,7 @@ namespace StarcraftNN.OrganismInterfaces
                 bool hasShortRange = enemies.Any(x => Utils.isShortRange(x));
                 bool hasAir = enemies.Any(x => Utils.isAir(x));
                 bool hasAttackAirBonus = enemies.Any(x => Utils.hasAttackAirBonus(x));
+                bool hasMachine = enemies.Any(x => Utils.isMachine(x));
                 blackbox.InputSignalArray[sensor++] = enemies.Count == 0 ? 0 : (double)enemyHP / enemyMaxHP;
                 blackbox.InputSignalArray[sensor++] = allEnemyCount == 0 ? 0 : (double)enemies.Count / allEnemyCount;
                 blackbox.InputSignalArray[sensor++] = allies.Count == 0 ? 0 : (double)allyHP / allyMaxHP;
@@ -139,6 +140,7 @@ namespace StarcraftNN.OrganismInterfaces
                 blackbox.InputSignalArray[sensor++] = hasShortRange ? 1 : -1;
                 blackbox.InputSignalArray[sensor++] = hasAir ? 1 : -1;
                 blackbox.InputSignalArray[sensor++] = hasAttackAirBonus ? 1 : -1;
+                blackbox.InputSignalArray[sensor++] = hasMachine ? 1 : -1;
             }
         }
 
@@ -304,7 +306,7 @@ namespace StarcraftNN.OrganismInterfaces
 
         public double ComputeFitness(int frameCount)
         {
-            double maxScale = 4;
+            double maxScale = 1;
             double minimum = -(_enemies.Count * _enemies.Count) * maxScale;
             int allyScore = _allies.Count(x => x.exists());
             int enemyScore = _enemies.Count(x => x.exists());
@@ -313,14 +315,14 @@ namespace StarcraftNN.OrganismInterfaces
             double score = allyScore - enemyScore;
             score *= Math.Abs(score);
             if (frameCount == 0)
-                score = 1;
+                score = 0;
             else
             {
-                score *= 300.0 / frameCount;
+                //score *= 300.0 / frameCount;
                 score -= minimum;
                 score /= Math.Abs(minimum);
             }
-            Debug.Assert(!double.IsNaN(score) && score > 0);
+            Debug.Assert(!double.IsNaN(score));
             return score;
         }
     }
