@@ -110,7 +110,11 @@ namespace SharpNeat.Genomes.Neat
 
             // If we have a factory then create the evaluation info object now, also count the nodes that have auxiliary state.
             // Otherwise wait until the factory is provided through the property setter.
-            if(null != _genomeFactory) 
+            if (_genomeFactory == null)
+            {
+                _evalInfo = new EvaluationInfo(0);
+            }
+            else
             {
                 _evalInfo = new EvaluationInfo(genomeFactory.NeatGenomeParameters.FitnessHistoryLength);
                 _auxStateNeuronCount = CountAuxStateNodes();

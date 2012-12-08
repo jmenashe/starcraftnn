@@ -1,0 +1,13 @@
+﻿<Window x:Class="UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button Name="btnSave" Content="Save" Click="btnSave_Click" HorizontalAlignment="Left" Width="101" />
+        <Button Name="btnLoad" Content="Load" Click="btnLoad_Click"  HorizontalAlignment="Right" Width="101" />
+    </Grid>
+</Window>

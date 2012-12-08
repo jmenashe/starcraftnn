@@ -122,7 +122,7 @@ namespace SharpNeat.Genomes.Neat
         /// <param name="nodeFnIds">Indicates if node activation function IDs should be read. If false then 
         /// all node activation function IDs default to 0.</param>
         /// <param name="genomeFactory">A NeatGenomeFactory object to construct genomes against.</param>
-        public static List<NeatGenome> LoadCompleteGenomeList(XmlNode xmlNode, bool nodeFnIds, NeatGenomeFactory genomeFactory)
+        public static List<NeatGenome> LoadCompleteGenomeList(XmlNode xmlNode, bool nodeFnIds, NeatGenomeFactory genomeFactory = null)
         {
             using(XmlNodeReader xr = new XmlNodeReader(xmlNode))
             {
@@ -278,7 +278,7 @@ namespace SharpNeat.Genomes.Neat
         /// <param name="nodeFnIds">Indicates if node activation function IDs should be read. If false then 
         /// all node activation function IDs default to 0.</param>
         /// <param name="genomeFactory">A NeatGenomeFactory object to construct genomes against.</param>
-        public static List<NeatGenome> ReadCompleteGenomeList(XmlReader xr, bool nodeFnIds, NeatGenomeFactory genomeFactory)
+        public static List<NeatGenome> ReadCompleteGenomeList(XmlReader xr, bool nodeFnIds, NeatGenomeFactory genomeFactory = null)
         {
             // Find <Root>.
             XmlIoUtils.MoveToElement(xr, false, __ElemRoot);
@@ -302,7 +302,7 @@ namespace SharpNeat.Genomes.Neat
                 // Read Network elements.
                 do
                 {
-                    NeatGenome genome = ReadGenome(xrSubtree, nodeFnIds);
+                    NeatGenome genome = ReadGenome(xrSubtree, nodeFnIds, genomeFactory);
                     genomeList.Add(genome);
                 } 
                 while(xrSubtree.ReadToNextSibling(__ElemNetwork));
@@ -313,10 +313,6 @@ namespace SharpNeat.Genomes.Neat
                 return genomeList;
             }
 
-            // Get the number of inputs and outputs expected by the genome factory.
-            int inputCount = genomeFactory.InputNeuronCount;
-            int outputCount = genomeFactory.OutputNeuronCount;
-
             // Check all genomes have the same number of inputs & outputs.
             // Also track the highest genomeID and innovation ID values; we need these to construct a new genome factory.
             uint maxGenomeId = 0;
@@ -324,10 +320,15 @@ namespace SharpNeat.Genomes.Neat
 
             foreach(NeatGenome genome in genomeList)
             {
-                // Check number of inputs/outputs.
-                if(genome.InputNeuronCount != inputCount || genome.OutputNeuronCount != outputCount) {
-                    throw new SharpNeatException(string.Format("Genome with wrong number of inputs and/or outputs, expected [{0}][{1}] got [{2}][{3}]",
-                                                               inputCount, outputCount, genome.InputNeuronCount, genome.OutputNeuronCount));
+
+                if (genomeFactory != null)
+                {
+                    // Check number of inputs/outputs.
+                    if (genome.InputNeuronCount != genomeFactory.InputNeuronCount || genome.OutputNeuronCount != genomeFactory.OutputNeuronCount)
+                    {
+                        throw new SharpNeatException(string.Format("Genome with wrong number of inputs and/or outputs, expected [{0}][{1}] got [{2}][{3}]",
+                                                                   genomeFactory.InputNeuronCount, genomeFactory.OutputNeuronCount, genome.InputNeuronCount, genome.OutputNeuronCount));
+                    }
                 }
 
                 // Track max IDs.
@@ -344,29 +345,26 @@ namespace SharpNeat.Genomes.Neat
                 }
             }
 
-            // Check that activation functions in XML match that in the genome factory.
-            IList<ActivationFunctionInfo> loadedActivationFnList = activationFnLib.GetFunctionList();
-            IList<ActivationFunctionInfo> factoryActivationFnList = genomeFactory.ActivationFnLibrary.GetFunctionList();
-            if(loadedActivationFnList.Count != factoryActivationFnList.Count) {
-                throw new SharpNeatException("The activation function library loaded from XML does not match the genome factory's activation function library.");
-            }
-
-            for(int i=0; i<factoryActivationFnList.Count; i++) 
+            if(genomeFactory != null)
             {
-                if(    (loadedActivationFnList[i].Id != factoryActivationFnList[i].Id)
-                    || (loadedActivationFnList[i].ActivationFunction.FunctionId != factoryActivationFnList[i].ActivationFunction.FunctionId)) {
+                // Check that activation functions in XML match that in the genome factory.
+                IList<ActivationFunctionInfo> loadedActivationFnList = activationFnLib.GetFunctionList();
+                IList<ActivationFunctionInfo> factoryActivationFnList = genomeFactory.ActivationFnLibrary.GetFunctionList();
+                if(loadedActivationFnList.Count != factoryActivationFnList.Count) {
                     throw new SharpNeatException("The activation function library loaded from XML does not match the genome factory's activation function library.");
                 }
-            }
 
-            // Initialise the genome factory's genome and innovation ID generators.
-            genomeFactory.GenomeIdGenerator.Reset(Math.Max(genomeFactory.GenomeIdGenerator.Peek, maxGenomeId+1));
-            genomeFactory.InnovationIdGenerator.Reset(Math.Max(genomeFactory.InnovationIdGenerator.Peek, maxInnovationId+1));
+                for(int i=0; i<factoryActivationFnList.Count; i++) 
+                {
+                    if(    (loadedActivationFnList[i].Id != factoryActivationFnList[i].Id)
+                        || (loadedActivationFnList[i].ActivationFunction.FunctionId != factoryActivationFnList[i].ActivationFunction.FunctionId)) {
+                        throw new SharpNeatException("The activation function library loaded from XML does not match the genome factory's activation function library.");
+                    }
+                }
 
-            // Retrospecitively assign the genome factory to the genomes. This is how we overcome the genome/genomeFactory
-            // chicken and egg problem.
-            foreach(NeatGenome genome in genomeList) {
-                genome.GenomeFactory = genomeFactory;
+                // Initialise the genome factory's genome and innovation ID generators.
+                genomeFactory.GenomeIdGenerator.Reset(Math.Max(genomeFactory.GenomeIdGenerator.Peek, maxGenomeId+1));
+                genomeFactory.InnovationIdGenerator.Reset(Math.Max(genomeFactory.InnovationIdGenerator.Peek, maxInnovationId+1));
             }
 
             return genomeList;
@@ -378,7 +376,7 @@ namespace SharpNeat.Genomes.Neat
         /// <param name="xr">The XmlReader to read from.</param>
         /// <param name="nodeFnIds">Indicates if node activation function IDs should be read. They are required
         /// for HyperNEAT genomes but not for NEAT</param>
-        public static NeatGenome ReadGenome(XmlReader xr, bool nodeFnIds)
+        public static NeatGenome ReadGenome(XmlReader xr, bool nodeFnIds, NeatGenomeFactory genomeFactory = null)
         {
             // Find <Network>.
             XmlIoUtils.MoveToElement(xr, false, __ElemNetwork);
@@ -394,6 +392,10 @@ namespace SharpNeat.Genomes.Neat
             string birthGenStr = xr.GetAttribute(__AttrBirthGeneration);
             uint birthGen;
             uint.TryParse(birthGenStr, out birthGen);
+
+            string fitnessStr = xr.GetAttribute(__AttrFitness);
+            double fitness;
+            double.TryParse(fitnessStr, out fitness);
 
             // Find <Nodes>.
             XmlIoUtils.MoveToElement(xr, true, __ElemNodes);
@@ -480,7 +482,10 @@ namespace SharpNeat.Genomes.Neat
             while(xr.Read());
 
             // Construct and return loaded NeatGenome.
-            return new NeatGenome(null, genomeId, birthGen, nGeneList, cGeneList, inputNodeCount, outputNodeCount, true);
+            var genome = new NeatGenome(genomeFactory, genomeId, birthGen, nGeneList, cGeneList, inputNodeCount, outputNodeCount, true);
+            if(genome.EvaluationInfo != null)
+                genome.EvaluationInfo.SetFitness(fitness);
+            return genome;
         }
 
         #endregion
