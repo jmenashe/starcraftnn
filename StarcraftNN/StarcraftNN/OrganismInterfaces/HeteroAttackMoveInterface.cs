@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SWIG.BWAPI;
+using BwapiPosition = SWIG.BWAPI.Position;
 using SharpNeat.Genomes.Neat;
 using SharpNeat.Decoders.Neat;
 using SharpNeat.Phenomes;
@@ -10,7 +11,7 @@ using System.Diagnostics;
 
 namespace StarcraftNN.OrganismInterfaces
 {
-    public abstract class HeteroAttackMoveInterface : ISquad
+    public abstract class HeteroAttackMoveInterface : IOrganismInterface
     {
         private List<Unit> _allies, _enemies;
         private List<Action> _lastAction;
@@ -65,7 +66,7 @@ namespace StarcraftNN.OrganismInterfaces
             param.AddConnectionMutationProbability = 0.1;
             param.AddNodeMutationProbability = 0.1;
             param.ConnectionWeightMutationProbability = 0.8;
-            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 2), UnitCount * (UnitCount + 4), param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 1), UnitCount * (UnitCount + 3), param);
             return factory;
         }
 
@@ -94,7 +95,7 @@ namespace StarcraftNN.OrganismInterfaces
             {
                 foreach (var ally in _allies)
                 {
-                    Position difference = enemy.getPosition().opSubtract(ally.getPosition());
+                    BwapiPosition difference = enemy.getPosition().opSubtract(ally.getPosition());
                     double distance = ally.getPosition().getDistance(enemy.getPosition());
                     distance /= MaxDistance;
                     double angle = Math.Atan2(difference.yConst(), difference.xConst());
@@ -137,7 +138,7 @@ namespace StarcraftNN.OrganismInterfaces
                             moveTheta = -moveTheta;
                         int dx = (int)(moveDistance * Math.Cos(moveTheta));
                         int dy = (int)(moveDistance * Math.Sin(moveTheta));
-                        Position target = new Position(ally.getPosition().xConst() + dx, ally.getPosition().yConst() + dy);
+                        BwapiPosition target = new BwapiPosition(ally.getPosition().xConst() + dx, ally.getPosition().yConst() + dy);
                         ally.move(target);
                         _lastAction[i].Type = ActionTypes.Move;
                         _lastAction[i].Arg1 = moveTheta;

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SWIG.BWAPI;
+using bwapi = SWIG.BWAPI.bwapi;
+using Unit = SWIG.BWAPI.Unit;
+using BwapiPosition = SWIG.BWAPI.Position;
 using StarcraftNN.OrganismInterfaces;
 
 namespace StarcraftNN
@@ -11,7 +13,7 @@ namespace StarcraftNN
     {
         private bool _resetting = false, _completionSignaled = false, _initialized = false;
         private int _resetLocation = 0, _maxAllyUnits, _maxEnemyUnits;
-        private Position _resetPosition, _targetPosition;
+        private BwapiPosition _resetPosition, _targetPosition;
         private int _frameCount, _completionSignalFrame;
         private BroodwarPopulation _population;
         private static readonly int _locationCounts = 8;
@@ -92,7 +94,7 @@ namespace StarcraftNN
                 case 6: dx = -dist; dy = dist; break; 
                 case 7: dx = -dist; dy = 0; break;
             }
-            _targetPosition = new Position(_resetPosition.xConst() + dx, _resetPosition.yConst() + dy);
+            _targetPosition = new BwapiPosition(_resetPosition.xConst() + dx, _resetPosition.yConst() + dy);
             this.ResetUnit.move(_targetPosition);
             _completionSignaled = true;
             _resetLocation++;

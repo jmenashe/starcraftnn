@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SWIG.BWAPI;
+using System.Diagnostics;
+using System.IO;
+using SharpNeat.Genomes.Neat;
+using System.Xml;
 
 namespace StarcraftNN
 {
@@ -79,6 +83,39 @@ namespace StarcraftNN
                 bwapi.UnitTypes_Terran_SCV.getID(),
                 bwapi.UnitTypes_Terran_Goliath.getID()
             );
+        }
+
+        public static double computeStandardFitness(List<Unit> allies, List<Unit> enemies, int frameCount)
+        {
+            double minimum = -(enemies.Count * enemies.Count);
+            int allyScore = allies.Count(x => x.exists());
+            int enemyScore = enemies.Count(x => x.exists());
+            if (enemyScore == 0 && allyScore == 0)
+                return 0;
+            double score = allyScore - enemyScore;
+            score *= Math.Abs(score);
+            if (frameCount == 0)
+                score = 0;
+            else
+            {
+                score -= minimum;
+                score /= Math.Abs(minimum);
+            }
+            Debug.Assert(!double.IsNaN(score));
+            return score;
+        }
+
+        public static NeatGenome loadBestGenome(string name, NeatGenomeFactory factory)
+        {
+            string directory = Path.Combine(Environment.GetEnvironmentVariable("STARCRAFT_RESULTS"), Environment.MachineName);
+            string path = Path.Combine(directory, name + ".xml");
+            if (!File.Exists(path))
+                return null;
+            XmlDocument document = new XmlDocument();
+            document.Load(path);
+            List<NeatGenome> genomes = NeatGenomeXmlIO.LoadCompleteGenomeList(document, true, factory);
+            var genome = genomes.OrderByDescending(x => x.EvaluationInfo.Fitness).First();
+            return genome;
         }
     }
 }

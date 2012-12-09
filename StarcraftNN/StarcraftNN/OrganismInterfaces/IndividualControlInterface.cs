@@ -19,16 +19,9 @@ namespace StarcraftNN.OrganismInterfaces
         private Dictionary<Unit, Action> _lastAction;
         private Dictionary<Unit, Position> _currentPositions = new Dictionary<Unit,Position>();
         protected static readonly int ThetaBins = 12;
-        private static double[] DistanceRanges = { 0, 50, 300, double.PositiveInfinity };
-
-        protected static int DistanceBins
-        {
-            get
-            {
-                return DistanceRanges.Length - 1;
-            }
-        }
-
+        private static List<double> DistanceRanges = new List<double>{ 0, 50, 300, double.PositiveInfinity };
+        public int DistanceBins { get { return DistanceRanges.Count - 1; } }
+        private PolarBinManager _polarbins;
 
         public string SaveFile
         {
@@ -55,22 +48,6 @@ namespace StarcraftNN.OrganismInterfaces
         {
             public int bin;
             public double score;
-        }
-
-        protected struct Position
-        {
-            public Position(int x, int y) { this.x = x; this.y = y; }
-            public int x;
-            public int y;
-            public double distanceTo(Position other)
-            {
-                return Math.Sqrt(Math.Pow(this.x - other.x, 2) + Math.Pow(this.y - other.y, 2));
-            }
-            public static Position operator-(Position left, Position right)
-            {
-                Position difference = new Position(left.x - right.x, left.y - right.y);
-                return difference;
-            }
         }
 
         private class Action
@@ -114,8 +91,8 @@ namespace StarcraftNN.OrganismInterfaces
         protected void Input(Unit ally, IBlackBox blackbox)
         {
             int sensor = 0;
-            var binnedEnemies = getUnitsInBins(ally);
-            var binnedAllies = getUnitsInBins(ally, true);
+            var binnedEnemies = _polarbins.GetEnemiesInBins(ally);
+            var binnedAllies = _polarbins.GetAlliesInBins(ally);
             var allEnemyCount = _enemies.Count(x => x.exists());
             var allAllyCount = _allies.Count(x => x.exists());
             blackbox.InputSignalArray[sensor++] = Utils.isShortRange(ally) ? 1 : -1;
@@ -167,7 +144,7 @@ namespace StarcraftNN.OrganismInterfaces
                 sbin.score = blackbox.OutputSignalArray[signal++];
                 sbins.Add(sbin);
             }
-            var enemyBins = getUnitsInBins(ally);
+            var enemyBins = _polarbins.GetEnemiesInBins(ally);
             sbins = sbins.OrderByDescending(x => x.score).ToList();
             ActionType action = sactions[0].action;
             foreach (var sbin in sbins)
@@ -180,7 +157,7 @@ namespace StarcraftNN.OrganismInterfaces
                     case ActionType.Move:
                         if (_lastAction[ally].Type != ActionType.Move || !ally.isMoving())
                         {
-                            Position center = getMovePosition(ally, sbin.bin, moveDistance);
+                            Position center = _polarbins.GetMovePosition(ally, sbin.bin, moveDistance);
                             ally.move(new BwapiPosition(center.x, center.y));
                             _lastAction[ally].Type = ActionType.Move;
                         }
@@ -219,57 +196,6 @@ namespace StarcraftNN.OrganismInterfaces
             }
         }
 
-        protected void getLogPolarBounds(int bin, out double d0, out double d1, out double t0, out double t1)
-        {
-            Debug.Assert(0 <= bin && bin < DistanceBins * ThetaBins);
-            d0 = 0;
-
-            int tbin = bin % ThetaBins;
-            double tRange = 2 * Math.PI / ThetaBins;
-            t0 = tRange * tbin;
-            t1 = tRange * (tbin + 1);
-
-            int dbin = (bin - tbin) / ThetaBins;
-            d0 = DistanceRanges[dbin];
-            d1 = DistanceRanges[dbin + 1];
-        }
-
-        protected Position getMovePosition(Unit ally, int bin, double moveDistance)
-        {
-            double d0, d1, t0, t1;
-            getLogPolarBounds(bin, out d0, out d1, out t0, out t1);
-            double distance = Math.Pow(10, moveDistance * 3);
-            double tAvg = (t0 + t1) / 2;
-
-            int dx = (int)(distance * Math.Cos(tAvg));
-            int dy = (int)(distance * Math.Sin(tAvg));
-            Position allyPos = _currentPositions[ally];
-            Position center = new Position(allyPos.x + dx, allyPos.y + dy);
-            return center;
-        }
-
-        protected List<List<Unit>> getUnitsInBins(Unit referenceUnit, bool allies = false)
-        {
-            IEnumerable<Unit> allUnits = allies ? _allies : _enemies;
-            List<List<Unit>> binnedUnits = new List<List<Unit>>();
-            for (int bin = 0; bin < DistanceBins * ThetaBins; bin++)
-            {
-                List<Unit> last = new List<Unit>();
-                binnedUnits.Add(last);
-                foreach (var unit in allUnits.Where(x => x.exists()))
-                {
-                    double d0, d1, t0, t1;
-                    getLogPolarBounds(bin, out d0, out d1, out t0, out t1);
-                    double distance = _currentPositions[referenceUnit].distanceTo(_currentPositions[unit]);
-                    Position difference = _currentPositions[unit] - _currentPositions[referenceUnit];
-                    double theta = Math.Atan2(difference.y, difference.x);
-                    if (d0 <= distance && d1 > distance && t0 <= theta && t1 > theta)
-                        last.Add(unit);
-                }
-            }
-            return binnedUnits;
-        }
-
         public void InputActivate(NeatGenome genome)
         {
             var blackbox = this.Decoder.Decode(genome);
@@ -290,6 +216,7 @@ namespace StarcraftNN.OrganismInterfaces
         {
             _allies = allies.OrderBy(x => x.getType().getID()).ToList();
             _enemies = enemies.OrderBy(x => x.getType().getID()).ToList();
+            _polarbins = new PolarBinManager(_allies, _enemies, DistanceRanges, ThetaBins);
             _startEnemyHealth = _enemies.Sum(x => x.getType().maxHitPoints());
             _lastAction.Clear();
             foreach (var ally in allies)
@@ -318,7 +245,6 @@ namespace StarcraftNN.OrganismInterfaces
                 score = 0;
             else
             {
-                //score *= 300.0 / frameCount;
                 score -= minimum;
                 score /= Math.Abs(minimum);
             }

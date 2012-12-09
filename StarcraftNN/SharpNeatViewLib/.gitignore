@@ -1,0 +1,7 @@
+obj/*
+bin/*
+*.ncb
+*.suo
+*.user
+*.exe
+*.dll

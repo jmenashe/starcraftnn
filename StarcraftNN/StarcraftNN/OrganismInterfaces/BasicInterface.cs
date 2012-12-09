@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SWIG.BWAPI;
+using BwapiPosition = SWIG.BWAPI.Position;
 using SharpNeat.Genomes.Neat;
 using SharpNeat.Decoders.Neat;
 
@@ -48,7 +49,7 @@ namespace StarcraftNN.OrganismInterfaces
             var blackbox = decoder.Decode(genome);
             foreach (var enemy in _enemies)
             {
-                Position difference = enemy.getPosition().opSubtract(allyPosition);
+                BwapiPosition difference = enemy.getPosition().opSubtract(allyPosition);
                 double distance = allyPosition.getDistance(enemy.getPosition());
                 double angle = Math.Tan(difference.yConst() / difference.xConst());
                 blackbox.InputSignalArray[sensor++] = distance;

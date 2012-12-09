@@ -51,18 +51,23 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="OrganismInterfaces\BasicInterface.cs" />
     <Compile Include="OrganismInterfaces\HeteroIndividual20v20.cs" />
+    <Compile Include="OrganismInterfaces\KMeans.cs" />
+    <Compile Include="OrganismInterfaces\Marine5v5Interface.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebatIndividual12v12.cs" />
-    <Compile Include="OrganismInterfaces\LogPolarBinInterface.cs" />
     <Compile Include="OrganismInterfaces\IndividualControlInterface.cs" />
-    <Compile Include="OrganismInterfaces\ISquad.cs" />
+    <Compile Include="OrganismInterfaces\Squads\GoliathSquad.cs" />
+    <Compile Include="OrganismInterfaces\Squads\ISquad.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat4v4.cs" />
     <Compile Include="OrganismInterfaces\HeteroAttackMoveInterface.cs" />
     <Compile Include="OrganismInterfaces\IOrganismInterface.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat12v12.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat3v3.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebatIndividual4v4.cs" />
-    <Compile Include="OrganismInterfaces\MarineFirebatSquads12v12.cs" />
-    <Compile Include="OrganismInterfaces\Squad.cs" />
+    <Compile Include="OrganismInterfaces\PolarBinManager.cs" />
+    <Compile Include="OrganismInterfaces\Position.cs" />
+    <Compile Include="OrganismInterfaces\Squads\SquadInterface.cs" />
+    <Compile Include="OrganismInterfaces\Squads\SquadControlInterface.cs" />
+    <Compile Include="OrganismInterfaces\UnitGroup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoundManager.cs" />
@@ -82,6 +87,7 @@
       <Name>SharpNeatLib</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
