@@ -23,6 +23,12 @@ namespace StarcraftNN
         private List<double> _fitnessResults = new List<double>();
         uint _generation = 0;
 
+        public bool EnableEvolution
+        {
+            get;
+            set;
+        }
+
         public string GenomeFile
         {
             get;
@@ -35,7 +41,19 @@ namespace StarcraftNN
             private set;
         }
 
+        public string IterationResultsFile
+        {
+            get;
+            private set;
+        }
+
         public ulong EvaluationCount
+        {
+            get;
+            private set;
+        }
+
+        public uint Iteration
         {
             get;
             private set;
@@ -49,12 +67,17 @@ namespace StarcraftNN
             }
         }
 
+        private string _saveDirectory = Path.Combine(Environment.GetEnvironmentVariable("STARCRAFT_RESULTS"), Environment.MachineName);
+
         public BroodwarPopulation(IOrganismInterface iface)
         {
             _iface = iface;
             NeatGenomeFactory factory = _iface.CreateGenomeFactory();
-            this.GenomeFile = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "sc_populations", _iface.SaveFile + ".xml");
-            this.StatsFile = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "sc_populations", _iface.SaveFile + ".csv");
+            this.GenomeFile = Path.Combine(_saveDirectory, _iface.SaveFile + ".xml");
+            this.StatsFile = Path.Combine(_saveDirectory, _iface.SaveFile + ".csv");
+            this.IterationResultsFile = Path.Combine(_saveDirectory, _iface.SaveFile + "_results.csv");
+            if (!Directory.Exists(_saveDirectory))
+                Directory.CreateDirectory(_saveDirectory);
             _algorithm = new NeatEvolutionAlgorithm<NeatGenome>();
             _algorithm.UpdateScheme = new UpdateScheme(1);
             _algorithm.UpdateEvent += (sender, e) =>
@@ -72,17 +95,27 @@ namespace StarcraftNN
                     if (File.Exists(this.GenomeFile))
                     {
                         var genomes = Load(factory);
-                        _algorithm.Initialize(this, factory, genomes);
+                        if (this.EnableEvolution)
+                            _algorithm.Initialize(this, factory, genomes);
+                        else
+                            _currentGenome = genomes.OrderByDescending(x => x.EvaluationInfo.Fitness).First();
                     }
-                    else _algorithm.Initialize(this, factory, PopulationSize);
-                    _algorithm.StartContinue();
+                    else if (this.EnableEvolution)
+                        _algorithm.Initialize(this, factory, PopulationSize);
+                    else
+                        _currentGenome = factory.CreateGenome(0);
+                    if(this.EnableEvolution)
+                        _algorithm.StartContinue();
                 });
             t.Start();
         }
         public void PerformStep()
         {
-            while (_currentGenome.EvaluationInfo.IsEvaluated)
-                Thread.Sleep(250);
+            if (this.EnableEvolution)
+            {
+                while (_currentGenome.EvaluationInfo.IsEvaluated)
+                    Thread.Sleep(250);
+            }
             _iface.InputActivate(_currentGenome);
         }
 
@@ -96,11 +129,14 @@ namespace StarcraftNN
             if (frameCount == 0) return;
             double fitness = _iface.ComputeFitness(frameCount);
             _fitnessResults.Add(fitness);
-            if (_fitnessResults.Count == FitnessTrials)
+            using (var w = new StreamWriter(this.IterationResultsFile, true))
+                w.WriteLine("{0},{1}", this.Iteration, fitness);
+            if (this.EnableEvolution && _fitnessResults.Count == FitnessTrials)
             {
                 _currentGenome.EvaluationInfo.SetFitness(_fitnessResults.Average());
                 Console.WriteLine("Fitness Avg: {0:f3} Max: {1:f3} Min: {2:f3}", _currentGenome.EvaluationInfo.Fitness, _fitnessResults.Max(), _fitnessResults.Min());
             }
+            this.Iteration++;
         }
 
         public void Evaluate(IList<NeatGenome> genomeList)

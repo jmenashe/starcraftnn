@@ -32,6 +32,7 @@ namespace StarcraftNN
         static void Main(string[] args)
         {
             BroodwarPopulation population = new BroodwarPopulation(new HeteroIndividual20v20());
+            population.EnableEvolution = false;
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
@@ -47,6 +48,7 @@ namespace StarcraftNN
                         reconnect();
                     }
                 }
+                bwapi.Broodwar.setGUI(false);
                 bwapi.Broodwar.setLocalSpeed(speed);
                 RoundManager manager = new RoundManager(population);
                 while (bwapi.Broodwar.isInGame())
