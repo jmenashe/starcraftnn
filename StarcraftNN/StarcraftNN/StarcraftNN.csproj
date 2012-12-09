@@ -65,8 +65,10 @@
     <Compile Include="OrganismInterfaces\MarineFirebatIndividual4v4.cs" />
     <Compile Include="OrganismInterfaces\PolarBinManager.cs" />
     <Compile Include="OrganismInterfaces\Position.cs" />
+    <Compile Include="OrganismInterfaces\Squads\Marine2Firebat1Squad.cs" />
+    <Compile Include="OrganismInterfaces\Squads\Marine2Firebat1SquadController.cs" />
     <Compile Include="OrganismInterfaces\Squads\SquadInterface.cs" />
-    <Compile Include="OrganismInterfaces\Squads\SquadControlInterface.cs" />
+    <Compile Include="OrganismInterfaces\Squads\SquadControllerInterface.cs" />
     <Compile Include="OrganismInterfaces\UnitGroup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

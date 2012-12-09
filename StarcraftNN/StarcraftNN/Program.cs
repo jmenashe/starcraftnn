@@ -5,6 +5,7 @@ using System.Text;
 using SWIG.BWAPI;
 using SWIG.BWAPIC;
 using StarcraftNN.OrganismInterfaces;
+using StarcraftNN.OrganismInterfaces.Squads;
 
 namespace StarcraftNN
 {
@@ -31,8 +32,8 @@ namespace StarcraftNN
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population = new BroodwarPopulation(new HeteroIndividual20v20());
-            population.EnableEvolution = false;
+            BroodwarPopulation population = new BroodwarPopulation(new Marine2Firebat1SquadController());
+            population.EnableEvolution = true;
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
@@ -48,7 +49,7 @@ namespace StarcraftNN
                         reconnect();
                     }
                 }
-                bwapi.Broodwar.setGUI(false);
+                //bwapi.Broodwar.setGUI(false);
                 bwapi.Broodwar.setLocalSpeed(speed);
                 RoundManager manager = new RoundManager(population);
                 while (bwapi.Broodwar.isInGame())

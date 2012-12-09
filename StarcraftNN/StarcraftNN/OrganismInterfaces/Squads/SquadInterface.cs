@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace StarcraftNN.OrganismInterfaces
 {
-    public class SquadInterface : UnitGroup, ISquad, IOrganismInterface
+    public class SquadInterface : UnitGroup, ISquad
     {
         #region Subclasses
         private enum ActionType
@@ -44,7 +44,7 @@ namespace StarcraftNN.OrganismInterfaces
         #endregion
 
         protected UnitGroup _enemies;
-        protected NeatGenome _genome;
+        protected static NeatGenome _genome;
         protected PolarBinManager _polarbins;
         private Dictionary<Unit, Action> _lastAction;
 
@@ -75,28 +75,19 @@ namespace StarcraftNN.OrganismInterfaces
             _lastAction = new Dictionary<Unit, Action>();
         }
 
-        public SquadInterface(List<Unit> units) : base(units) 
+        public SquadInterface(List<Unit> allies, List<Unit> enemies) : base(allies) 
         {
             _lastAction = new Dictionary<Unit, Action>();
+            UpdateState(allies, enemies);
         }
 
         public void UpdateState(IEnumerable<Unit> allies, IEnumerable<Unit> enemies)
         {
-            _units = allies.ToList();
-            _enemies = enemies.ToList();
-            this.MaxHitPoints = _units.Sum(x => x.getType().maxHitPoints());
+            _units = allies.OrderBy(x => x.getType().getID()).ToList();
+            _enemies = enemies.OrderBy(x => x.getType().getID()).ToList();
             _polarbins = new PolarBinManager(_units, _enemies, DistanceRanges, ThetaBins);
-        }
-
-        public int HitPoints
-        {
-            get { return _units.Sum(x => x.getHitPoints()); }
-        }
-
-        public int MaxHitPoints
-        {
-            get;
-            private set;
+            foreach (var ally in allies)
+                _lastAction[ally] = new Action { Type = ActionType.None };
         }
 
         public int Size
@@ -153,6 +144,8 @@ namespace StarcraftNN.OrganismInterfaces
         public void InputActivate(NeatGenome genome)
         {
             var blackbox = this.Decoder.Decode(genome);
+            this.Input(blackbox);
+            this.Activate(blackbox);
         }
 
         protected void Input(IBlackBox blackbox)

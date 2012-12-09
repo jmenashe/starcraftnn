@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace StarcraftNN.OrganismInterfaces
 {
-    public abstract class SquadControlInterface : IOrganismInterface
+    public abstract class SquadControllerInterface : IOrganismInterface
     {
         protected List<Unit> _allies, _enemies;
         protected List<ISquad> _squads;
@@ -24,8 +24,8 @@ namespace StarcraftNN.OrganismInterfaces
 
         protected abstract int SquadSize { get; }
         protected abstract int SquadCount { get; }
-        protected abstract List<double> DistanceRanges { get; }
-        protected abstract int ThetaBins { get; }
+        protected List<double> DistanceRanges = new List<double> { 0, 100, 300, 1000, double.PositiveInfinity };
+        protected int ThetaBins = 12;
 
         protected int DistanceBins
         {
@@ -68,7 +68,7 @@ namespace StarcraftNN.OrganismInterfaces
             protected set;
         }
 
-        public SquadControlInterface()
+        public SquadControllerInterface()
         {
             _lastAction = new Dictionary<Unit, Action>();
             this.Decoder = new NeatGenomeDecoder(SharpNeat.Decoders.NetworkActivationScheme.CreateCyclicFixedTimestepsScheme(10, true));
@@ -80,22 +80,35 @@ namespace StarcraftNN.OrganismInterfaces
             param.AddConnectionMutationProbability = 0.1;
             param.AddNodeMutationProbability = 0.1;
             param.ConnectionWeightMutationProbability = 0.8;
-            NeatGenomeFactory factory = new NeatGenomeFactory(this.SquadCount * 5 + DistanceBins * ThetaBins * 5, this.SquadCount * DistanceBins * ThetaBins, param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(this.SquadCount * 2, this.SquadCount * 2, param);
             return factory;
         }
 
         protected void Input(IBlackBox blackbox)
         {
             int sensor = 0;
-            foreach (var squad in _squads)
+            for (int i = 0; i < this.SquadCount; i++ )
             {
+                ISquad squad = _squads[i];
+                UnitGroup enemyGroup = _enemyGroups[i];
                 blackbox.InputSignalArray[sensor++] = (double)squad.HitPoints / squad.MaxHitPoints;
+                blackbox.InputSignalArray[sensor++] = (double)enemyGroup.HitPoints / enemyGroup.MaxHitPoints;
             }
         }
 
         protected void Activate(IBlackBox blackbox)
         {
             blackbox.Activate();
+            int signal = 0;
+            for (int i = 0; i < this.SquadCount; i++)
+            {
+                double moveScore = blackbox.OutputSignalArray[signal++];
+                double delegateScore = blackbox.OutputSignalArray[signal++];
+                if (delegateScore > 0.5)
+                    _squads[i].Delegate();
+                else
+                    _squads[i].Move(moveScore * 2 * Math.PI);
+            }
         }
 
         protected void groupEnemies()
@@ -103,7 +116,7 @@ namespace StarcraftNN.OrganismInterfaces
             _enemyGroups = _kmeans.ComputeClusters(_polarbins.EnemyPositions, _enemies, this.SquadCount);
         }
 
-        protected abstract void formSquads();
+        protected abstract void formSquads(List<UnitGroup> enemyGroups);
 
         public void InputActivate(NeatGenome genome)
         {
@@ -118,7 +131,7 @@ namespace StarcraftNN.OrganismInterfaces
             _enemies = enemies.OrderBy(x => x.getType().getID()).ToList();
             _polarbins = new PolarBinManager(_allies, _enemies, DistanceRanges, ThetaBins);
             groupEnemies();
-            formSquads();
+            formSquads(_enemyGroups);
         }
 
         public void UpdateState()
@@ -128,11 +141,10 @@ namespace StarcraftNN.OrganismInterfaces
 
         public double ComputeFitness(int frameCount)
         {
-            double maxScale = 1;
-            double minimum = -(_enemies.Count * _enemies.Count) * maxScale;
+            double minimum = -(_enemies.Count * _enemies.Count);
             int allyScore = _allies.Count(x => x.exists());
             int enemyScore = _enemies.Count(x => x.exists());
-            if (enemyScore == 0 && allyScore == 0)
+            if (allyScore == enemyScore) // This can happen if the squads all just run away
                 return 0;
             double score = allyScore - enemyScore;
             score *= Math.Abs(score);

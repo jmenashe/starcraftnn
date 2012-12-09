@@ -17,7 +17,12 @@ namespace StarcraftNN.OrganismInterfaces
                 return _units;
             }
         }
-        public List<Position> Positions
+        public int HitPoints
+        {
+            get { return _units.Sum(x => x.getHitPoints()); }
+        }
+
+        public int MaxHitPoints
         {
             get;
             private set;
@@ -56,6 +61,7 @@ namespace StarcraftNN.OrganismInterfaces
         public UnitGroup(List<Unit> units)
         {
             _units = units;
+            this.MaxHitPoints = _units.Sum(x => x.getType().maxHitPoints());
         }
 
         public static implicit operator UnitGroup(List<Unit> list)
