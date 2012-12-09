@@ -55,6 +55,7 @@
     <Compile Include="OrganismInterfaces\Marine5v5Interface.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebatIndividual12v12.cs" />
     <Compile Include="OrganismInterfaces\IndividualControlInterface.cs" />
+    <Compile Include="OrganismInterfaces\Squads\Goliath2Wraith2Squad.cs" />
     <Compile Include="OrganismInterfaces\Squads\GoliathSquad.cs" />
     <Compile Include="OrganismInterfaces\Squads\ISquad.cs" />
     <Compile Include="OrganismInterfaces\MarineFirebat4v4.cs" />

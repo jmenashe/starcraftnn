@@ -32,7 +32,30 @@ namespace StarcraftNN
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population = new BroodwarPopulation(new Marine2Firebat1SquadController());
+            BroodwarPopulation population;
+            bool useGui = false;
+            if (args.Length > 0)
+            {
+                switch(args[0])
+                {
+                    case "gw":
+                        population = new BroodwarPopulation(new Goliath2Wraith2Squad());
+                        break;
+                    case "mf":
+                        population = new BroodwarPopulation(new Marine2Firebat1Squad());
+                        break;
+                    default:
+                        population = new BroodwarPopulation(new Marine2Firebat1Squad());
+                        break;
+                }
+                if (args.Length > 1)
+                    switch (args[1])
+                    {
+                        case "gui": useGui = true; break;
+                    }
+            }
+            else population = new BroodwarPopulation(new Marine2Firebat1Squad());
+            
             population.EnableEvolution = true;
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
@@ -49,7 +72,8 @@ namespace StarcraftNN
                         reconnect();
                     }
                 }
-                //bwapi.Broodwar.setGUI(false);
+                if(!useGui)
+                    bwapi.Broodwar.setGUI(false);
                 bwapi.Broodwar.setLocalSpeed(speed);
                 RoundManager manager = new RoundManager(population);
                 while (bwapi.Broodwar.isInGame())
