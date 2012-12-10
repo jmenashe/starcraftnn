@@ -2,4 +2,5 @@
 *.bbl
 *.blg
 *.log
-
+papers
+bib_pres.bib

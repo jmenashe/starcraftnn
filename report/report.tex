@@ -1,5 +1,4 @@
 \documentclass[a4paper]{article}
-\usepackage[numbers]{natbib}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{array}
@@ -13,7 +12,6 @@
 \setlist[enumerate]{itemsep=0mm}
 \setlist[itemize]{itemsep=0mm}
 \newcounter{algcounter}
-\bibliographystyle{plainnat}
 \newcommand{\fillin}[1]{X}
 
 \begin{document}
@@ -37,6 +35,10 @@ In this paper we present a novel application of NEAT to small-scale combat probl
 \section{Background}
 \label{sec:back}
 
+Classic AI techniques (or GOFAI) have been used on a variety of board games, such as Connect Four, Checkers, and Chess \cite{Allis94searchingfor}. Due to their simplistic and discrete state spaces, board games can often be broken down by traditional AI techniques such as alpha-beta pruning, or in some cases even brute force search. Chess pushes the limits of these techniques with a search tree complexity of at least $10^{120}$ \cite{Shannon:1988:PCP:61701.67002}, but can still benefit from the prediction value of limited search. What these games have in common is that computers maintain a significant advantage over humans stemming from their predictive abilities. As computing technology has improved, however, games have begun to take on more realistic simulations of the world and therefore rely heavily on continuous and highly complex states and actions. This increase in state-action complexity has in turn rendered traditional AI approaches ineffective at performing competitively with human opponents.
+
+Recent work has seen reasonable success at taking on the challenges of modern games and simulations, particularly in the domain of First-Person Shooters (FPS). FPS games are a genre of computer game in which the player views the world through an avatar from a first-person point of view. The point of an FPS is to navigate through the game world and kill opponents with weapons and tools found throughout the environment. Neuroevolution has been successfully applied toward the goal of producing human-like actions \cite{schrum:cig11competition}, resulting in creating bots that effectively pass the Turing test. In FPS games, creating bots that are simply better than human players can be achieved through simple physics calculations, so here the emphasis is on enabling human-like movements and downgrading combat prowess where it can be seen as unrealistic. In contrast, our work focuses on outperforming human- and AI-controlled systems alike.
+
 \section{Technical Approach}
 \label{sec:tech}
 
@@ -52,6 +54,7 @@ In this paper we present a novel application of NEAT to small-scale combat probl
 \section{Future Work}
 \label{sec:future}
 
+\bibliographystyle{unsrt}
 \bibliography{bibliography}
 
 \end{document}
