@@ -1,9 +1,9 @@
 set terminal pdf
-source = "multiunit"
+source = "individual"
 set output source.".pdf"
 set xlabel "Generation";
 set ylabel "Normalized Fitness";
-set title "Multi-Unit Controller Population Fitness Over Time";
+set title "Individual Controller Population Fitness Over Time";
 set datafile separator ',';
 set key outside right center;
 f(x) = a + b*log(x)

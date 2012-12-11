@@ -11,6 +11,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{multirow}
+\usepackage{subfigure}
 \usepackage{enumitem}
 \usepackage{chngcntr}
 \counterwithin{figure}{section}
@@ -36,7 +37,7 @@ Micro-management is a major component of real-time strategy (RTS) games such as 
 
 The domain of micro-management in combat environments is therefore well-suited to the application of intelligent, autonomous agents. While the best AI implementations still fall below the average competitive human player in terms of high-level planning and strategy \cite{weber2011building}, a trained unit controller agent should have little difficulty outperforming a human for any reasonably-sized army. Indeed, while an agent may potentially make hundreds of decisions and unit actions per second, even the most skilled human Starcraft players can only achieve about 5 actions per second \cite{mccoy2008integrated}.
 
-In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \fillin{ai competition citation}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results agains the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
+In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \fillin{AI competition citation}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results against the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
 
 \section{Background}
 \label{sec:back}
@@ -45,7 +46,7 @@ Classic AI techniques (or GOFAI) have been used on a variety of board games, suc
 
 Recent work has seen reasonable success at taking on the challenges of modern games and simulations, particularly in the domain of First-Person Shooters (FPS). FPS games are a genre of computer game in which the player views the world through an avatar from a first-person point of view. The point of an FPS is to navigate through the game world and kill opponents with weapons and tools found throughout the environment. Neuroevolution has been successfully applied toward the goal of producing human-like actions \cite{schrum:cig11competition}, resulting in creating bots that effectively pass the Turing test. In FPS games, creating bots that are simply better than human players can be achieved through simple physics calculations, so here the emphasis is on enabling human-like movements and downgrading combat prowess where it can be seen as unrealistic. In contrast, our work focuses on outperforming human- and AI-controlled systems alike.
 
-There has been considerable progress toward this goal in Starcraft, primarily due to the Starcraft AI Competition. The competition pits Starcraft bots against one another to determine a winner, however this task lies parallel to that of defeating a human controller. EISBot, one of the more successful bot implementatoins, has been tested against skilled human players and achieved a win rate of approximately 32\% \cite{weber2011building}. Other top-performing bots from the competition have been unable to win against expert players \cite{ai_comp_2010_website}. In our work, we therefore train and evaluate our networks based on the built-in AI, with the long-term goal of competing against both bots in the competition and human players.
+There has been considerable progress toward this goal in Starcraft, primarily due to the Starcraft AI Competition. The competition pits Starcraft bots against one another to determine a winner, however this task lies parallel to that of defeating a human controller. EISBot, one of the more successful bot implementations, has been tested against skilled human players and achieved a win rate of approximately 32\% \cite{weber2011building}. Other top-performing bots from the competition have been unable to win against expert players \cite{ai_comp_2010_website}. In our work, we therefore train and evaluate our networks based on the built-in AI, with the long-term goal of competing against both bots in the competition and human players.
 
 Typical approaches to Starcraft bots include case-based reasoning \fillin{more citations} and hierarchical skill management \fillin{citations}. The former technique aims to learn skills, build order, and general strategy from replays of past games, while the latter technique organizes expert modules into a hierarchical decision model. These two approaches need not be mutually exclusive. Wender and Watson refine the problem of creating expert modules by focusing exclusively on small-scale combat tactics in \cite{rl_small_scale_combat}, and it is this work that relates most closely to our own. While Wender and Watson restrict their analysis to the particular combat configuration of a single, fast, ranged unit versus multiple slower short-ranged units, we seek to optimize small-scale combat in a more general sense by allowing for heterogeneous unit groups with an unspecified number of combatants. In this way, our approach moves toward a more flexible solution for the problem of micro-management in small-scale combat. 
 
@@ -54,7 +55,7 @@ Another notable difference between our work and that of \cite{rl_small_scale_com
 \section{Software}
 \label{sec:soft}
 
-Our research was enabled by the BroodWar API (BWAPI) \cite{bwapi}, BWAPI Mono-Bridge \cite{monobridge}, and Starcraft: Broodwar itself. We use SharpNeat \cite{sharpneat}, a C\# NEAT implementation for neuroevolution. While BWAPI is natively coded in C++, we selected a C\# implementation due to the following considerations:
+Our research was enabled by the BroodWar API (BWAPI) \cite{bwapi}, BWAPI Mono-Bridge \cite{monobridge}, and Starcraft: Broodwar itself. We use SharpNEAT \cite{sharpneat}, a C\# NEAT implementation for neuroevolution. While BWAPI is natively coded in C++, we selected a C\# implementation due to the following considerations:
 
 \begin{itemize}
 	\item Our focus for this work is in testing new configurations for NEAT and new combinations with our own heuristics, so development speed is of particular importance. C\# provides many high-level language features that allow for faster development than in C++.
@@ -127,7 +128,7 @@ We attempted multiple network designs, each of which is evaluated in Section \re
 We now begin with the multi-unit control network design in Figure \ref{fig:design_multiunit}.
 
 \begin{figure}
-\input{multiunit}
+\input{designs/multiunit}
 \caption{The multi-unit network design for 3 allies and 3 enemies. $r$ and $\theta$ represent relative distance and angle. $s$ represents a score in the range $[0,1]$, and $f$ is a flip.}
 \label{fig:design_multiunit}
 \end{figure}
@@ -153,7 +154,7 @@ Using this network design, our units were able to achieve reasonable fitness lev
 Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of allied units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. In this way, we allow for arbitrary configurations of heterogeneous enemy combatants. To reduce the number of output nodes, we use a small set of nodes for action selection, where the action with the highest score is selected. We then use another cluster of nodes for bin selection so that the highest-scoring action is applied to the target bin. Actions are defined in Table \ref{tab:actions}. Finally, to ensure that all values are normalized to the range $[0,1]$, each I/O value represents a percentage. Ally/Enemy counts are relative to the entire battle, so a bin with 7 enemies out of a total of 10 on the battlefield would have any enemy count value of 0.7, and a bin with all of the flying enemy units would have a \texttt{HasFlyer} value of 1.
 
 \begin{figure}
-\input{individualcontroller}
+\input{designs/individualcontroller}
 \caption{The individual controller network design.}
 \label{fig:design_individual}
 \end{figure}
@@ -180,7 +181,7 @@ This network design performed well in a variety of scenarios, from small (3v3) b
 \label{sec:squad_design}
 
 \begin{figure}
-\input{squadcontroller}
+\input{designs/squadcontroller}
 \caption{The squad controller network design.}
 \label{fig:squad_design}
 \end{figure}
@@ -188,7 +189,7 @@ This network design performed well in a variety of scenarios, from small (3v3) b
 In Figure \ref{fig:squad_design} we see the basic design for the squad controller. The idea behind this design is to take a small number of predefined unit types and teach them to work together, so that they can be organized into a larger battalion with a squad commander. The network design is essentially a mix of the ideas from the multi-unit and individual-unit controllers: ally and enemy statistics are captured per bin (with respect to the squad's centroid), and action/bin scores are calculated for each ally. With 4 allies in one squad and 15 bins, this results in 105 input nodes and 80 output nodes.
 
 \begin{figure}
-\input{squadcommander}
+\input{designs/squadcommander}
 \caption{The squad commander network design.}
 \label{fig:quad_commander_design}
 \end{figure}
@@ -228,8 +229,33 @@ Of particular interest in this experiment is the development of interesting beha
 \begin{figure}
 \centering
 \includegraphics[scale=1.1]{plots/multiunit.pdf}
-\caption{A fitness graph of the multi-unit controller in a 3v3 scenario, with 2 marines and 1 firebat on each team. Fitness progresses slowly over the threshold of 1.0, indicating that the average genome defeats the enemy units more often than not.}
+\caption{A fitness graph of the multi-unit controller in a 3v3 scenario, with 2 marines and 1 firebat on each team. Mean population fitness progresses slowly over the threshold of 1.0, indicating that the average genome defeats the enemy units more often than not.}
 \label{fig:multiunit_exp}
+\end{figure}
+
+\subsection{Individual Control}
+
+Our second experiment emphasizes the scalability of our individual unit controller described in Section \ref{sec:individual_design}. We use a 20-vs-20 training scenario in which each team has 5 ghosts, 5 firebats, 5 goliaths, and 5 wraiths. Figure \ref{fig:individual_exp} shows the fitness graph. This experiment differed from others in that no clear ``interesting" behavior was identified.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.1]{plots/individual.pdf}
+\caption{A fitness graph of the individual-unit controller in a 20v20 scenario, with 5 ghosts, firebats, goliaths, and wraiths on each team. Fitness progresses rapidly in the first few generations, and then levels out over the next 300.}
+\label{fig:individual_exp}
+\end{figure}
+
+Furthermore, we see a highly accelerated fitness gain during the first 4 generations. This is likely due to the mechanics of our network phenotypes. In the multi-unit controller, a unit can only move or attack a particular enemy, so each unit has a roughly 75\% chance of entering combat given a random genome. In the individual controller, the controller has the option of attacking different unit types. If a controller chooses to attack air units in a bin that doesn't have any, then no action is taken. Thus the individual controller encodes a large number of ``dead" actions. NEAT quickly learns to discard these state/action pairs. Once this has happened, evolution proceeds in roughly the same manner as in the multi-unit case, offset with a clear advantage over the built-in AI from the start. Considering its scalability and its improved fitness, the individual controller proves to be a significant improvement over the multi-unit controller.
+
+\subsection{Squad Control}
+
+Motivated by our search for interesting behaviors, we now consider the squad controller and squad commander networks. The squad controller described in Section \ref{sec:squad_design} is somewhat of a hybrid between the multi-unit and individual controllers, combining the group awareness of the former with the flexibility and scalability of the latter. We trained two squad types with this controller: a 2-marine, 2-firebat controller, and a 2-goliath, 2-wraith controller. Fitness graphs for both of these are shown in Figure \ref{fig:squads_individual}.
+
+\begin{figure}
+\centering
+\mbox{\subfigure{\includegraphics[width=3in]{plots/squad_mf.pdf}}\quad
+\subfigure{\includegraphics[width=3in]{plots/squad_gw.pdf} }}
+\caption{Fitness graphs for squad controllers in isolation. The marine-firebat setup performs similarly to the multi-unit controller, but can compensate for varying numbers of enemies. The goliath-wraith setup performs much better, in a similar fashion to the individual unit controller.}
+\label{fig:squads_individual}
 \end{figure}
 
 \section{Conclusions}

@@ -1,9 +1,9 @@
 set terminal pdf
-source = "multiunit"
+source = "squad_mf"
 set output source.".pdf"
 set xlabel "Generation";
 set ylabel "Normalized Fitness";
-set title "Multi-Unit Controller Population Fitness Over Time";
+set title "Marine-Firebat Population Fitness Over Time";
 set datafile separator ',';
 set key outside right center;
 f(x) = a + b*log(x)
