@@ -21,19 +21,11 @@
 
 	\node[cloud, cloud puffs=15.7, cloud ignores aspect, minimum width=2cm, minimum height=5cm, align=center, draw] (hidden) at (2, 1.5) {};
 
-    % Draw the input layer nodes
-	\node[attr] (attr1) at (0,4) {};
-	\node[attr] (attr2) at (0,3.7) {};
-	\node[attr] (attr3) at (0,3.4) {};
-	\node[annot, text width = 2cm] (attr_annot) at (-2,3.7) {Unit Attributes};
-	\foreach \dest in {1,...,3}
-		\path (attr_annot) edge (attr\dest);
-
-	\node[health] (ah1) at (0,2.7) {};
-	\node[health] (ac1) at (0,2.4) {};
-	\node[ehealth] (eh1) at (0,2.1) {};
-	\node[ehealth] (ec1) at (0,1.8) {};
-	\node[annot, text width = 2.2cm] (allyenemy_annot) at (-2,2) {Ally/Enemy Health/Count Ratios ($\forall$ bins)};
+	\node[health] (ah1) at (0,3.2) {};
+	\node[health] (ac1) at (0,2.9) {};
+	\node[ehealth] (eh1) at (0,2.6) {};
+	\node[ehealth] (ec1) at (0,2.3) {};
+	\node[annot, text width = 2.2cm] (allyenemy_annot) at (-2,2.5) {Ally/Enemy Health/Count Ratios ($\forall$ bins)};
 	\foreach \d in {ah1,ac1,eh1,ec1}
 		\path (allyenemy_annot) edge (\d);
 
@@ -45,7 +37,7 @@
 	\foreach \d in {1,...,4}
 		\path (eattr_annot) edge (eattr\d);
 
-	\foreach \s in {attr1,attr2,attr3,ah1,ac1,eh1,ec1,eattr1,eattr2,eattr3,eattr4}
+	\foreach \s in {ah1,ac1,eh1,ec1,eattr1,eattr2,eattr3,eattr4}
 		\path (\s) edge (hidden);
 
 	\node[action] (action1) at (4,3) {};
@@ -57,12 +49,12 @@
 	\foreach \d in {1,...,5}
 		\path (hidden) edge (action\d);
 
-	\node[annot, text width=2.3cm] (actions) at (5.6, 2.3) {Action Scores};
+	\node[annot, text width=2.3cm] (actions) at (5.6, 2.3) {Action Scores ($\forall$ allies)};
 
 	\node[bin] (bin1) at (4,0.1) {};
 	\path (hidden) edge (bin1);
 
-	\node[annot, text width=2cm] (bins) at (5.6, .1) {Bin Scores ($\forall$ bins)};
+	\node[annot, text width=2.4cm] (bins) at (5.6, .1) {Bin Scores \\($\forall$ bins, allies)};
 
     \node[annot] at (0,5) {Input layer};
     \node[annot] at (2,5) {Hidden layer};

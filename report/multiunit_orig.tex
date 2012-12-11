@@ -46,21 +46,14 @@
 	\node[attack] (a1attack2) at (4,3.7) {};
 	\node[attack] (a1attack3) at (4,3.4) {};
 
-	\node[annot, text width=2.3cm] (a1attacks) at (6, 3.7) {Ally 1 Enemy Attack Scores};
-	\path (a1attacks) edge (a1attack1);
-	\path (a1attacks) edge (a1attack2);
-	\path (a1attacks) edge (a1attack3);
+	\node[annot, text width=2.3cm] (a1attacks) at (5.6, 3.7) {Ally 1 Enemy Attack Scores};
 
 	\node[move] (a1moveScore) at (4,3) {};
 	\node[move] (a1moveDist) at (4,2.7) {};
 	\node[move] (a1moveTheta) at (4,2.4) {};
 	\node[move] (a1moveFlip) at (4,2.1) {};
 
-	\node[annot, text width=2.3cm] (a1moves) at (6, 2.4) {Ally 1 Move $(s,r,\theta,f)$};
-	\path (a1moves) edge (a1moveScore);
-	\path (a1moves) edge (a1moveDist);
-	\path (a1moves) edge (a1moveTheta);
-	\path (a1moves) edge (a1moveFlip);
+	\node[annot, text width=2.3cm] (a1moves) at (5.6, 2.4) {Ally 1 Move $(s,r,\theta,f)$};
 
 	\node[annot, text width=.1cm] (dots) at (4,1.7) {\vdots};
 
@@ -68,21 +61,14 @@
 	\node[attack] (a3attack2) at (4,.7) {};
 	\node[attack] (a3attack3) at (4,.4) {};
 
-	\node[annot, text width=2.3cm] (a1attacks) at (6, .7) {Ally 3 Enemy Attack Scores};
-	\path (a1attacks) edge (a3attack1);
-	\path (a1attacks) edge (a3attack2);
-	\path (a1attacks) edge (a3attack3);
+	\node[annot, text width=2.3cm] (a1attacks) at (5.6, .7) {Ally 3 Enemy Attack Scores};
 
 	\node[move] (a3moveScore) at (4,0) {};
 	\node[move] (a3moveDist) at (4,-.3) {};
 	\node[move] (a3moveTheta) at (4,-.6) {};
 	\node[move] (a3moveFlip) at (4,-.9) {};
 
-	\node[annot, text width=2.3cm] (a3moves) at (6, -.6) {Ally 3 Move $(s,r,\theta,f)$};
-	\path (a3moves) edge (a3moveScore);
-	\path (a3moves) edge (a3moveDist);
-	\path (a3moves) edge (a3moveTheta);
-	\path (a3moves) edge (a3moveFlip);
+	\node[annot, text width=2.3cm] (a3moves) at (5.6, -.6) {Ally 3 Move $(s,r,\theta,f)$};
 
 	\foreach \d in {a1attack1,a1attack2,a1attack3,a1moveScore,a1moveDist,
 						a1moveTheta,a1moveFlip,a3moveScore,a3moveDist,

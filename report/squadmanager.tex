@@ -1,0 +1,38 @@
+\definecolor{turquoise}{RGB}{0,200,180}
+\definecolor{orange}{RGB}{230,127,0}
+\definecolor{purple}{RGB}{230,0,200}
+\definecolor{urple}{RGB}{100,0,200}
+\centering
+\hspace*{.5cm}
+\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep]
+   \tikzstyle{annot} = [text width=4em, text centered];
+	\tikzstyle{health}=[rectangle,fill=green];
+	\tikzstyle{ehealth}=[rectangle,fill=red];
+	\tikzstyle{move}=[rectangle,fill=orange];
+	\tikzstyle{delegate}=[rectangle,fill=turquoise];
+
+	\node[cloud, cloud puffs=15.7, cloud ignores aspect, minimum width=2cm, minimum height=5cm, align=center, draw] (hidden) at (2, 1.5) {};
+
+	\node[health] (ah) at (0,3) {};
+	\node[ehealth] (eh) at (0,0) {};
+
+	\node[move] (m1) at (4,3) {};
+	\node[delegate] (d1) at (4,0) {};
+
+	\node[annot, text width=2.7cm] (ah_annot) at (-2,3) {Squad Health \% \\ ($\forall$ squads)};
+	\node[annot, text width=2.7cm] (eh_annot) at (-2,0) {Enemy Health \% \\ ($\forall$ squads)};
+
+	\node[annot, text width=3cm] at (6,3) {Move Score \\ ($\forall$ squads)};
+	\node[annot, text width=3cm] at (6,0) {Delegate Score \\ ($\forall$ squads)};
+
+	\path (ah_annot) edge (ah);
+	\path (eh_annot) edge (eh);
+	\path (ah) edge (hidden);
+	\path (eh) edge (hidden);
+	\path (hidden) edge (m1);
+	\path (hidden) edge (d1);
+
+    \node[annot] at (0,5) {Input layer};
+    \node[annot] at (2,5) {Hidden layer};
+    \node[annot] at (4,5)  {Output layer};
+\end{tikzpicture}
