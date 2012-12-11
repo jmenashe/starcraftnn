@@ -1,9 +1,11 @@
 \documentclass[a4paper]{article}
+\usepackage{textpos}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{cite}
 \usepackage{tikz}
+\usetikzlibrary{shapes}
 \usepackage{courier}
 \usepackage[margin=1.4in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsmath}
@@ -56,7 +58,7 @@ We now cover our approach to the small-scale combat problem, beginning with a sh
 \subsection{The NEAT Algorithm}
 \label{sec:neat}
 
-NEAT provides us with a fairly simple way of creating network designs without prior knowledge of the optimal target configuration. While traditional neural network algorithms, such as backpropagation, rely on a predefined network architecture, NEAT requires only that we specify a relatively small number of parameters, shown in Table \ref{tab:neat_params}.
+NEAT provides us with a fairly simple way of creating network designs without prior knowledge of the optimal target configuration. While traditional neural network algorithms, such as backpropagation, rely on a predefined network architecture, NEAT requires only that we specify a relatively small number of parameters, shown in Table \ref{tab:neat_params}. Hidden nodes are added as needed based on random mutation and resulting fitness values.
 
 \begin{table}
 \centering
@@ -72,8 +74,39 @@ NEAT provides us with a fairly simple way of creating network designs without pr
 \label{tab:neat_params}
 \end{table}
 
+Clearly, properly designing the input and output nodes is critical to the performance of a neural network. We therefore maintain the evolutionary parameters defined in Table \ref{tab:neat_params_specific} for all tests, and instead focus our attention on the network I/O architecture.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+	\hline
+	Connection Weight Mutation Probability & 0.8\\ \hline
+	Add Connection Probability & 0.1\\ \hline
+	Delete Connection Probability & 0.001\\ \hline
+	Add Node Probability & 0.1\\ \hline
+	Timesteps Per Activation & 10\\ \hline
+	Connection Cycles & Enabled (i.e. Recurrent)\\ \hline
+\end{tabular}
+\caption{Selected NEAT evolution parameters. Probabilities are normalized such that they sum to 1.0 upon evaluation.}
+\label{tab:neat_params_specific}
+\end{table}
+
 \subsection{Network Design}
 \label{sec:net_design}
+
+We attempted multiple network designs, each of which is evaluated in Section \ref{sec:exp}. We begin with the Multi-Unit Network Design in Figure \ref{fig:design_multiunit}.
+
+\begin{figure}
+\input{multiunit_orig}
+\caption{The initial multi-unit network design for 3 allies and 3 enemies. $r$ and $\theta$ represent relative distance and angle. $s$ represents a score in the range $[0,1]$, and $f$ is a flip.}
+\label{fig:design_multiunit}
+\end{figure}
+
+\begin{figure}
+\input{individualcontroller}
+\caption{The initial individual controller network design.}
+\label{fig:design_individual}
+\end{figure}
 
 \section{Software}
 \label{sec:soft}
