@@ -2,5 +2,6 @@
 *.bbl
 *.blg
 *.log
+*.synctex
 papers
 bib_pres.bib

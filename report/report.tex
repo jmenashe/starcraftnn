@@ -122,11 +122,12 @@ where $A$ and $E$ are the ally and enemy counts at the end of the round, respect
 We attempted multiple network designs, each of which is evaluated in Section \ref{sec:exp}. In this section we make multiple references to training time in terms of hours. Training was performed on a desktop PC with Starcraft and NEAT running on a single core at 3.07 GHz. 
 
 \subsubsection{Multi-Unit Control}
+\label{sec:multiunit_design}
 
 We now begin with the multi-unit control network design in Figure \ref{fig:design_multiunit}.
 
 \begin{figure}
-\input{multiunit_orig}
+\input{multiunit}
 \caption{The multi-unit network design for 3 allies and 3 enemies. $r$ and $\theta$ represent relative distance and angle. $s$ represents a score in the range $[0,1]$, and $f$ is a flip.}
 \label{fig:design_multiunit}
 \end{figure}
@@ -147,8 +148,9 @@ This way, units can move omnidirectionally with either extreme of the output ran
 Using this network design, our units were able to achieve reasonable fitness levels in almost all trials with small combat scenarios within a few hours of training. Particularly, the design performed well with 3-5 units on either side. In the case of a 20-vs-20 battle, however, the design was not able to surpass an average population fitness of 1. This meant our units were losing battles more often than not, even after days of training. Reflecting on the design, this makes sense: with 20 allies and enemies there are $2 \cdot 20 + 20\cdot 20 \cdot 2 = 880$ input nodes and $20 \cdot (20 + 4) = 480$ output nodes. This results in over 400,000 possible connections, without taking into account hidden nodes that are added through neuroevolution. Given the constraints of interoperation with Starcraft, this presents a clear problem for quickly evolving networks to solve the small-scale combat problem. Moreover, the evolved networks are statically tied to the number of combatants; for any particular battle, we would need to have a precise controller pre-trained for that particular scenario. In practice, we would like our controllers to be more flexible, and thus we proceed to other solutions.
 
 \subsubsection{Individual Control}
+\label{sec:individual_design}
 
-Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of allied units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. In this way, we allow for arbitrary configurations of heterogeneous enemy combatants. To reduce the number of output nodes, we use a small set of nodes for action selection, where the action with the highest score is selected. We then use another cluster of nodes for bin selection so that the highest-scoring action is applied to the target bin. Actions are defined in Table \ref{tab:actions}.
+Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of allied units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. In this way, we allow for arbitrary configurations of heterogeneous enemy combatants. To reduce the number of output nodes, we use a small set of nodes for action selection, where the action with the highest score is selected. We then use another cluster of nodes for bin selection so that the highest-scoring action is applied to the target bin. Actions are defined in Table \ref{tab:actions}. Finally, to ensure that all values are normalized to the range $[0,1]$, each I/O value represents a percentage. Ally/Enemy counts are relative to the entire battle, so a bin with 7 enemies out of a total of 10 on the battlefield would have any enemy count value of 0.7, and a bin with all of the flying enemy units would have a \texttt{HasFlyer} value of 1.
 
 \begin{figure}
 \input{individualcontroller}
@@ -172,25 +174,63 @@ Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where
 \label{tab:actions}
 \end{table}
 
-This network design performed well in a variety of scenarios, from small (3v3) battles to larger 20v20 battles, however the networks that were generated lost some of the interesting behaviors we had seen in the multi-unit controller. A side goal of our experiments was to create networks that discovered interesting behavior, and so we decided to try another formulation that combines the scalability of the individual unit controller with the enhanced awareness of the multi-unit controller. We examine this controller in Section \ref{sec:squad_control}.
+This network design performed well in a variety of scenarios, from small (3v3) battles to larger 20v20 battles, however the networks that were generated lost some of the interesting behaviors we had seen in the multi-unit controller. A side goal of our experiments was to create networks that discovered interesting behavior, and so we decided to try another formulation that combines the scalability of the individual unit controller with the enhanced awareness of the multi-unit controller. We examine this controller in Section \ref{sec:squad_design}.
 
 \subsubsection{Squad Control}
-\label{sec:squad_control}
+\label{sec:squad_design}
 
 \begin{figure}
 \input{squadcontroller}
 \caption{The squad controller network design.}
-\label{fig:design_squad}
+\label{fig:squad_design}
 \end{figure}
 
+In Figure \ref{fig:squad_design} we see the basic design for the squad controller. The idea behind this design is to take a small number of predefined unit types and teach them to work together, so that they can be organized into a larger battalion with a squad commander. The network design is essentially a mix of the ideas from the multi-unit and individual-unit controllers: ally and enemy statistics are captured per bin (with respect to the squad's centroid), and action/bin scores are calculated for each ally. With 4 allies in one squad and 15 bins, this results in 105 input nodes and 80 output nodes.
+
 \begin{figure}
-\input{squadmanager}
-\caption{The squad manager network design.}
-\label{fig:design_squad_manager}
+\input{squadcommander}
+\caption{The squad commander network design.}
+\label{fig:quad_commander_design}
 \end{figure}
+
+Individual squads need to function together as a team, and thus we introduce the squad commander as the final network design we examined. The squad commander is much simpler than the other network designs, since it relies heavily on the fact that its squads are pre-trained. Figure \ref{fig:quad_commander_design} shows the details. The commander takes in ally and enemy health, and decides whether to move each squad to a different location or to delegate control to that squad. The commander uses heuristics with prior knowledge to divide enemy groups between squads. For example, a squad that is well-equipped to take out flying units will preferentially be assigned flying enemy combatants as targets. Squads can therefore focus specifically on their targets assigned by the commander and ignore the rest of the enemies on the battlefield. This hierarchical organization reduces complexity at each level, and reduces overall design complexity by orders of magnitude.
 
 \section{Experiments}
 \label{sec:exp}
+
+We now present a series of experiments to show the effectiveness of each network design in practice. In the following experiments we will refer to a handful of Starcraft units. These units are described briefly in Table \ref{tab:units}. We proceed with the experiments analogously to Section \ref{sec:net_design}, and conclude with small trials against an existing bot and a human competitor.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+	\hline
+	{\bf Unit} & {\bf Description} \\ \hline
+	Marine & Long-range ground unit \\ \hline
+	\multirow{2}{*}{Firebat} & Short-range ground unit \\
+	& Can hit multiple enemies simultaneously \\ \hline
+	\multirow{2}{*}{Ghost} & Long-range ground unit \\
+	& More powerful than a marine\\ \hline
+	\multirow{3}{*}{Goliath} & Long-range ground unit \\
+	& Has attack bonus vs. air units \\
+	& More powerful than marines, firebats, and ghosts \\ \hline
+	Wraith & Long-range air unit \\ \hline
+\end{tabular}
+\caption{Descriptions of units used in the training experiments.}
+\label{tab:units}
+\end{table}
+	
+\subsection{Multi-Unit Control}
+
+We performed our initial experiment to gauge the ability of a simple network design to outperform Starcraft's built-in AI. Using the controller from Section \ref{sec:multiunit_design} we construct a training scenario in which 2 marines and 1 firebat spawn for each team on the two sides of the combat area. The built-in (i.e. enemy) AI attacks the spawn location of the allied AI, ensuring that if the allies do nothing then a battle will still take place. Figure \ref{fig:multiunit_exp} shows the fitness graph obtained for this experiment.
+
+Of particular interest in this experiment is the development of interesting behavior that was found. The first of these behaviors was a tendency for units to run away when only 1 ally is left in battle. Our original fitness formulation didn't assign any fitness value when battles ended due to a timeout. Due to the stochastic nature of these battles, a team with occasional wins could avoid losses entirely by running away when such a loss was imminent. The second interesting behavior regards the dynamics of firebats and marines. Firebats do a large amount of damage, so killing them as early as possible at as great a range as possible is preferable. In these training sessions we saw a behavior surface in which the allied firebat would go straight for the enemy firebat at the beginning of the battle, and then switch targets to a marine when the enemy firebat had gotten low on health. This dealt out a maximal amount of damage to the enemy firebat initially, while in some cases preserving the allied firebat in the process. It also ensured that allied marines could keep a safe distance from the enemy firebat. A video of this behavior is given in Section \ref{sec:videos}.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.1]{plots/multiunit.pdf}
+\caption{A fitness graph of the multi-unit controller in a 3v3 scenario, with 2 marines and 1 firebat on each team. Fitness progresses slowly over the threshold of 1.0, indicating that the average genome defeats the enemy units more often than not.}
+\label{fig:multiunit_exp}
+\end{figure}
 
 \section{Conclusions}
 \label{sec:conclusion}
@@ -198,6 +238,19 @@ This network design performed well in a variety of scenarios, from small (3v3) b
 \section{Future Work}
 \label{sec:future}
 
+\section{Videos}
+\label{sec:videos}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+	\hline
+	{\bf Video} & {\bf Description}\\ \hline
+	\multirow{2}{*}{\url{http://www.youtube.com/watch?v=OeMwC0bexlo}} & 3v3 battle with 2 marines and \\
+	& 1 firebat on each team \\ \hline
+\end{tabular}
+\end{center}
+	
+	
 \bibliographystyle{unsrt}
 \bibliography{bibliography}
 
