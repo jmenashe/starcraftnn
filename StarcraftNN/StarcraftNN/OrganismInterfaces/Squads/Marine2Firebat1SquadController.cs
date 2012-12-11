@@ -7,11 +7,6 @@ namespace StarcraftNN.OrganismInterfaces.Squads
 {
     public class Marine2Firebat1SquadController : SquadControllerInterface
     {
-        protected override int SquadSize
-        {
-            get { return 3; }
-        }
-
         protected override int SquadCount
         {
             get { return 1; }

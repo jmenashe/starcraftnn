@@ -57,7 +57,10 @@ namespace StarcraftNN.OrganismInterfaces
                 return _hasAir.Value;
             }
         }
-        public UnitGroup() { }
+        public UnitGroup() 
+        {
+            _units = new List<Unit>();
+        }
         public UnitGroup(List<Unit> units)
         {
             _units = units;

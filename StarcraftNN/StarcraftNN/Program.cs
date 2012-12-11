@@ -44,8 +44,12 @@ namespace StarcraftNN
                     case "mf":
                         population = new BroodwarPopulation(new Marine2Firebat1Squad());
                         break;
+                    case "mfgw":
+                        population = new BroodwarPopulation(new MarineFirebatGoliathWraithSquadController());
+                        Console.WriteLine("Starting marine firebat goliath wraith squad controller");
+                        break;
                     default:
-                        population = new BroodwarPopulation(new Marine2Firebat1Squad());
+                        population = new BroodwarPopulation(new MarineFirebatGoliathWraithSquadController());
                         break;
                 }
                 if (args.Length > 1)
@@ -56,7 +60,6 @@ namespace StarcraftNN
             }
             else population = new BroodwarPopulation(new Marine2Firebat1Squad());
             
-            population.EnableEvolution = true;
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();

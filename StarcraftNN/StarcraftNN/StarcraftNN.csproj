@@ -68,6 +68,7 @@
     <Compile Include="OrganismInterfaces\Position.cs" />
     <Compile Include="OrganismInterfaces\Squads\Marine2Firebat1Squad.cs" />
     <Compile Include="OrganismInterfaces\Squads\Marine2Firebat1SquadController.cs" />
+    <Compile Include="OrganismInterfaces\Squads\MarineFirebatGoliathWraithSquadController.cs" />
     <Compile Include="OrganismInterfaces\Squads\SquadInterface.cs" />
     <Compile Include="OrganismInterfaces\Squads\SquadControllerInterface.cs" />
     <Compile Include="OrganismInterfaces\UnitGroup.cs" />

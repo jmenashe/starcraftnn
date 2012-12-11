@@ -22,7 +22,6 @@ namespace StarcraftNN.OrganismInterfaces
         private KMeans _kmeans = new KMeans();
         PolarBinManager _polarbins;
 
-        protected abstract int SquadSize { get; }
         protected abstract int SquadCount { get; }
         protected List<double> DistanceRanges = new List<double> { 0, 100, 300, 1000, double.PositiveInfinity };
         protected int ThetaBins = 12;

@@ -71,6 +71,7 @@ namespace StarcraftNN
 
         public BroodwarPopulation(IOrganismInterface iface)
         {
+            this.EnableEvolution = true;
             _iface = iface;
             NeatGenomeFactory factory = _iface.CreateGenomeFactory();
             this.GenomeFile = Path.Combine(_saveDirectory, _iface.SaveFile + ".xml");
@@ -114,7 +115,9 @@ namespace StarcraftNN
             if (this.EnableEvolution)
             {
                 while (_currentGenome.EvaluationInfo.IsEvaluated)
+                {
                     Thread.Sleep(250);
+                }
             }
             _iface.InputActivate(_currentGenome);
         }
