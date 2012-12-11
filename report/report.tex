@@ -15,6 +15,7 @@
 \usepackage{chngcntr}
 \counterwithin{figure}{section}
 \counterwithin{table}{section}
+\counterwithin{equation}{section}
 \setlist[enumerate]{itemsep=0mm}
 \setlist[itemize]{itemsep=0mm}
 \newcommand{\fillin}[1]{X}
@@ -35,7 +36,7 @@ Micro-management is a major component of real-time strategy (RTS) games such as 
 
 The domain of micro-management in combat environments is therefore well-suited to the application of intelligent, autonomous agents. While the best AI implementations still fall below the average competitive human player in terms of high-level planning and strategy \cite{weber2011building}, a trained unit controller agent should have little difficulty outperforming a human for any reasonably-sized army. Indeed, while an agent may potentially make hundreds of decisions and unit actions per second, even the most skilled human Starcraft players can only achieve about 5 actions per second \cite{mccoy2008integrated}.
 
-In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \fillin{ai competition citation}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:tech} we review our approach to learning controller agents, along with a discussion of software libraries and implementation challenges in Section \ref{sec:soft}. We evaluate our results agains the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
+In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \fillin{ai competition citation}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results agains the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
 
 \section{Background}
 \label{sec:back}
@@ -49,6 +50,19 @@ There has been considerable progress toward this goal in Starcraft, primarily du
 Typical approaches to Starcraft bots include case-based reasoning \fillin{more citations} and hierarchical skill management \fillin{citations}. The former technique aims to learn skills, build order, and general strategy from replays of past games, while the latter technique organizes expert modules into a hierarchical decision model. These two approaches need not be mutually exclusive. Wender and Watson refine the problem of creating expert modules by focusing exclusively on small-scale combat tactics in \cite{rl_small_scale_combat}, and it is this work that relates most closely to our own. While Wender and Watson restrict their analysis to the particular combat configuration of a single, fast, ranged unit versus multiple slower short-ranged units, we seek to optimize small-scale combat in a more general sense by allowing for heterogeneous unit groups with an unspecified number of combatants. In this way, our approach moves toward a more flexible solution for the problem of micro-management in small-scale combat. 
 
 Another notable difference between our work and that of \cite{rl_small_scale_combat} is our use of NEAT (see Section \ref{sec:neat}) for learning unit controllers. We select NEAT for a number of reasons. First, as we will describe in Section \ref{sec:net_design}, our state space is continuous and high-dimensional. Neural networks are naturally well-designed for parsing continuous state spaces and determining their value. Second, due to the computational cost of communicating with and executing commands on the Starcraft runtime, we are restricted in the number of iterations we may perform to learn this state space. NEAT has been shown to significantly outperform traditional reinforcement learning methods under these circumstances \cite{Stanley:2004:EEN:1048234}. Finally, while we can accurately determine the value of a match, we cannot predict what intermediate behaviors might be optimal for our overall goal of achieving combat prowess. We therefore rely on NEAT to discover these innovations in the form of connections and connection weights in an efficient manner.
+
+\section{Software}
+\label{sec:soft}
+
+Our research was enabled by the BroodWar API (BWAPI) \cite{bwapi}, BWAPI Mono-Bridge \cite{monobridge}, and Starcraft: Broodwar itself. We use SharpNeat \cite{sharpneat}, a C\# NEAT implementation for neuroevolution. While BWAPI is natively coded in C++, we selected a C\# implementation due to the following considerations:
+
+\begin{itemize}
+	\item Our focus for this work is in testing new configurations for NEAT and new combinations with our own heuristics, so development speed is of particular importance. C\# provides many high-level language features that allow for faster development than in C++.
+	\item BWAPI only runs on Visual Studio in Windows, so there is no cross-platform or open-source advantage to using C++.
+	\item SharpNEAT is an exceptionally well-coded and well-documented NEAT implementation. Along with working quite simply out of the box, the code is modularized and easily configurable, and has built in analysis and visualization tools.
+\end{itemize}
+
+Because C\# communicates with BWAPI through a client-server interface, processing is slower than would be in the case of C++. We felt that the increased productivity more than made up for this disadvantage. In addition, the mono-bridge implementation uses an out-of-date version of BWAPI, although this didn't significantly affect our work. For future development it will be necessary to update this interface.
 
 \section{Technical Approach}
 \label{sec:tech}
@@ -91,10 +105,25 @@ Clearly, properly designing the input and output nodes is critical to the perfor
 \label{tab:neat_params_specific}
 \end{table}
 
+\subsection{Training Setup}
+
+Our network designs are closely tied to our training configurations, and thus we will cover the general outline for training. Starcraft's built-in Campaign Editor application allows for users to create custom maps complete with environment specifications and state-based triggers. We used the campaign editor to construct scenarios in which teams of units are repeatedly spawned at two starting points, one for our bot (``allies") and one for the built-in AI (``enemies"). Allies and enemies repeatedly fight one another until all of one side has been defeated, signaling the completion of that round. For each genome generated by NEAT, we assign fitness based on its average performance over 5 rounds using Equation \ref{eqn:fitness}:
+
+\begin{equation}
+f = \frac{(A - E) + A_\mathrm{max}}{A_\mathrm{max}}\\
+\label{eqn:fitness}
+\end{equation}
+
+where $A$ and $E$ are the ally and enemy counts at the end of the round, respectively, and $A_\mathrm{max} = E_\mathrm{max}$ is the starting count of allies or enemies in the training scenario. Using this formulation, the fitness value is always in the range $[0,2]$, with 1 representing a tie. In practice, ties only occur when the learned network moves the allies out of the combat area, so to avoid this behavior we assign a fitness score of 0 in all scenarios where $A \neq 0$ and $E \neq 0$.
+
 \subsection{Network Design}
 \label{sec:net_design}
 
-We attempted multiple network designs, each of which is evaluated in Section \ref{sec:exp}. We begin with the Multi-Unit Network Design in Figure \ref{fig:design_multiunit}.
+We attempted multiple network designs, each of which is evaluated in Section \ref{sec:exp}. In this section we make multiple references to training time in terms of hours. Training was performed on a desktop PC with Starcraft and NEAT running on a single core at 3.07 GHz. 
+
+\subsubsection{Multi-Unit Control}
+
+We now begin with the multi-unit control network design in Figure \ref{fig:design_multiunit}.
 
 \begin{figure}
 \input{multiunit_orig}
@@ -102,11 +131,30 @@ We attempted multiple network designs, each of which is evaluated in Section \re
 \label{fig:design_multiunit}
 \end{figure}
 
+This design represents our initial attempt at a network design. Inputs to the network include health percentages for each ally and each enemy in the training session, as well as the distances and angles of each enemy relative to each ally. Outputs include one score for each ally/enemy pair, as well as move score, distance, angle, and flip values for each ally. Flips are added as a way to differentiate between different extremes of the output range of the movement angle node. Originally we attempted a direct mapping of $\theta = 2 \cdot \pi \cdot o_\theta$, where $o_\theta \in [0,1]$ is the value of the movement angle output node. This has the effect that the extremes 0 and 1 map to the same movement. Thus, we instead use the following formulation:
+
+ \begin{displaymath}
+   \theta = \left\{
+     \begin{array}{lr}
+       o_\theta \cdot \pi & : f > 0.5\\
+       o_\theta \cdot -\pi & : f \leq 0.5\\
+     \end{array}
+   \right.
+\end{displaymath}
+
+This way, units can move omnidirectionally with either extreme of the output range corresponding to different directions.
+
+Using this network design, our units were able to achieve reasonable fitness levels in almost all trials with small combat scenarios within a few hours of training. Particularly, the design performed well with 3-5 units on either side. In the case of a 20-vs-20 battle, however, the design was not able to surpass an average population fitness of 1, meaning our units were losing battles more often than not, even after days of training. Reflecting on the design, this makes sense: with 20 allies and enemies, there are $2 \cdot 20 + 20\cdot 20 \cdot 2 = 880$ input nodes and $20 \cdot (20 + 4) = 480$ output nodes. This results in over 400,000 possible connections, without taking into account hidden nodes that are added through neuroevolution. Given the constraints of interoperation with Starcraft, this presents a clear problem for quickly evolving networks to solve the small-scale combat problem. Moreover, the evolved networks are statically tied to the number of combatants; for any particular battle, we would need to have a precise controller pre-trained for that particular scenario. In practice, we would like our controllers to be more flexible, and thus we proceed to other solutions.
+
+\subsubsection{Individual Control}
+
 \begin{figure}
 \input{individualcontroller}
 \caption{The individual controller network design.}
 \label{fig:design_individual}
 \end{figure}
+
+\subsubsection{Squad Control}
 
 \begin{figure}
 \input{squadcontroller}
@@ -119,9 +167,6 @@ We attempted multiple network designs, each of which is evaluated in Section \re
 \caption{The squad manager network design.}
 \label{fig:design_squad_manager}
 \end{figure}
-
-\section{Software}
-\label{sec:soft}
 
 \section{Experiments}
 \label{sec:exp}
