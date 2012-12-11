@@ -24,6 +24,16 @@ namespace StarcraftNN.OrganismInterfaces
             public void Clear() { units.Clear(); positions.Clear(); }
         }
 
+        public List<UnitGroup> ComputeClusters(List<Unit> units, int clusterCount)
+        {
+            if (units.Count == 0)
+                return new List<UnitGroup>();
+            if (units.Count < clusterCount)
+                return new List<UnitGroup> { units };
+            List<Position> positions = units.Select(x => x.getPosition()).Select(x => new Position(x.xConst(), x.yConst())).ToList();
+            return ComputeClusters(positions, units, clusterCount);
+        }
+
         public List<UnitGroup> ComputeClusters(List<Position> positions, List<Unit> units, int clusterCount)
         {
             HashSet<int> centerIndexes = new HashSet<int>();

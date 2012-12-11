@@ -19,8 +19,8 @@ namespace StarcraftNN.OrganismInterfaces
         protected List<ISquad> _squads;
         protected List<UnitGroup> _enemyGroups;
         protected Dictionary<Unit, Action> _lastAction;
-        private KMeans _kmeans = new KMeans();
-        PolarBinManager _polarbins;
+        protected KMeans _kmeans = new KMeans();
+        protected PolarBinManager _polarbins;
 
         protected abstract int SquadCount { get; }
         protected List<double> DistanceRanges = new List<double> { 0, 100, 300, 1000, double.PositiveInfinity };
@@ -89,7 +89,8 @@ namespace StarcraftNN.OrganismInterfaces
             for (int i = 0; i < this.SquadCount; i++ )
             {
                 ISquad squad = _squads[i];
-                UnitGroup enemyGroup = _enemyGroups[i];
+                int gi = Math.Min(_enemyGroups.Count - 1, i);
+                UnitGroup enemyGroup = _enemyGroups[gi];
                 blackbox.InputSignalArray[sensor++] = (double)squad.HitPoints / squad.MaxHitPoints;
                 blackbox.InputSignalArray[sensor++] = (double)enemyGroup.HitPoints / enemyGroup.MaxHitPoints;
             }
@@ -110,14 +111,14 @@ namespace StarcraftNN.OrganismInterfaces
             }
         }
 
-        protected void groupEnemies()
+        protected virtual void groupEnemies()
         {
             _enemyGroups = _kmeans.ComputeClusters(_polarbins.EnemyPositions, _enemies, this.SquadCount);
         }
 
         protected abstract void formSquads(List<UnitGroup> enemyGroups);
 
-        public void InputActivate(NeatGenome genome)
+        public virtual void InputActivate(NeatGenome genome)
         {
             var blackbox = this.Decoder.Decode(genome);
             this.Input(blackbox);

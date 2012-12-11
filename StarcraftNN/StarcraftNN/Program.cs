@@ -49,7 +49,7 @@ namespace StarcraftNN
                         Console.WriteLine("Starting marine firebat goliath wraith squad controller");
                         break;
                     default:
-                        population = new BroodwarPopulation(new MarineFirebatGoliathWraithSquadController());
+                        population = new BroodwarPopulation(new MFGW_IG_SquadController());
                         break;
                 }
                 if (args.Length > 1)
@@ -58,7 +58,7 @@ namespace StarcraftNN
                         case "gui": useGui = true; break;
                     }
             }
-            else population = new BroodwarPopulation(new Marine2Firebat1Squad());
+            else population = new BroodwarPopulation(new MFGW_IG_SquadController());
             
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
