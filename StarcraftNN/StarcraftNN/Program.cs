@@ -38,14 +38,17 @@ namespace StarcraftNN
             {
                 switch(args[0])
                 {
-                    case "gw":
+                    case "mf":
+                        population = new BroodwarPopulation(new MarineFirebat3v3());
+                        break;
+                    case "gws":
                         population = new BroodwarPopulation(new Goliath2Wraith2Squad());
                         break;
-                    case "mf":
+                    case "mfs":
                         population = new BroodwarPopulation(new Marine2Firebat1Squad());
                         break;
                     case "mfgw":
-                        population = new BroodwarPopulation(new MarineFirebatGoliathWraithSquadController());
+                        population = new BroodwarPopulation(new MFGW_IG_SquadController());
                         Console.WriteLine("Starting marine firebat goliath wraith squad controller");
                         break;
                     default:
@@ -58,7 +61,7 @@ namespace StarcraftNN
                         case "gui": useGui = true; break;
                     }
             }
-            else population = new BroodwarPopulation(new MFGW_IG_SquadController());
+            else population = new BroodwarPopulation(new MarineFirebat3v3());
             
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
@@ -84,17 +87,17 @@ namespace StarcraftNN
                     bwapiclient.BWAPIClient.update();
                     manager.HandleFrame();
                     List<Event> events = bwapi.Broodwar.getEvents().ToList();
-                    if (events.Any(x => x.type == EventType_Enum.UnitDestroy))
+                    if (events.Any(x => x.getType() == EventType_Enum.UnitDestroy))
                         advanceFrames();
                     foreach (Event e in events)
                     {
-                        switch(e.type)
+                        switch(e.getType())
                         {
                             case EventType_Enum.UnitCreate:
-                                manager.HandleUnitCreate(e.unit);
+                                manager.HandleUnitCreate(e.getUnit());
                                 break;
                             case EventType_Enum.UnitDestroy:
-                                manager.HandleUnitDestroy(e.unit);
+                                manager.HandleUnitDestroy(e.getUnit());
                                 break;
                             case EventType_Enum.MatchEnd:
                                 manager.HandleMatchEnd();

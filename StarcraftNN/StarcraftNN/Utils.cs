@@ -22,10 +22,11 @@ namespace StarcraftNN
         }
         public static List<Unit> getEnemies()
         {
-            return bwapi.Broodwar
+            var e = bwapi.Broodwar
                 .enemies().SelectMany(x => x.getUnits())
                 .Where(x => x.getType().canMove())
                 .ToList();
+            return e;
         }
 
         public static Position getCentroid(IEnumerable<Unit> units)

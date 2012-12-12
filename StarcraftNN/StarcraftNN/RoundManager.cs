@@ -23,14 +23,17 @@ namespace StarcraftNN
         {
             get
             {
-                return bwapi.Broodwar.self().getUnits().Where(x => x.getType().getID() == RoundManager.ResetUnitTypeID).Single();
+                var unit = bwapi.Broodwar.self().getUnits().Where(x => x.getType().getID() == RoundManager.ResetUnitTypeID).FirstOrDefault();
+                return unit;
             }
         }
         public RoundManager(BroodwarPopulation population) 
         {
             _maxAllyUnits = Utils.getAllies().Count;
             _maxEnemyUnits = Utils.getEnemies().Count;
-            _resetPosition = this.ResetUnit.getPosition();
+            var unit = this.ResetUnit;
+            if (unit != null)
+                _resetPosition = unit.getPosition();
             _population = population;
         }
 
@@ -70,7 +73,10 @@ namespace StarcraftNN
             _resetting = true;
             _completionSignaled = false;
             _population.EndIteration(_frameCount);
-            signalCompletion();
+            if (this.ResetUnit == null)
+                _completionSignaled = true;
+            else
+                signalCompletion();
         }
 
         private void beginRound()
