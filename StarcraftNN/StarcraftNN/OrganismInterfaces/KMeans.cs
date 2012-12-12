@@ -42,10 +42,12 @@ namespace StarcraftNN.OrganismInterfaces
             CenteredClusters clusters = new CenteredClusters();
             foreach (var i in centerIndexes)
                 clusters.Add(positions[i], new Cluster());
+            double distance;
             do
             {
                 assign(clusters, positions, units);
-            } while (update(clusters) < _epsilon);
+                distance = update(clusters);
+            } while (distance > _epsilon);
             var groups = new List<UnitGroup>();
             foreach (var kvp in clusters)
                 groups.Add(clusters[kvp.Key].units);
@@ -72,6 +74,9 @@ namespace StarcraftNN.OrganismInterfaces
                 clusters[nearestCenter].positions.Add(positions[i]);
                 clusters[nearestCenter].units.Add(units[i]);
             }
+            foreach (var kvp in clusters.ToList())
+                if (clusters[kvp.Key].positions.Count == 0)
+                    clusters.Remove(kvp.Key);
         }
 
         protected double update(CenteredClusters clusters)

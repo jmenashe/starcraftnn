@@ -66,7 +66,7 @@ namespace StarcraftNN.OrganismInterfaces
             param.AddConnectionMutationProbability = 0.1;
             param.AddNodeMutationProbability = 0.1;
             param.ConnectionWeightMutationProbability = 0.8;
-            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 1), UnitCount * (UnitCount + 3), param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(UnitCount * (UnitCount * 2 + 2), UnitCount * (UnitCount + 4), param);
             return factory;
         }
 
@@ -185,13 +185,7 @@ namespace StarcraftNN.OrganismInterfaces
 
         public double ComputeFitness(int frameCount)
         {
-            double maxScale = 4;
-            double minimum = -(_startEnemyHealth * _startEnemyHealth) * maxScale;
-            double score = _allies.Sum(x => x.getHitPoints()) - _enemies.Sum(x => x.getHitPoints());
-            score *= Math.Abs(score);
-            score *= 200.0 / frameCount;
-            score -= minimum;
-            return score;
+            return Utils.computeStandardFitness(_allies, _enemies, frameCount);
         }
     }
 }
