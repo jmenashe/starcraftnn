@@ -305,7 +305,7 @@ Another possible area of improvement lies in squad command and enemy grouping. O
 
 Our current implementation also does not make use of specialized unit abilities. For example, a Templar unit is able to use the Psionic Storm ability to attack a large area of enemies simultaneously. Effective use of these abilities is a particular challenge for human players, so mastering them would prove a significant advantage for an AI controller. Using the squad paradigm, it would be a simple matter to attach unique unit abilities to individual squads without a significant increase in training complexity.
 
-Finally, the squad commander network should be more flexible to different squad configurations. This might be achieved by discretizing squad attributes with adjectives like \texttt{HasAttackAirBonus} or \texttt{CanTurnInvisible}. This would add invariance to squad ordering and specific setup by instead focusing on each squad's abilities.
+Finally, the squad commander network should be more flexible to different squad configurations. This might be achieved by discretizing squad attributes with adjectives like \texttt{HasAttackAirBonus} or \texttt{CanTurnInvisible}. This would add invariance to squad ordering and specific setup by instead focusing on each squad's abilities. To handle varying numbers of squads, we propose a recursive hierarchical structure like the squad commander/controller setup we use here, in which multiple layers of combat strategy oversee the course of a battle. This corresponds to real-world combat scenarios in which officer ranks determine each soldier's level of oversight.
 
 \section{Videos}
 \label{sec:videos}
