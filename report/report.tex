@@ -7,7 +7,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 \usepackage{courier}
-\usepackage[margin=1.5in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage[margin=1.25in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{multirow}
@@ -63,7 +63,9 @@ Our research was enabled by the BroodWar API (BWAPI) \cite{bwapi}, BWAPI Mono-Br
 	\item SharpNEAT is an exceptionally well-coded and well-documented NEAT implementation. Along with working quite simply out of the box, the code is modularized and easily configurable, and has built in analysis and visualization tools.
 \end{itemize}
 
-Because C\# communicates with BWAPI through a client-server interface, processing is slower than would be in the case of C++. We felt that the increased productivity more than made up for this disadvantage. In addition, the mono-bridge implementation uses an out-of-date version of BWAPI, although this didn't significantly affect our work. For future development it will be necessary to update this interface.
+Because C\# communicates with BWAPI through a client-server interface, processing is slower than would be in the case of C++. We felt that the increased productivity more than made up for this disadvantage.
+
+It proved difficult to automate more complex training sessions due to the limitations of Starcraft and BWAPI. The Starcraft Campaign Editor has a number of bugs that prevent triggers from executing properly, forcing us to use a series of hacks to maintain quick training cycles. Automating bot-vs-bot battles was a challenge as well; the BWAPI software often crashes between battles, and is not fast enough for running the thousands of training rounds necessary for optimal results. For this reason, the majority of our training was performed against the built-in AI.
 
 \section{Technical Approach}
 \label{sec:tech}
@@ -254,8 +256,8 @@ Motivated by our search for interesting behaviors, we now consider the squad con
 \begin{figure}
 \centering
 \mbox{\subfigure{\includegraphics[width=3in]{plots/squad_mf.pdf}}\quad
-\subfigure{\includegraphics[width=3in]{plots/squad_gw.pdf} }}
-\caption{Fitness graphs for squad controllers in isolation. The marine-firebat setup performs similarly to the multi-unit controller, but can compensate for varying numbers of enemies. The goliath-wraith setup performs much better, in a similar fashion to the individual unit controller.}
+\subfigure{\includegraphics[width=2.3in,height=1.8in]{plots/squad_gw.pdf} }}
+\caption{Fitness graphs for squad controllers in isolation. The marine-firebat setup performs similarly to the multi-unit controller, but can compensate for varying numbers of enemies. The goliath-wraith setup performs much better.}
 \label{fig:squads_exp}
 \end{figure}
 
@@ -288,6 +290,7 @@ To anchor our reported fitness scores to a practical setting, we now present res
 \label{tab:results}
 \end{table}
 
+The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't generalize to human players or the Skynet bot. \fillin{Talk about why - if we can evolve a controller to do well against skynet, then that shows it's most likely overfitting or a deficient built-in AI, and could be resolved in the general case w/ competitive evolution}.
 \section{Conclusions}
 \label{sec:conclusion}
 
@@ -295,6 +298,14 @@ We have shown the effectiveness of three different approaches to creating small-
 
 \section{Future Work}
 \label{sec:future}
+
+The most obvious deficiency of our training method is the reliance upon Starcraft's built-in AI for training. This AI is rather poor at small-scale combat, and so our best genomes were only barely competitive in human trials and were easily defeated against Skynet. Training directly against a target opponent (such as Skynet) seems like a reasonable requirement at the surface, however we would prefer a system that does not rely on prior knowledge of the opponent's behaviors and tendencies. Therefore a possible remedy to this would be a competitive evolutionary setup, in which our genomes compete against one another. This would push for continual innovation, and we believe would allow for better generalization against unknown bots or human opponents. Allowing for this type of evolutionary strategy would require updates to BWAPI to allow smoother transitions between battles in a multi-instance setting. Alternatively, our system could be moved off of the BWAPI platform and onto an open-source alternative, such as ORTS \cite{orts}.
+
+Another possible area of improvement lies in squad command and enemy grouping. Our current squad commander implementation relies on hard-coded heuristics for grouping squads with enemies. An alternative approach might use the neural network controlling the squad commander to make these decisions as well. Rather than ignoring enemy attributes and simply choosing to move or delegate, the commander might learn to associate enemy configurations with a library of trained squads. Squads can be trained effectively in just a few hours on a standard desktop machine, allowing for a large number of specialized squads to be created for the commander to choose from.
+
+Our current implementation also does not make use of specialized unit abilities. For example, a Templar unit is able to use the Psionic Storm ability to attack a large area of enemies simultaneously. Effective use of these abilities is a particular challenge for human players, so mastering them would prove a significant advantage for an AI controller. Using the squad paradigm, it would be a simple matter to attach unique unit abilities to individual squads without a significant increase in training complexity.
+
+Finally, the squad commander network should be more flexible to different squad configurations. This might be achieved by discretizing squad attributes with adjectives like \texttt{HasAttackAirBonus} or \texttt{CanTurnInvisible}. This would add invariance to squad ordering and specific setup by instead focusing on each squad's abilities.
 
 \section{Videos}
 \label{sec:videos}

@@ -5,7 +5,8 @@ set xlabel "Generation";
 set ylabel "Normalized Fitness";
 set title "Goliath-Wraith Population Fitness Over Time";
 set datafile separator ',';
-set key outside right center;
+#set key outside right center;
+unset key;
 f(x) = a + b*log(x)
 fit f(x) source.".csv" u 12:2 via a, b
 plot \
