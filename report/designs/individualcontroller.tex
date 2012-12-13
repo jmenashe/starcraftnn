@@ -3,7 +3,8 @@
 \definecolor{purple}{RGB}{230,0,200}
 \definecolor{urple}{RGB}{100,0,200}
 \centering
-\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep]
+\hspace*{-.4cm}
+\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep, scale=.8]
    \tikzstyle{every pin edge}=[<-,shorten <=1pt]
    \tikzstyle{neuron}=[circle,fill=black!25,minimum size=17pt,inner sep=0pt]
    \tikzstyle{input neuron}=[neuron, fill=green!50];
@@ -33,7 +34,7 @@
 	\node[health] (ac1) at (0,2.4) {};
 	\node[ehealth] (eh1) at (0,2.1) {};
 	\node[ehealth] (ec1) at (0,1.8) {};
-	\node[annot, text width = 2.2cm] (allyenemy_annot) at (-2,2) {Ally/Enemy Health/Count Ratios ($\forall$ bins)};
+	\node[annot, text width = 2.2cm] (allyenemy_annot) at (-2,2) {Unit Health/Count ($\forall$ bins)};
 	\foreach \d in {ah1,ac1,eh1,ec1}
 		\path (allyenemy_annot) edge (\d);
 

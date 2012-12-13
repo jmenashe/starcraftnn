@@ -1,3 +1,4 @@
+load "fonts.gp"
 set terminal pdf
 source = "squad_gw"
 set output source.".pdf"
@@ -5,8 +6,7 @@ set xlabel "Generation";
 set ylabel "Normalized Fitness";
 set title "Goliath-Wraith Population Fitness Over Time";
 set datafile separator ',';
-#set key outside right center;
-unset key;
+set key inside right bottom;
 f(x) = a + b*log(x)
 fit f(x) source.".csv" u 12:2 via a, b
 plot \

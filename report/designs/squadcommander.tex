@@ -3,8 +3,8 @@
 \definecolor{purple}{RGB}{230,0,200}
 \definecolor{urple}{RGB}{100,0,200}
 \centering
-\hspace*{.5cm}
-\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep]
+\hspace*{-.5cm}
+\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep, scale=.8]
    \tikzstyle{annot} = [text width=4em, text centered];
 	\tikzstyle{health}=[rectangle,fill=green];
 	\tikzstyle{ehealth}=[rectangle,fill=red];
@@ -27,8 +27,8 @@
 	\node[annot, text width=2.2cm] (health_annot) at (-2,3) {Ally, Enemy Health \% \\ ($\forall$ squads)};
 	\node[annot, text width=2.2cm] (count_annot) at (-2,.75) {Ally, Enemy Count \% \\ ($\forall$ bins)};
 
-	\node[annot, text width=3cm] at (6,3) {Move Score \\ ($\forall$ squads)};
-	\node[annot, text width=3cm] at (6,0) {Delegate Score \\ ($\forall$ squads)};
+	\node[annot, text width=3cm] at (5.65,3) {Move Score \\ ($\forall$ squads)};
+	\node[annot, text width=3cm] at (5.65,0.2) {Delegate Score \\ ($\forall$ squads)};
 
 	\path (health_annot) edge (ah);
 	\path (health_annot) edge (eh);
@@ -41,7 +41,7 @@
 	\path (hidden) edge (m1);
 	\path (hidden) edge (d1);
 
-    \node[annot] at (0,5) {Input layer};
-    \node[annot] at (2,5) {Hidden layer};
-    \node[annot] at (4,5)  {Output layer};
+    \node[annot] at (0,5.2) {Input layer};
+    \node[annot] at (2,5.2) {Hidden layer};
+    \node[annot] at (4,5.2)  {Output layer};
 \end{tikzpicture}

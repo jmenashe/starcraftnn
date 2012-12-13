@@ -1,8 +1,8 @@
 \definecolor{turquoise}{RGB}{0,200,180}
 \definecolor{orange}{RGB}{230,127,0}
 \centering
-\hspace*{-1.5cm}
-\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep]
+\hspace*{-.3cm}
+\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep, scale=.8]
    \tikzstyle{every pin edge}=[<-,shorten <=1pt]
    \tikzstyle{neuron}=[circle,fill=black!25,minimum size=17pt,inner sep=0pt]
    \tikzstyle{input neuron}=[neuron, fill=green!50];
@@ -22,20 +22,20 @@
 	\node[health] (ah1) at (0,4) {};
 	\node[health] (ah2) at (0,3.5) {};
 	\node[health] (ah3) at (0,3) {};
-	\node[annot,left of=ah2, node distance = 3cm, text width = 2cm] (health_annot) {Ally Health Percentage};
+	\node[annot,left of=ah2, node distance = 1.5cm, text width = 2cm] (health_annot) {Ally \\ Health};
 	\foreach \dest in {1,...,3}
 		\path (health_annot) edge (ah\dest);
 
 	\node[ehealth] (eh1) at (0,2) {};
 	\node[ehealth] (eh2) at (0,1.5) {};
 	\node[ehealth] (eh3) at (0,1) {};
-	\node[annot,left of=eh2, node distance = 3cm, text width = 2.3cm] (ehealth_annot) {Enemy Health Percentage};
+	\node[annot,left of=eh2, node distance = 1.5cm, text width = 2cm] (ehealth_annot) {Enemy \\ Health};
 	\foreach \dest in {1,...,3}
 		\path (ehealth_annot) edge (eh\dest);
 
 	\node[dist] (dist) at (0,0) {};
 	\node[theta] (theta) at (0,-.5) {};
-	\node[annot, text width = 3cm] (disttheta_annot) at (-3,-.25) {Enemy $r,\theta$ \\($\forall$ allies, enemies)};
+	\node[annot, text width = 2cm] (disttheta_annot) at (-2,-.25) {Enemy $r,\theta$ \\($\forall$ pairs)};
 	\path (disttheta_annot) edge (dist);
 	\path (disttheta_annot) edge (theta);
 
@@ -76,7 +76,7 @@
 		\path (hidden) edge (\d);
 
     % Annotate the layers
-    \node[annot] at (0,5) {Input layer};
-    \node[annot] at (2,5) {Hidden layer};
-    \node[annot] at (4,5)  {Output layer};
+    \node[annot] at (0,5.2) {Input layer};
+    \node[annot] at (2,5.2) {Hidden layer};
+    \node[annot] at (4,5.2)  {Output layer};
 \end{tikzpicture}
