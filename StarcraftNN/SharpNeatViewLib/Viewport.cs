@@ -31,7 +31,7 @@ namespace SharpNeat.View
     public class Viewport : UserControl
     {
         const PixelFormat ViewportPixelFormat = PixelFormat.Format16bppRgb565;
-        readonly Brush _brushBackground = new SolidBrush(Color.Lavender);
+        readonly Brush _brushBackground = new SolidBrush(Color.White);
 
         IViewportPainter _viewportPainter;
         Rectangle _viewportArea;

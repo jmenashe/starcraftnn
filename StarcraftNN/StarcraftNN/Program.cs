@@ -83,9 +83,11 @@ namespace StarcraftNN
                 {
                     loop(population, useGui);
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Console.WriteLine("Error: {0}", ex.Message);
                     Thread.Sleep(5000);
+                    reconnect();
                 }
             }
         }

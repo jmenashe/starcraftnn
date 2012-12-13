@@ -39,6 +39,7 @@ namespace UI
             InitializeComponent();
 
             _view = new NeatGenomeView();
+            _view.BackColor = System.Drawing.Color.White;
 
             _host = new WindowsFormsHost();
             _host.Child = _view;
