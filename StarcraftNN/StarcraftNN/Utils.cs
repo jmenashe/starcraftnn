@@ -31,8 +31,8 @@ namespace StarcraftNN
 
         public static Position getCentroid(IEnumerable<Unit> units)
         {
-            int avgX = (int)units.Average(x => x.getPosition().xConst());
-            int avgY = (int)units.Average(x => x.getPosition().yConst());
+            int avgX = (int)units.Where(x => x.exists()).Average(x => x.getPosition().xConst());
+            int avgY = (int)units.Where(x => x.exists()).Average(x => x.getPosition().yConst());
             return new Position(avgX, avgY);
         }
 
@@ -102,7 +102,11 @@ namespace StarcraftNN
                 score -= minimum;
                 score /= Math.Abs(minimum);
             }
-            Debug.Assert(!double.IsNaN(score));
+            if (double.IsNaN(score) || double.IsInfinity(score) || score < 0)
+            {
+                Console.WriteLine("Warning: score of {0} from {1} allies, {2} enemies", score, allies.Count, enemies.Count);
+                score = 0;
+            }
             return score;
         }
 
@@ -116,6 +120,7 @@ namespace StarcraftNN
             document.Load(path);
             List<NeatGenome> genomes = NeatGenomeXmlIO.LoadCompleteGenomeList(document, true, factory);
             var genome = genomes.OrderByDescending(x => x.EvaluationInfo.Fitness).First();
+            Console.WriteLine("Loaded best genome for {0}", name);
             return genome;
         }
     }

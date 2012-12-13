@@ -6,6 +6,7 @@ using SWIG.BWAPI;
 using SWIG.BWAPIC;
 using StarcraftNN.OrganismInterfaces;
 using StarcraftNN.OrganismInterfaces.Squads;
+using System.Threading;
 
 namespace StarcraftNN
 {
@@ -13,12 +14,10 @@ namespace StarcraftNN
     {
         static void reconnect()
         {
-
             while (!bwapiclient.BWAPIClient.connect())
             {
                 System.Threading.Thread.Sleep(1000);
             }
-
         }
 
         /// <summary>
@@ -32,77 +31,102 @@ namespace StarcraftNN
 
         static void Main(string[] args)
         {
-            BroodwarPopulation population;
+            IOrganismInterface iface;
             bool useGui = false;
+            bool evolve = false;
             if (args.Length > 0)
             {
-                switch(args[0])
+                switch (args[0])
                 {
                     case "mf":
-                        population = new BroodwarPopulation(new MarineFirebat3v3());
+                        iface = new MarineFirebat3v3();
                         break;
                     case "gws":
-                        population = new BroodwarPopulation(new Goliath2Wraith2Squad());
+                        iface = new Goliath2Wraith2Squad();
                         break;
                     case "mfs":
-                        population = new BroodwarPopulation(new Marine2Firebat1Squad());
+                        iface = new Marine2Firebat1Squad();
+                        break;
+                    case "20v20":
+                        iface = new HeteroIndividual20v20();
                         break;
                     case "mfgw":
-                        population = new BroodwarPopulation(new MFGW_IG_SquadController());
-                        Console.WriteLine("Starting marine firebat goliath wraith squad controller");
+                        iface = new MFGW_IG_SquadController();
                         break;
                     default:
-                        population = new BroodwarPopulation(new MFGW_IG_SquadController());
+                        iface = new MFGW_IG_SquadController();
                         break;
                 }
                 if (args.Length > 1)
-                    switch (args[1])
-                    {
-                        case "gui": useGui = true; break;
-                    }
+                {
+                    for (int i = 1; i < args.Length; i++ )
+                        switch (args[i])
+                        {
+                            case "gui": useGui = true; break;
+                            case "evolve": evolve = true; break;
+                        }
+                }
             }
-            else population = new BroodwarPopulation(new MarineFirebat3v3());
-            
+            else iface = new HeteroIndividual20v20();
+            Console.WriteLine("Evolution: {0}", evolve);
+            Console.WriteLine("Gui: {0}", useGui);
+            Console.WriteLine("Iface: {0}", iface.GetType().Name);
+                
+
             bwapi.BWAPI_init();
             System.Console.WriteLine("Connecting...");
             reconnect();
-            int speed = 0;
+            BroodwarPopulation population = new BroodwarPopulation(iface, evolve);
             while (true)
             {
-                while (!bwapi.Broodwar.isInGame())
+                try
                 {
-                    bwapiclient.BWAPIClient.update();
-                    if (!bwapiclient.BWAPIClient.isConnected())
-                    {
-                        System.Console.WriteLine("Reconnecting...\n");
-                        reconnect();
-                    }
+                    loop(population, useGui);
                 }
-                if(!useGui)
-                    bwapi.Broodwar.setGUI(false);
-                bwapi.Broodwar.setLocalSpeed(speed);
-                RoundManager manager = new RoundManager(population);
-                while (bwapi.Broodwar.isInGame())
+                catch
                 {
-                    bwapiclient.BWAPIClient.update();
-                    manager.HandleFrame();
-                    List<Event> events = bwapi.Broodwar.getEvents().ToList();
-                    if (events.Any(x => x.getType() == EventType_Enum.UnitDestroy))
-                        advanceFrames();
-                    foreach (Event e in events)
+                    Thread.Sleep(5000);
+                }
+            }
+        }
+
+        static void loop(BroodwarPopulation population, bool useGui) 
+        {
+            int speed = 0;
+            while (!bwapi.Broodwar.isInGame())
+            {
+                bwapiclient.BWAPIClient.update();
+                if (!bwapiclient.BWAPIClient.isConnected())
+                {
+                    System.Console.WriteLine("Reconnecting...\n");
+                    reconnect();
+                }
+            }
+            if (!useGui)
+                bwapi.Broodwar.setGUI(false);
+            bwapi.Broodwar.setLocalSpeed(speed);
+            RoundManager manager = new RoundManager(population);
+            while (bwapi.Broodwar.isInGame())
+            {
+                bwapiclient.BWAPIClient.update();
+                if (bwapi.Broodwar == null) break;
+                manager.HandleFrame();
+                List<Event> events = bwapi.Broodwar.getEvents().ToList();
+                if (events.Any(x => x.getType() == EventType_Enum.UnitDestroy))
+                    advanceFrames();
+                foreach (Event e in events)
+                {
+                    switch (e.getType())
                     {
-                        switch(e.getType())
-                        {
-                            case EventType_Enum.UnitCreate:
-                                manager.HandleUnitCreate(e.getUnit());
-                                break;
-                            case EventType_Enum.UnitDestroy:
-                                manager.HandleUnitDestroy(e.getUnit());
-                                break;
-                            case EventType_Enum.MatchEnd:
-                                manager.HandleMatchEnd();
-                                break;
-                        }
+                        case EventType_Enum.UnitCreate:
+                            manager.HandleUnitCreate(e.getUnit());
+                            break;
+                        case EventType_Enum.UnitDestroy:
+                            manager.HandleUnitDestroy(e.getUnit());
+                            break;
+                        case EventType_Enum.MatchEnd:
+                            manager.HandleMatchEnd();
+                            break;
                     }
                 }
             }

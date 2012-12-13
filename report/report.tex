@@ -7,7 +7,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 \usepackage{courier}
-\usepackage[margin=1.4in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage[margin=1.5in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{multirow}
@@ -194,7 +194,7 @@ In Figure \ref{fig:squad_design} we see the basic design for the squad controlle
 \label{fig:quad_commander_design}
 \end{figure}
 
-Individual squads need to function together as a team, and thus we introduce the squad commander as the final network design we examined. The squad commander is much simpler than the other network designs, since it relies heavily on the fact that its squads are pre-trained. Figure \ref{fig:quad_commander_design} shows the details. The commander takes in ally and enemy health, and decides whether to move each squad to a different location or to delegate control to that squad. The commander uses heuristics with prior knowledge to divide enemy groups between squads. For example, a squad that is well-equipped to take out flying units will preferentially be assigned flying enemy combatants as targets. Squads can therefore focus specifically on their targets assigned by the commander and ignore the rest of the enemies on the battlefield. This hierarchical organization reduces complexity at each level, and reduces overall design complexity by orders of magnitude.
+Individual squads need to function together as a team, and thus we introduce the squad commander as the final network design we examined. The squad commander is much simpler than the other network designs, since it relies heavily on the fact that its squads are pre-trained. Figure \ref{fig:quad_commander_design} shows the details. The commander takes in ally and enemy health and positions, and decides whether to move each squad to a different location or to delegate control to that squad. The commander uses heuristics with prior knowledge to divide enemy groups between squads. For example, a squad that is well-equipped to take out flying units will preferentially be assigned flying enemy combatants as targets. Squads can therefore focus specifically on their targets assigned by the commander and ignore the rest of the enemies on the battlefield. This hierarchical organization reduces complexity at each level, and reduces overall design complexity by orders of magnitude.
 
 \section{Experiments}
 \label{sec:exp}
@@ -221,6 +221,7 @@ We now present a series of experiments to show the effectiveness of each network
 \end{table}
 	
 \subsection{Multi-Unit Control}
+\label{sec:multiunit_exp}
 
 We performed our initial experiment to gauge the ability of a simple network design to outperform Starcraft's built-in AI. Using the controller from Section \ref{sec:multiunit_design} we construct a training scenario in which 2 marines and 1 firebat spawn for each team on the two sides of the combat area. The built-in (i.e. enemy) AI attacks the spawn location of the allied AI, ensuring that if the allies do nothing then a battle will still take place. Figure \ref{fig:multiunit_exp} shows the fitness graph obtained for this experiment.
 
@@ -229,7 +230,7 @@ Of particular interest in this experiment is the development of interesting beha
 \begin{figure}
 \centering
 \includegraphics[scale=1.1]{plots/multiunit.pdf}
-\caption{A fitness graph of the multi-unit controller in a 3v3 scenario, with 2 marines and 1 firebat on each team. Mean population fitness progresses slowly over the threshold of 1.0, indicating that the average genome defeats the enemy units more often than not.}
+\caption{A fitness graph of the multi-unit controller in a 3v3 scenario, with 2 marines and 1 firebat on each team. Mean population fitness progresses quickly toward a fitness score of about 1.2, indicating a strong advantage over the built-in AI.}
 \label{fig:multiunit_exp}
 \end{figure}
 
@@ -248,18 +249,49 @@ Furthermore, we see a highly accelerated fitness gain during the first 4 generat
 
 \subsection{Squad Control}
 
-Motivated by our search for interesting behaviors, we now consider the squad controller and squad commander networks. The squad controller described in Section \ref{sec:squad_design} is somewhat of a hybrid between the multi-unit and individual controllers, combining the group awareness of the former with the flexibility and scalability of the latter. We trained two squad types with this controller: a 2-marine, 2-firebat controller, and a 2-goliath, 2-wraith controller. Fitness graphs for both of these are shown in Figure \ref{fig:squads_individual}. The marine-firebat setup performs poorly in comparison go the goliath-wraith setup.
+Motivated by our search for interesting behaviors, we now consider the squad controller and squad commander networks. The squad controller described in Section \ref{sec:squad_design} is somewhat of a hybrid between the multi-unit and individual controllers, combining the group awareness of the former with the flexibility and scalability of the latter. We trained two squad types with this controller: a 2-marine, 2-firebat controller, and a 2-goliath, 2-wraith controller. Fitness graphs for both of these are shown in Figure \ref{fig:squads_exp}. The marine-firebat setup performs poorly in comparison go the goliath-wraith setup, and the earlier marine-firebat controller from Section \ref{sec:multiunit_exp}. The multi-unit controller has a clear advantage in that it is highly specialized for the 2-marine, 1-firebat symmetric setup. Considering the high degree of similarity between the marine-firebat and goliath-wraith squad controllers, it's unclear why these two would achieve such varied fitness levels. One possible explanation is that stochasticity plays a larger role for ground units, whereas goliaths and wraiths are distinct enough that more optimization is possible from our state models.
 
 \begin{figure}
 \centering
 \mbox{\subfigure{\includegraphics[width=3in]{plots/squad_mf.pdf}}\quad
 \subfigure{\includegraphics[width=3in]{plots/squad_gw.pdf} }}
 \caption{Fitness graphs for squad controllers in isolation. The marine-firebat setup performs similarly to the multi-unit controller, but can compensate for varying numbers of enemies. The goliath-wraith setup performs much better, in a similar fashion to the individual unit controller.}
-\label{fig:squads_individual}
+\label{fig:squads_exp}
 \end{figure}
+
+Next we combine multiple squads into a single battalion using the squad commander network. The results are shown in Figure \ref{fig:squadcommand_exp}. Only \fillin{generations for squad command} generations were used due to the increased training time. While the squad controllers took approximately 6 hours for 300 generations, the squad commander required over 24 hours for 100 generations. The fitness graph closely follows a logarithmic trendline however, and extrapolation based on the trendline tells us that the genome will achieve a fitness score of 1.08 at 300 generations. This is approximately equal with the individual controller.
+
+\begin{figure}
+\centering
+\includegraphics[scale=1.1]{plots/squadcommand.pdf}
+\caption{A fitness graph of the final squad commander network, using pretrained squad controllers from Figure \ref{fig:squads_exp}. Fitness is kept low, but increases more steadily after the initial few generations than with other controllers.}
+\label{fig:squadcommand_exp}
+\end{figure}
+
+\section{Combat Results}
+
+To anchor our reported fitness scores to a practical setting, we now present results for a variety of controllers and training scenarios. These are given in Table \ref{tab:results}. We include tests against the Skynet bot, the current champion of the Starcraft AI competition.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+	\hline
+	{\bf Game} & {\bf Players } & {\bf Fitness-$\mu$} & {\bf Fitness-$\sigma$} & {\bf Wins - Losses } \\ \hline
+	Heterogeneous 20v20 & IC vs. BWAI & 1.11 & 0.21 & 1,661 - 339\\ \hline
+	Heterogeneous 20v20 & IC vs. Skynet \cite{skynet} & 0.76 & 0.24 &  160 - 1,840 \\ \hline
+	2-Goliath, 2-Wraith & SC vs. Human & 0.96 & 0.16 & 5 - 5 \\ \hline
+	2-Marine, 1-Firebat & MUC vs. Human & 0.83 & 0.42 & 3 - 7 \\ \hline
+	Heterogeneous 20v20 & IC vs. Human & 0.96 & 0.19 & 4 - 6 \\ \hline
+	2-Goliath, 2-Wraith & Human vs. BWAI & N/A & N/A & 9 - 1\\ \hline
+\end{tabular}
+\caption{The final results for a selected set of genomes. Only completed games are reported, and wins/losses are reported with respect to the first player listed. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. 10 rounds are used for tests involving human players, and 2,000 rounds for automated tests.}
+\label{tab:results}
+\end{table}
 
 \section{Conclusions}
 \label{sec:conclusion}
+
+We have shown the effectiveness of three different approaches to creating small-scale combat controllers using neural networks and NEAT to learn control techniques. In each case we have shown that given the proper training setup, these designs are capable of performing well against the built-in AI. We additionally show that our method is competitive against a human player, however the top-ranking AI still outperforms our most successful genome. It is possible that further modifications can be made to our training and design. We discuss this in the following section.
 
 \section{Future Work}
 \label{sec:future}
@@ -271,8 +303,11 @@ Motivated by our search for interesting behaviors, we now consider the squad con
 \begin{tabular}{|l|l|}
 	\hline
 	{\bf Video} & {\bf Description}\\ \hline
-	\multirow{2}{*}{\url{http://www.youtube.com/watch?v=OeMwC0bexlo}} & 3v3 battle with 2 marines and \\
-	& 1 firebat on each team \\ \hline
+	\multirow{3}{*}{\url{http://www.youtube.com/watch?v=OeMwC0bexlo}} & 3v3 battle with 2 marines and \\
+	& 1 firebat on each team, with a \\
+	& multi-unit controller. \\ \hline
+	\multirow{2}{*}{\url{http://www.youtube.com/watch?v=zHyUqjc55Bc}} & 20v20 battle with heterogeneous \\
+	& units, using an individual controller. \\ \hline
 \end{tabular}
 \end{center}
 	

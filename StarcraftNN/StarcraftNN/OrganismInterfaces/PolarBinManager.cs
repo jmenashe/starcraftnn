@@ -144,7 +144,7 @@ namespace StarcraftNN.OrganismInterfaces
                     double theta = Math.Atan2(difference.y, difference.x);
                     if (theta <= 0)
                         theta += 2 * Math.PI;
-                    if (d0 <= distance && d1 > distance && t0 <= theta && t1 > theta)
+                    if (d0 <= distance && d1 > distance && t0 <= theta && t1 >= theta)
                         last.Add(unit);
                 }
             }

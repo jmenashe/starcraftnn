@@ -44,9 +44,10 @@ namespace StarcraftNN.OrganismInterfaces
         #endregion
 
         protected UnitGroup _enemies;
-        protected static NeatGenome _genome;
+        protected NeatGenome _genome;
         protected PolarBinManager _polarbins;
         private Dictionary<Unit, Action> _lastAction;
+        static Dictionary<string, NeatGenome> _genomes = new Dictionary<string, NeatGenome>();
 
         private NeatGenomeDecoder _decoder;
         public NeatGenomeDecoder Decoder
@@ -97,6 +98,7 @@ namespace StarcraftNN.OrganismInterfaces
 
         public void Move(double theta)
         {
+            if (!_units.Any(x => x.exists())) return;
             double distance = 200;
             int dx = (int)(Math.Cos(theta) * distance);
             int dy = (int)(Math.Sin(theta) * distance);
@@ -111,7 +113,9 @@ namespace StarcraftNN.OrganismInterfaces
 
         protected NeatGenome loadGenome()
         {
-            return Utils.loadBestGenome(this.SaveFile, this.CreateGenomeFactory());
+            if (!_genomes.ContainsKey(this.SaveFile))
+                _genomes[this.SaveFile] = Utils.loadBestGenome(this.SaveFile, this.CreateGenomeFactory());
+            return _genomes[this.SaveFile];
         }
 
         public void Delegate()
@@ -143,6 +147,8 @@ namespace StarcraftNN.OrganismInterfaces
 
         public void InputActivate(NeatGenome genome)
         {
+            if (!_units.Any(x => x.exists())) return;
+            _polarbins.UpdatePositions();
             var blackbox = this.Decoder.Decode(genome);
             this.Input(blackbox);
             this.Activate(blackbox);

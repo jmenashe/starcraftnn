@@ -14,7 +14,7 @@ using System.Xml;
 namespace StarcraftNN
 {
     public class BroodwarPopulation : IGenomeListEvaluator<NeatGenome>
-    {
+    { 
         private IOrganismInterface _iface;
         NeatEvolutionAlgorithm<NeatGenome> _algorithm;
         private NeatGenome _currentGenome;
@@ -69,9 +69,9 @@ namespace StarcraftNN
 
         private string _saveDirectory = Path.Combine(Environment.GetEnvironmentVariable("STARCRAFT_RESULTS"), Environment.MachineName);
 
-        public BroodwarPopulation(IOrganismInterface iface)
+        public BroodwarPopulation(IOrganismInterface iface, bool evolve)
         {
-            this.EnableEvolution = true;
+            this.EnableEvolution = evolve;
             _iface = iface;
             NeatGenomeFactory factory = _iface.CreateGenomeFactory();
             this.GenomeFile = Path.Combine(_saveDirectory, _iface.SaveFile + ".xml");
@@ -95,11 +95,16 @@ namespace StarcraftNN
                 {
                     if (File.Exists(this.GenomeFile))
                     {
-                        var genomes = Load(factory);
                         if (this.EnableEvolution)
+                        {
+                            var genomes = Load(factory);
+                            Console.WriteLine("Loading genomes from file");
                             _algorithm.Initialize(this, factory, genomes);
+                        }
                         else
-                            _currentGenome = genomes.OrderByDescending(x => x.EvaluationInfo.Fitness).First();
+                        {
+                            _currentGenome = Utils.loadBestGenome(iface.SaveFile, factory);
+                        }
                     }
                     else if (this.EnableEvolution)
                         _algorithm.Initialize(this, factory, PopulationSize);

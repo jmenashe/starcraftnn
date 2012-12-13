@@ -23,8 +23,8 @@ namespace StarcraftNN.OrganismInterfaces
         protected PolarBinManager _polarbins;
 
         protected abstract int SquadCount { get; }
-        protected List<double> DistanceRanges = new List<double> { 0, 100, 300, 1000, double.PositiveInfinity };
-        protected int ThetaBins = 12;
+        protected List<double> DistanceRanges = new List<double> { 0, 100, 300, double.PositiveInfinity };
+        protected int ThetaBins = 5;
 
         protected int DistanceBins
         {
@@ -79,7 +79,7 @@ namespace StarcraftNN.OrganismInterfaces
             param.AddConnectionMutationProbability = 0.1;
             param.AddNodeMutationProbability = 0.1;
             param.ConnectionWeightMutationProbability = 0.8;
-            NeatGenomeFactory factory = new NeatGenomeFactory(this.SquadCount * 2, this.SquadCount * 2, param);
+            NeatGenomeFactory factory = new NeatGenomeFactory(this.SquadCount * 2 + this.DistanceBins * this.ThetaBins * 2, this.SquadCount * 2, param);
             return factory;
         }
 
@@ -93,6 +93,17 @@ namespace StarcraftNN.OrganismInterfaces
                 UnitGroup enemyGroup = _enemyGroups[gi];
                 blackbox.InputSignalArray[sensor++] = (double)squad.HitPoints / squad.MaxHitPoints;
                 blackbox.InputSignalArray[sensor++] = (double)enemyGroup.HitPoints / enemyGroup.MaxHitPoints;
+            }
+            var centroid = Utils.getCentroid(_allies);
+            List<List<Unit>> enemies = _polarbins.GetEnemiesInBins(centroid), allies = _polarbins.GetAlliesInBins(centroid);
+            int totalEnemies = enemies.Sum(x => x.Count), totalAllies = allies.Sum(x => x.Count);
+            Debug.Assert(totalEnemies > 0 && totalAllies > 0);
+            for (int bin = 0; bin < this.ThetaBins * this.DistanceBins; bin++ )
+            {
+                double enemyRatio = (double)enemies[bin].Count / totalEnemies;
+                blackbox.InputSignalArray[sensor++] = enemyRatio;
+                double allyRatio = (double)allies[bin].Count / totalAllies;
+                blackbox.InputSignalArray[sensor++] = allyRatio;
             }
         }
 
@@ -120,6 +131,8 @@ namespace StarcraftNN.OrganismInterfaces
 
         public virtual void InputActivate(NeatGenome genome)
         {
+            if (!_allies.Any(x => x.exists()) || !_enemies.Any(x => x.exists())) return;
+            _polarbins.UpdatePositions();
             var blackbox = this.Decoder.Decode(genome);
             this.Input(blackbox);
             this.Activate(blackbox);

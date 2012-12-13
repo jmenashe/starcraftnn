@@ -199,6 +199,7 @@ namespace StarcraftNN.OrganismInterfaces
         public void InputActivate(NeatGenome genome)
         {
             var blackbox = this.Decoder.Decode(genome);
+            _polarbins.UpdatePositions();
             _currentPositions.Clear();
             foreach (var unit in _allies.Union(_enemies))
             { 
@@ -233,23 +234,7 @@ namespace StarcraftNN.OrganismInterfaces
 
         public double ComputeFitness(int frameCount)
         {
-            double maxScale = 1;
-            double minimum = -(_enemies.Count * _enemies.Count) * maxScale;
-            int allyScore = _allies.Count(x => x.exists());
-            int enemyScore = _enemies.Count(x => x.exists());
-            if (enemyScore == 0 && allyScore == 0)
-                return 0;
-            double score = allyScore - enemyScore;
-            score *= Math.Abs(score);
-            if (frameCount == 0)
-                score = 0;
-            else
-            {
-                score -= minimum;
-                score /= Math.Abs(minimum);
-            }
-            Debug.Assert(!double.IsNaN(score));
-            return score;
+            return Utils.computeStandardFitness(_allies, _enemies, frameCount);
         }
     }
 }

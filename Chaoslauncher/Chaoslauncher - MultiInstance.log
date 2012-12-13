@@ -1,3 +1,241 @@
-12/11/2012 8:48:48 PM 9276 Logging started
-12/11/2012 8:48:48 PM 9276 Already running
-12/11/2012 8:48:48 PM 9276 Logging ended
+12/12/2012 5:12:38 PM 10504 Logging started
+12/12/2012 5:12:38 PM 10504 Begin Startup
+12/12/2012 5:12:38 PM 10504 Chaosauncher 0.5.4.1 on NT 6.1.7601 Service Pack 1 at X:\code\school\nn\starcraft\Chaoslauncher\Chaoslauncher - MultiInstance.exe
+12/12/2012 5:12:38 PM 10504 Load Settings
+12/12/2012 5:12:38 PM 10504 GamePath: C:\Program Files (x86)\StarCraft\\
+12/12/2012 5:12:38 PM 10504 Load Plugins
+12/12/2012 5:12:38 PM 10504 Loading BWL4-Plugin X:\code\school\nn\starcraft\Chaoslauncher\BWAPI_ChaosLauncherInjector.bwl
+12/12/2012 5:12:38 PM 10504 Plugin loaded BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:12:38 PM 10504 Loading BWL4-Plugin X:\code\school\nn\starcraft\Chaoslauncher\BWAPI_ChaosLauncherInjectord.bwl
+12/12/2012 5:12:38 PM 10504 Plugin loaded BWAPI Injector (1.16.1) DEBUG
+12/12/2012 5:12:38 PM 10504 Loading BWL4-Plugin X:\code\school\nn\starcraft\Chaoslauncher\wmode.bwl
+12/12/2012 5:12:38 PM 10504 Plugin loaded W-MODE 1.02
+12/12/2012 5:12:38 PM 10504 Load Tools
+12/12/2012 5:12:38 PM 10504 Init GUI
+12/12/2012 5:12:38 PM 10504 Get Starcraftversions
+12/12/2012 5:12:38 PM 10504 Init complete
+12/12/2012 5:12:40 PM 10504 Startbutton
+12/12/2012 5:12:40 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:12:40 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:12:40 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:12:40 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:12:40 PM 10504 CreateProcess
+12/12/2012 5:12:40 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:12:40 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:12:40 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:12:40 PM 10504 ResumeThread
+12/12/2012 5:12:40 PM 10504 WaitForInputIdle
+12/12/2012 5:12:40 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:12:40 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:12:40 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:12:40 PM 10504 Starting Starcraft completed
+12/12/2012 5:13:02 PM 10504 Startbutton
+12/12/2012 5:13:02 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:13:02 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:13:02 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:13:02 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:13:02 PM 10504 CreateProcess
+12/12/2012 5:13:02 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:13:02 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:13:02 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:13:02 PM 10504 ResumeThread
+12/12/2012 5:13:02 PM 10504 WaitForInputIdle
+12/12/2012 5:13:02 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:13:02 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:13:02 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:13:02 PM 10504 Starting Starcraft completed
+12/12/2012 5:13:06 PM 10504 Startbutton
+12/12/2012 5:13:06 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:13:06 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:13:06 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:13:06 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:13:06 PM 10504 CreateProcess
+12/12/2012 5:13:06 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:13:06 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:13:06 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:13:06 PM 10504 ResumeThread
+12/12/2012 5:13:06 PM 10504 WaitForInputIdle
+12/12/2012 5:13:06 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:13:06 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:13:06 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:13:06 PM 10504 Starting Starcraft completed
+12/12/2012 5:24:21 PM 10504 Startbutton
+12/12/2012 5:24:21 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:24:21 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:24:21 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:24:21 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:24:21 PM 10504 CreateProcess
+12/12/2012 5:24:21 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:24:21 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:24:21 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:24:21 PM 10504 ResumeThread
+12/12/2012 5:24:21 PM 10504 WaitForInputIdle
+12/12/2012 5:24:21 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:24:21 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:24:21 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:24:21 PM 10504 Starting Starcraft completed
+12/12/2012 5:24:25 PM 10504 Startbutton
+12/12/2012 5:24:25 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:24:25 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:24:25 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:24:25 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:24:25 PM 10504 CreateProcess
+12/12/2012 5:24:25 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:24:25 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:24:25 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:24:25 PM 10504 ResumeThread
+12/12/2012 5:24:25 PM 10504 WaitForInputIdle
+12/12/2012 5:24:25 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:24:25 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:24:25 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:24:25 PM 10504 Starting Starcraft completed
+12/12/2012 5:33:05 PM 10504 Startbutton
+12/12/2012 5:33:05 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:33:05 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:33:05 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:33:05 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:33:05 PM 10504 CreateProcess
+12/12/2012 5:33:05 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:33:05 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:33:05 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:33:05 PM 10504 ResumeThread
+12/12/2012 5:33:05 PM 10504 WaitForInputIdle
+12/12/2012 5:33:05 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:33:05 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:33:05 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:33:05 PM 10504 Starting Starcraft completed
+12/12/2012 5:33:10 PM 10504 Startbutton
+12/12/2012 5:33:10 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:33:10 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:33:10 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:33:10 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:33:10 PM 10504 CreateProcess
+12/12/2012 5:33:10 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:33:10 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:33:10 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:33:10 PM 10504 ResumeThread
+12/12/2012 5:33:10 PM 10504 WaitForInputIdle
+12/12/2012 5:33:10 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:33:10 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:33:10 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:33:10 PM 10504 Starting Starcraft completed
+12/12/2012 5:37:05 PM 10504 Startbutton
+12/12/2012 5:37:05 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:37:05 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:37:05 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:37:05 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:37:05 PM 10504 CreateProcess
+12/12/2012 5:37:05 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:37:05 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:37:05 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:37:05 PM 10504 ResumeThread
+12/12/2012 5:37:05 PM 10504 WaitForInputIdle
+12/12/2012 5:37:05 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:37:05 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:37:05 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:37:05 PM 10504 Starting Starcraft completed
+12/12/2012 5:37:07 PM 10504 Startbutton
+12/12/2012 5:37:07 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:37:07 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:37:07 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:37:07 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:37:07 PM 10504 CreateProcess
+12/12/2012 5:37:07 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:37:07 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:37:07 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:37:07 PM 10504 ResumeThread
+12/12/2012 5:37:07 PM 10504 WaitForInputIdle
+12/12/2012 5:37:07 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:37:07 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:37:07 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:37:07 PM 10504 Starting Starcraft completed
+12/12/2012 5:43:18 PM 10504 Startbutton
+12/12/2012 5:43:18 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:43:18 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:43:18 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:43:18 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:43:18 PM 10504 CreateProcess
+12/12/2012 5:43:18 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:43:18 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:43:18 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:43:18 PM 10504 ResumeThread
+12/12/2012 5:43:18 PM 10504 WaitForInputIdle
+12/12/2012 5:43:19 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:43:19 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:43:19 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:43:19 PM 10504 Starting Starcraft completed
+12/12/2012 5:43:21 PM 10504 Startbutton
+12/12/2012 5:43:21 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:43:21 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:43:21 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:43:21 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:43:21 PM 10504 CreateProcess
+12/12/2012 5:43:21 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:43:21 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:43:21 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:43:21 PM 10504 ResumeThread
+12/12/2012 5:43:21 PM 10504 WaitForInputIdle
+12/12/2012 5:43:21 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:43:21 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:43:21 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:43:21 PM 10504 Starting Starcraft completed
+12/12/2012 5:45:28 PM 10504 Startbutton
+12/12/2012 5:45:28 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:45:28 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:45:28 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:45:28 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:45:28 PM 10504 CreateProcess
+12/12/2012 5:45:28 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:45:28 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:45:28 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:45:28 PM 10504 ResumeThread
+12/12/2012 5:45:28 PM 10504 WaitForInputIdle
+12/12/2012 5:45:28 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:45:28 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:45:28 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:45:28 PM 10504 Starting Starcraft completed
+12/12/2012 5:45:32 PM 10504 Startbutton
+12/12/2012 5:45:32 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:45:32 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:45:32 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:45:32 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:45:32 PM 10504 CreateProcess
+12/12/2012 5:45:32 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:45:32 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:45:32 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:45:32 PM 10504 ResumeThread
+12/12/2012 5:45:32 PM 10504 WaitForInputIdle
+12/12/2012 5:45:32 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:45:32 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:45:32 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:45:32 PM 10504 Starting Starcraft completed
+12/12/2012 5:53:37 PM 10504 Startbutton
+12/12/2012 5:53:37 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:53:37 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:53:37 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:53:37 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:53:37 PM 10504 CreateProcess
+12/12/2012 5:53:37 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:53:37 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:53:37 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:53:37 PM 10504 ResumeThread
+12/12/2012 5:53:37 PM 10504 WaitForInputIdle
+12/12/2012 5:53:37 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:53:37 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:53:37 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:53:37 PM 10504 Starting Starcraft completed
+12/12/2012 5:54:10 PM 10504 Startbutton
+12/12/2012 5:54:10 PM 10504 Starting Game Starcraft Multi-Instance C:\Program Files (x86)\StarCraft\\Starcraft_MultiInstance.exe
+12/12/2012 5:54:10 PM 10504 BWAPI Injector (1.16.1) RELEASE Version  Compatible
+12/12/2012 5:54:10 PM 10504 W-MODE 1.02 Version 1.0.2 Compatible
+12/12/2012 5:54:10 PM 10504 Obtained DebugPrivilege
+12/12/2012 5:54:10 PM 10504 CreateProcess
+12/12/2012 5:54:10 PM 10504 Call ScSuspended for all active Plugins
+12/12/2012 5:54:10 PM 10504 ApplyPatchSuspended for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:54:10 PM 10504 ApplyPatchSuspended for W-MODE 1.02
+12/12/2012 5:54:10 PM 10504 ResumeThread
+12/12/2012 5:54:10 PM 10504 WaitForInputIdle
+12/12/2012 5:54:10 PM 10504 Call ScWindowCreated for all active Plugins
+12/12/2012 5:54:10 PM 10504 ApplyPatch for BWAPI Injector (1.16.1) RELEASE
+12/12/2012 5:54:10 PM 10504 ApplyPatch for W-MODE 1.02
+12/12/2012 5:54:10 PM 10504 Starting Starcraft completed
