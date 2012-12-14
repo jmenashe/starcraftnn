@@ -67,7 +67,7 @@ namespace StarcraftNN
                         }
                 }
             }
-            else iface = new HeteroIndividual20v20();
+            else iface = new MFGW_IG_SquadController();
             Console.WriteLine("Evolution: {0}", evolve);
             Console.WriteLine("Gui: {0}", useGui);
             Console.WriteLine("Iface: {0}", iface.GetType().Name);
@@ -94,7 +94,7 @@ namespace StarcraftNN
 
         static void loop(BroodwarPopulation population, bool useGui) 
         {
-            int speed = 0;
+            int speed = 20;
             while (!bwapi.Broodwar.isInGame())
             {
                 bwapiclient.BWAPIClient.update();

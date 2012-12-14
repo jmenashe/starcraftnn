@@ -20,6 +20,7 @@
 \setlist[enumerate]{itemsep=0mm}
 \setlist[itemize]{itemsep=0mm}
 \newcommand{\fillin}[1]{X}
+\newcommand{\mrow}[2]{\multirow{#1}{*}{#2}}
 
 \begin{document}
 
@@ -28,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-A major challenge for players and AI modules alike in the real-time strategy community is the effective control of individual units in combat scenarios. Starcraft, a real-time strategy game released by Blizzard Entertainment, provides built-in heuristics for assisting players in combat management, but these heuristics are limited in their ability to make full use of a unit's potential. We present a series of techniques for training neural networks in small-scale combat situations, and lay the groundwork for further improvements to this system. We present a neural network design for controlling combat units, which, when coupled with the NEAT evolutionary learning algorithm, is able to consistently overcome Starcraft's built-in AI. In most cases our technique achieves optimal champion performance in less than 100 generations, and scales to large battles in a variety of unit configurations. Our system achieves a \fillin{pct games against AI, final}\% win rate against the AI, and a \fillin{pct games against humans}\% win rate against humans in small-scale battles.
+A major challenge for players and AI modules alike in the real-time strategy community is the effective control of individual units in combat scenarios. Starcraft, a real-time strategy game released by Blizzard Entertainment, provides built-in heuristics for assisting players in combat management, but these heuristics are limited in their ability to make full use of a unit's potential. We present a series of techniques for training neural networks in small-scale combat situations, and lay the groundwork for further improvements to this system. We present a neural network design for controlling combat units, which, when coupled with the NEAT evolutionary learning algorithm, is able to consistently overcome Starcraft's built-in AI. In most cases our technique outperforms the AI in less than 100 generations, and scales to large battles in a variety of unit configurations. Our system achieves an 83\% win rate against the built-in AI, and a 50\% win rate against humans. We additionally lay out the groundwork to generalize our training method for competing against arbitrary opponents.
 \end{abstract}
 
 \section{Introduction}
@@ -242,7 +243,7 @@ We now present a series of experiments to show the effectiveness of each network
 
 We performed our initial experiment to gauge the ability of a simple network design to outperform Starcraft's built-in AI. Using the controller from Section \ref{sec:multiunit_design} we construct a training scenario in which 2 marines and 1 firebat spawn for each team on the two sides of the combat area. The built-in (i.e. enemy) AI attacks the spawn location of the allied AI, ensuring that if the allies do nothing then a battle will still take place. Figure \ref{fig:multiunit_exp} shows the fitness graph obtained for this experiment.
 
-Of particular interest in this experiment is the development of interesting behavior that was found. The first of these behaviors was a tendency for units to run away when only 1 ally is left in battle. Our original fitness formulation didn't assign any fitness value when battles ended due to a timeout. Due to the stochastic nature of these battles, a team with occasional wins could avoid losses entirely by running away when such a loss was imminent. The second interesting behavior regards the dynamics of firebats and marines. Firebats do a large amount of damage, so killing them as early as possible at as great a range as possible is preferable. In these training sessions we saw a behavior surface in which the allied firebat would go straight for the enemy firebat at the beginning of the battle, and then switch targets to a marine when the enemy firebat had gotten low on health. This dealt out a maximal amount of damage to the enemy firebat initially, while in some cases preserving the allied firebat in the process. It also ensured that allied marines could keep a safe distance from the enemy firebat. A video of this behavior is given in Section \ref{sec:videos}.
+Of particular interest in this experiment is the development of interesting behavior that was found. The first of these behaviors was a tendency for units to run away when only 1 ally is left in battle. Our original fitness formulation didn't assign any fitness value when battles ended due to a timeout. Due to the stochastic nature of these battles, a team with occasional wins could avoid losses entirely by running away when such a loss was imminent. The second interesting behavior regards the dynamics of firebats and marines. Firebats do a large amount of damage, so killing them as early as possible at as great a range as possible is preferable. In these training sessions we saw a behavior surface in which the allied firebat would go straight for the enemy firebat at the beginning of the battle, and then switch targets to a marine when the enemy firebat had gotten low on health. This dealt out a maximal amount of damage to the enemy firebat initially, while in some cases preserving the allied firebat in the process. It also ensured that allied marines could keep a safe distance from the enemy firebat. A video of this behavior is given in Table \ref{tab:videos}.
 
 \begin{figure}
 \centering
@@ -273,6 +274,7 @@ Our second experiment emphasizes the scalability of our individual unit controll
 Furthermore, we see a highly accelerated fitness gain during the first 4 generations. This is likely due to the mechanics of our network phenotypes. In the multi-unit controller, a unit can only move or attack a particular enemy, so each unit has a roughly 75\% chance of entering combat given a random genome. In the individual controller, the controller has the option of attacking different unit types. If a controller chooses to attack air units in a bin that doesn't have any, then no action is taken. Thus the individual controller encodes a large number of ``dead" actions. NEAT quickly learns to discard these state/action pairs. Once this has happened, evolution proceeds in roughly the same manner as in the multi-unit case, offset with a clear advantage over the built-in AI from the start. Considering its scalability and its improved fitness, the individual controller proves to be a significant improvement over the multi-unit controller.
 
 \subsection{Squad Control}
+\label{sec:squad_exp}
 
 Motivated by our search for interesting behaviors, we now consider the squad controller and squad commander networks. The squad controller described in Section \ref{sec:squad_design} is somewhat of a hybrid between the multi-unit and individual controllers, combining the group awareness of the former with the flexibility and scalability of the latter. We trained two squad types with this controller: a 2-marine, 2-firebat controller, and a 2-goliath, 2-wraith controller. Fitness graphs for both of these are shown in Figures \ref{fig:squad_mf_exp} and \ref{fig:squad_gw_exp}. The marine-firebat setup performs poorly in comparison go the goliath-wraith setup, and the earlier marine-firebat controller from Section \ref{sec:multiunit_exp}. The multi-unit controller has a clear advantage in that it is highly specialized for the 2-marine, 1-firebat symmetric setup. Considering the high degree of similarity between the marine-firebat and goliath-wraith squad controllers, it's unclear why these two would achieve such varied fitness levels. One possible explanation is that stochasticity plays a larger role for ground units, whereas goliaths and wraiths are distinct enough that more optimization is possible from our state models.
 
@@ -290,7 +292,7 @@ Motivated by our search for interesting behaviors, we now consider the squad con
 \label{fig:squad_gw_exp}
 \end{figure}
 
-Next we combine multiple squads into a single battalion using the squad commander network. The results are shown in Figure \ref{fig:squadcommand_exp}. Only \fillin{generations for squad command} generations were used due to the increased training time. While the squad controllers took approximately 6 hours for 300 generations, the squad commander required over 24 hours for 100 generations. The fitness graph closely follows a logarithmic trendline however, and extrapolation based on the trendline tells us that the genome will achieve a fitness score of 1.08 at 300 generations. This is approximately equal with the individual controller.
+Next we combine multiple squads into a single battalion using the squad commander network. We use a larger battle with 8 marines, 4 firebats, 4 goliaths, and 4 wraiths, to create 4 squads of 2-marine, 2-firebat groups, and 2 squads of 2-goliath, 2-wraith groups. The results are shown in Figure \ref{fig:squadcommand_exp}. While the squad controllers took approximately 6 hours for 300 generations, the squad commander required over 72 hours for 200 generations. The fitness graph closely follows a logarithmic trendline however, and extrapolation based on the trendline tells us that the genome will achieve a fitness score of 1.01 at 300 generations. This indicates more wins than losses, but is still behind the individual controller.
 
 \begin{figure}
 \centering
@@ -301,43 +303,52 @@ Next we combine multiple squads into a single battalion using the squad commande
 
 \section{Combat Results}
 
-To anchor our reported fitness scores to a practical setting, we now present results for a variety of controllers and training scenarios. These are given in Table \ref{tab:results}. We include tests against the Skynet bot, the current champion of the Starcraft AI competition.
+To anchor our reported fitness scores to a practical setting, we now present results for a variety of controllers and training scenarios. These are given in Table \ref{tab:results}. We include tests against the Skynet bot \cite{skynet}, the current champion of the Starcraft AI competition. Skynet only performed reliably in our 20v20 large-scale battle. In small-scale battles, the units acted erratically.
 
 \begin{table*}
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 	\hline
-	{\bf Game} & {\bf Players } & {\bf Fitness-$\mu$} & {\bf Fitness-$\sigma$} & {\bf Wins - Losses } \\ \hline
+	{\bf Game} & {\bf Players } & {\bf Fitness $\mu$} & {\bf Fitness $\sigma$} & {\bf Wins - Losses } \\ \hline
+	MFGW 20v20 & SC vs. BWAI & 0.94 & 0.16 & 740 - 1260 \\ \hline
 	Heterogeneous 20v20 & IC vs. BWAI & 1.11 & 0.21 & 1,661 - 339\\ \hline
-	Heterogeneous 20v20 & IC vs. Skynet \cite{skynet} & 0.76 & 0.24 &  160 - 1,840 \\ \hline
-	2-Goliath, 2-Wraith & SC vs. Human & 0.96 & 0.16 & 5 - 5 \\ \hline
-	2-Marine, 1-Firebat & MUC vs. Human & 0.83 & 0.42 & 3 - 7 \\ \hline
+	Heterogeneous 20v20 & IC vs. Skynet & 0.76 & 0.24 &  160 - 1,840 \\ \hline
+	Heterogeneous 20v20 & IC\textsuperscript{$\prime$} vs. Skynet & 0.81 & 0.23 & 94 - 906 \\ \hline
+	Heterogeneous 20v20 & IC (untrained) vs. Skynet & \fillin{mean} & \fillin{stddev} & \fillin{results} \\ \hline
 	Heterogeneous 20v20 & IC vs. Human & 0.96 & 0.19 & 4 - 6 \\ \hline
+	Heterogeneous 20v20 & Human vs. Skynet & N/A & N/A & 4 - 6 \\ \hline
 	2-Goliath, 2-Wraith & Human vs. BWAI & N/A & N/A & 9 - 1\\ \hline
+	2-Goliath, 2-Wraith & SC vs. Human & 0.96 & 0.16 & 5 - 5 \\ \hline
+	2-Marine, 1-Firebat & MUC vs. BWAI & 1.17 & 0.35 & 1495 - 515 \\ \hline
 \end{tabular}
-\caption{The final results for a selected set of genomes. Only completed games are reported, and wins/losses are reported with respect to the first player listed. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. 10 rounds are used for tests involving human players, and 2,000 rounds for automated tests.}
+\caption{The final results for a selected set of genomes. Only completed games are reported, and wins/losses are reported with respect to the first player listed. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. MFGW refers to the marine-firebat-goliath-wraith setup described in Section \ref{sec:squad_exp}. Unless otherwise noted, all controllers were trained against BWAI and sample from a trained population. IC\textsuperscript{$\prime$} is identical to IC, except its population is trained against Skynet as well.}
 \label{tab:results}
 \end{table*}
 
 \begin{table*}
 \centering
-\begin{tabular}{|l|l|}
+\begin{tabular}{|l|l|l|}
 	\hline
-	{\bf Video} & {\bf Description}\\ \hline
-	\multirow{3}{*}{\small \url{http://www.youtube.com/watch?v=OeMwC0bexlo}} & 3v3 battle with 2 marines and \\
-	& 1 firebat on each team, with a \\
-	& multi-unit controller. \\ \hline
-	\multirow{2}{*}{\small \url{http://www.youtube.com/watch?v=zHyUqjc55Bc}} & 20v20 battle with heterogeneous \\
-	& units, using an individual controller. \\ \hline
+	{\bf Video} & {\bf Players} & {\bf Description}\\ \hline
+	\mrow{2}{\small \url{http://youtu.be/OeMwC0bexlo}} & \mrow{2}{MUC vs. BWAI} & 3v3 battle with 2 marines and \\
+	&& 1 firebat on each team\\ \hline
+	\mrow{2}{\small \url{http://youtu.be/zHyUqjc55Bc}} & \mrow{2}{IC vs. BWAI} & 20v20 battle with heterogeneous \\
+	&& units, using an individual controller. \\ \hline
+	\mrow{2}{\small \url{http://youtu.be/07mQnSVvytU}} & \mrow{2}{IC\textsuperscript{$\prime$} vs. Skynet} & 20v20 battle against Skynet with \\
+	&& heterogeneous units. \\ \hline
+	\mrow{2}{\small \url{http://youtu.be/2IKllwxzlGA}} & \mrow{2}{SC vs. BWAI} & 20v20 battle against BWAI with the \\
+	&& marine-firebat-goliath-wraith setup. \\ \hline
 \end{tabular}
-\caption{A collection of videos displaying the training battles.}
+\caption{A collection of videos displaying the training battles. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. IC\textsuperscript{$\prime$} was trained additionally against Skynet.}
+\label{tab:videos}
 \end{table*}
 
-The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't generalize to human players or the Skynet bot. \fillin{Talk about why - if we can evolve a controller to do well against skynet, then that shows it's most likely overfitting or a deficient built-in AI, and could be resolved in the general case w/ competitive evolution}.
+The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't generalize to human players or the Skynet bot. To improve performance against Skynet, we trained our individual controller population against Skynet. This training session was exceptionally processor-intensive. While 3v3 scenarios trained at approximately 12.5 generations per hour, we were able to achieve less than one generation per hour against Skynet. We therefore trained the IC controller for 15 additional generations against the Skynet bot. The fitness improvement is small but significant ($p < .001$), indicating that learning is taking place and that our network could potentially overcome the Skynet bot given weeks of training.
+
 \section{Conclusions}
 \label{sec:conclusion}
 
-We have shown the effectiveness of three different approaches to creating small-scale combat controllers using neural networks and NEAT to learn control techniques. In each case we have shown that given the proper training setup, these designs are capable of performing well against the built-in AI. We additionally show that our method is competitive against a human player, however the top-ranking AI still outperforms our most successful genome. It is possible that further modifications can be made to our training and design. We discuss this in the following section.
+We have shown the effectiveness of three different approaches to creating small-scale combat controllers using neural networks and NEAT to learn control techniques. In each case we have shown that given the proper training setup, these designs are capable of performing well against the built-in AI. We additionally show that our method is competitive against a human player, and while the top-ranking AI still outperforms our most successful genome, it's possible that continued training against Skynet could change these results. We discuss this and further modifications to our methods in the final section.
 
 \section{Future Work}
 \label{sec:future}
