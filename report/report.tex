@@ -7,7 +7,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 \usepackage{courier}
-\usepackage[margin=1.23in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage[margin=1.21in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{multirow}
@@ -34,11 +34,11 @@ A major challenge for players and AI modules alike in the real-time strategy com
 
 \section{Introduction}
 
-Micro-management is a major component of real-time strategy (RTS) games such as Starcraft. Players must effectively move individual units around for gathering resources, constructing buildings, or for tactical combat. In the case of tactical combat, micro-management requires quick action on the part of the player and thus can be difficult to master even with a small number of units. While modern games tend to minimize the degree to which players must control units on a small scale through the implementation of batch commands, this is usually achieved with simple heuristics and a significant amount of potential is sacrificed for such enhancements. For a simple example of this, consider the following scenario: a player might take a heterogeneous group of close-range and long-range units and issue a batch attack command, at which point her units will either attack at random or attack one unit at a time. A more effective strategy might be to allow ranged units to disengage and re-engage based on the enemy's response, to allow these units to keep their distance, while close-range units focus on the greatest threat to allied ranged units. In this situation, the simplicity of the batch AI has diminished the effectiveness of the player's army. Such circumstances are prevalent in modern RTS games.
+Micro-management is a major component of real-time strategy (RTS) games such as Starcraft. Players must effectively move individual units around for gathering resources, constructing buildings, or for tactical combat. In the case of tactical combat, micro-management requires quick action on the part of the player and thus can be difficult to master even with a small number of units. While modern games tend to minimize the degree to which players must control units on a small scale through the implementation of batch commands, this is usually achieved with simple heuristics and a significant amount of potential is sacrificed for such enhancements. For a simple example of this, consider the following scenario: a player might take a heterogeneous group of close-range and long-range units and issue a batch attack command, at which point her units will either attack at random or attack one unit at a time. A more effective strategy might be to allow ranged units to disengage and re-engage based on the enemy's response. This would allow these units to keep their distance, while close-range units focus on the greatest threat to allied ranged units. In this situation, the simplicity of the batch AI has diminished the effectiveness of the player's army. Such circumstances are prevalent in modern RTS games.
 
 The domain of micro-management in combat environments is therefore well-suited to the application of intelligent, autonomous agents. While the best AI implementations still fall below the average competitive human player in terms of high-level planning and strategy \cite{weber2011building}, a trained unit controller agent should have little difficulty outperforming a human for any reasonably-sized army. Indeed, while an agent may potentially make hundreds of decisions and unit actions per second, even the most skilled human Starcraft players can only achieve about 5 actions per second \cite{mccoy2008integrated}.
 
-In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \cite{ai_competition}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results against the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and against other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
+In this paper we present a novel application of NEAT to the small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \cite{ai_competition}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results against the built-in Starcraft AI, against another bot from the Starcraft AI Competition, and against a human competitor in Section \ref{sec:exp}, and then examine the particular effects of network topology in Section \ref{sec:network}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
 
 \section{Background}
 \label{sec:back}
@@ -295,6 +295,50 @@ Next we combine multiple squads into a single battalion using the squad commande
 \label{fig:squadcommand_exp}
 \end{figure}
 
+\subsection{Combat Results}
+
+To anchor our reported fitness scores to a practical setting, we now present results for a variety of controllers and training scenarios. These are given in Table \ref{tab:results}. We include tests against the Skynet bot \cite{skynet}, the current champion of the Starcraft AI competition. Skynet only performed reliably in our 20v20 large-scale battle. In small-scale battles, the units acted erratically.
+
+\begin{table*}
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+	\hline
+	{\bf Game} & {\bf Players } & {\bf Fitness $\mu$} & {\bf Fitness $\sigma$} & {\bf Wins - Losses } \\ \hline
+	MFGW 20v20 & SC vs. BWAI & 0.94 & 0.16 & 740 - 1260 \\ \hline
+	Heterogeneous 20v20 & IC vs. BWAI & 1.11 & 0.21 & 1,661 - 339\\ \hline
+	Heterogeneous 20v20 & IC vs. Skynet & 0.76 & 0.24 &  160 - 1,840 \\ \hline
+	Heterogeneous 20v20 & IC\textsuperscript{$\prime$} vs. Skynet & 0.81 & 0.23 & 94 - 906 \\ \hline
+	Heterogeneous 20v20 & IC (untrained) vs. Skynet & 0.60 & 0.13 & 0 - 1,000 \\ \hline
+	Heterogeneous 20v20 & IC vs. Human & 0.96 & 0.19 & 4 - 6 \\ \hline
+	Heterogeneous 20v20 & Human vs. Skynet & N/A & N/A & 4 - 6 \\ \hline
+	2-Goliath, 2-Wraith & Human vs. BWAI & N/A & N/A & 9 - 1\\ \hline
+	2-Goliath, 2-Wraith & SC vs. Human & 0.96 & 0.16 & 5 - 5 \\ \hline
+	2-Marine, 1-Firebat & MUC vs. BWAI & 1.17 & 0.35 & 1495 - 515 \\ \hline
+\end{tabular}
+\caption{The final results for a selected set of genomes. Only completed games are reported, and wins/losses are reported with respect to the first player listed. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. MFGW refers to the marine-firebat-goliath-wraith setup described in Section \ref{sec:squad_exp}. Unless otherwise noted, all controllers were trained against BWAI and sample from a trained population. IC\textsuperscript{$\prime$} is identical to IC, except its population is trained against Skynet as well.}
+\label{tab:results}
+\end{table*}
+
+\begin{table*}
+\centering
+\begin{tabular}{|l|l|l|}
+	\hline
+	{\bf Video} & {\bf Players} & {\bf Description}\\ \hline
+	\mrow{2}{\small \url{http://youtu.be/OeMwC0bexlo}} & \mrow{2}{MUC vs. BWAI} & 3v3 battle with 2 marines and \\
+	&& 1 firebat on each team\\ \hline
+	\mrow{2}{\small \url{http://youtu.be/zHyUqjc55Bc}} & \mrow{2}{IC vs. BWAI} & 20v20 battle with heterogeneous \\
+	&& units, using an individual controller. \\ \hline
+	\mrow{2}{\small \url{http://youtu.be/07mQnSVvytU}} & \mrow{2}{IC\textsuperscript{$\prime$} vs. Skynet} & 20v20 battle against Skynet with \\
+	&& heterogeneous units. \\ \hline
+	\mrow{2}{\small \url{http://youtu.be/2IKllwxzlGA}} & \mrow{2}{SC vs. BWAI} & 20v20 battle against BWAI with the \\
+	&& marine-firebat-goliath-wraith setup. \\ \hline
+\end{tabular}
+\caption{A collection of videos displaying the training battles. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. IC\textsuperscript{$\prime$} was trained additionally against Skynet.}
+\label{tab:videos}
+\end{table*}
+
+The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't generalize to human players or the Skynet bot. To improve performance against Skynet, we trained our individual controller population against Skynet. This training session was exceptionally processor-intensive. While 3v3 scenarios trained at approximately 12.5 generations per hour, we were able to achieve less than one generation per hour against Skynet. We therefore trained the IC controller for 15 additional generations against the Skynet bot. The fitness improvement is small but significant ($p < .001$), indicating that learning is taking place and that our network could potentially overcome the Skynet bot given weeks of training.
+
 \section{Network Analysis}
 \label{sec:network}
 
@@ -350,50 +394,6 @@ The Firebat's behavior is influenced more by the angles between allied and enemy
 \label{sec:network_remarks}
 
 While we can show signs of intelligent behavior from the champion network's structure and performance, it should be noted that the network is far from perfect. Many of the connections do not contribute to useful behavior, while many that should are not present (e.g. a marine can retreat when the enemy firebat gets close). The two hidden nodes in two layers are also redundant, as they form a chain of positive weights and can be replaced with a single connection \{41:33\}. This is because the network, while effective, was still going through the evolution process when this genome was evaluated. We stopped training the network once a reasonable level of fitness was attained due to time constraint, but further iterations through hundreds of generations may have resulted in more focused behavior, as well as higher fitness.
-
-\section{Combat Results}
-
-To anchor our reported fitness scores to a practical setting, we now present results for a variety of controllers and training scenarios. These are given in Table \ref{tab:results}. We include tests against the Skynet bot \cite{skynet}, the current champion of the Starcraft AI competition. Skynet only performed reliably in our 20v20 large-scale battle. In small-scale battles, the units acted erratically.
-
-\begin{table*}
-\centering
-\begin{tabular}{|c|c|c|c|c|}
-	\hline
-	{\bf Game} & {\bf Players } & {\bf Fitness $\mu$} & {\bf Fitness $\sigma$} & {\bf Wins - Losses } \\ \hline
-	MFGW 20v20 & SC vs. BWAI & 0.94 & 0.16 & 740 - 1260 \\ \hline
-	Heterogeneous 20v20 & IC vs. BWAI & 1.11 & 0.21 & 1,661 - 339\\ \hline
-	Heterogeneous 20v20 & IC vs. Skynet & 0.76 & 0.24 &  160 - 1,840 \\ \hline
-	Heterogeneous 20v20 & IC\textsuperscript{$\prime$} vs. Skynet & 0.81 & 0.23 & 94 - 906 \\ \hline
-	Heterogeneous 20v20 & IC (untrained) vs. Skynet & 0.60 & 0.13 & 0 - 1,000 \\ \hline
-	Heterogeneous 20v20 & IC vs. Human & 0.96 & 0.19 & 4 - 6 \\ \hline
-	Heterogeneous 20v20 & Human vs. Skynet & N/A & N/A & 4 - 6 \\ \hline
-	2-Goliath, 2-Wraith & Human vs. BWAI & N/A & N/A & 9 - 1\\ \hline
-	2-Goliath, 2-Wraith & SC vs. Human & 0.96 & 0.16 & 5 - 5 \\ \hline
-	2-Marine, 1-Firebat & MUC vs. BWAI & 1.17 & 0.35 & 1495 - 515 \\ \hline
-\end{tabular}
-\caption{The final results for a selected set of genomes. Only completed games are reported, and wins/losses are reported with respect to the first player listed. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. MFGW refers to the marine-firebat-goliath-wraith setup described in Section \ref{sec:squad_exp}. Unless otherwise noted, all controllers were trained against BWAI and sample from a trained population. IC\textsuperscript{$\prime$} is identical to IC, except its population is trained against Skynet as well.}
-\label{tab:results}
-\end{table*}
-
-\begin{table*}
-\centering
-\begin{tabular}{|l|l|l|}
-	\hline
-	{\bf Video} & {\bf Players} & {\bf Description}\\ \hline
-	\mrow{2}{\small \url{http://youtu.be/OeMwC0bexlo}} & \mrow{2}{MUC vs. BWAI} & 3v3 battle with 2 marines and \\
-	&& 1 firebat on each team\\ \hline
-	\mrow{2}{\small \url{http://youtu.be/zHyUqjc55Bc}} & \mrow{2}{IC vs. BWAI} & 20v20 battle with heterogeneous \\
-	&& units, using an individual controller. \\ \hline
-	\mrow{2}{\small \url{http://youtu.be/07mQnSVvytU}} & \mrow{2}{IC\textsuperscript{$\prime$} vs. Skynet} & 20v20 battle against Skynet with \\
-	&& heterogeneous units. \\ \hline
-	\mrow{2}{\small \url{http://youtu.be/2IKllwxzlGA}} & \mrow{2}{SC vs. BWAI} & 20v20 battle against BWAI with the \\
-	&& marine-firebat-goliath-wraith setup. \\ \hline
-\end{tabular}
-\caption{A collection of videos displaying the training battles. MUC, IC, SC, and BWAI represent Multi-Unit Controllers, Individual Controllers, Squad Controllers, and the built-in BroodWar AI, respectively. IC\textsuperscript{$\prime$} was trained additionally against Skynet.}
-\label{tab:videos}
-\end{table*}
-
-The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't generalize to human players or the Skynet bot. To improve performance against Skynet, we trained our individual controller population against Skynet. This training session was exceptionally processor-intensive. While 3v3 scenarios trained at approximately 12.5 generations per hour, we were able to achieve less than one generation per hour against Skynet. We therefore trained the IC controller for 15 additional generations against the Skynet bot. The fitness improvement is small but significant ($p < .001$), indicating that learning is taking place and that our network could potentially overcome the Skynet bot given weeks of training.
 
 \section{Conclusions}
 \label{sec:conclusion}
