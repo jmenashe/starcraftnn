@@ -3,7 +3,7 @@
 \definecolor{purple}{RGB}{230,0,200}
 \definecolor{urple}{RGB}{100,0,200}
 \centering
-\hspace*{-.4cm}
+\hspace*{-.2cm}
 \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep, scale=.8]
    \tikzstyle{every pin edge}=[<-,shorten <=1pt]
    \tikzstyle{neuron}=[circle,fill=black!25,minimum size=17pt,inner sep=0pt]
@@ -42,7 +42,7 @@
 	\node[eattr] (eattr2) at (0,0.6) {};
 	\node[eattr] (eattr3) at (0,0.3) {};
 	\node[eattr] (eattr4) at (0,0.0) {};
-	\node[annot, text width = 2.4cm] (eattr_annot) at (-2,.05) {Enemy Attributes  ($\forall$ bins)};
+	\node[annot, text width = 2.2cm] (eattr_annot) at (-2,.05) {Enemy Attributes  ($\forall$ bins)};
 	\foreach \d in {1,...,4}
 		\path (eattr_annot) edge (eattr\d);
 
@@ -58,12 +58,12 @@
 	\foreach \d in {1,...,5}
 		\path (hidden) edge (action\d);
 
-	\node[annot, text width=2.3cm] (actions) at (5.6, 2.3) {Action Scores};
+	\node[annot, text width=2.3cm] (actions) at (5.3, 2.3) {Action};
 
 	\node[bin] (bin1) at (4,0.1) {};
 	\path (hidden) edge (bin1);
 
-	\node[annot, text width=2cm] (bins) at (5.6, .1) {Bin Scores ($\forall$ bins)};
+	\node[annot, text width=2cm] (bins) at (5.3, .1) {Bins \\ ($\forall$ bins)};
 
     \node[annot] at (0,5) {Input layer};
     \node[annot] at (2,5) {Hidden layer};

@@ -7,7 +7,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 \usepackage{courier}
-\usepackage[margin=1.0in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage[margin=1.24in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{multirow}
@@ -25,7 +25,7 @@
 \begin{document}
 
 \title{Neural Networks for Small-Scale Combat Optimization in Real-Time Strategy Games}
-\author{Jacob Menashe and Vineet Keshari}
+\author{Jacob Menashe and Vineet Keshari \\ \texttt{\{jmenashe,vkeshari\}@cs.utexas.edu} \\ The University of Texas at Austin}
 \maketitle
 
 \begin{abstract}
@@ -272,17 +272,17 @@ Furthermore, we see a highly accelerated fitness gain during the first 4 generat
 
 Motivated by our search for interesting behaviors, we now consider the squad controller and squad commander networks. The squad controller described in Section \ref{sec:squad_design} is somewhat of a hybrid between the multi-unit and individual controllers, combining the group awareness of the former with the flexibility and scalability of the latter. We trained two squad types with this controller: a 2-marine, 2-firebat controller, and a 2-goliath, 2-wraith controller. Fitness graphs for both of these are shown in Figures \ref{fig:squad_mf_exp} and \ref{fig:squad_gw_exp}. The marine-firebat setup performs poorly in comparison go the goliath-wraith setup, and the earlier marine-firebat controller from Section \ref{sec:multiunit_exp}. The multi-unit controller has a clear advantage in that it is highly specialized for the 2-marine, 1-firebat symmetric setup. Considering the high degree of similarity between the marine-firebat and goliath-wraith squad controllers, it's unclear why these two would achieve such varied fitness levels. One possible explanation is that stochasticity plays a larger role for ground units, whereas goliaths and wraiths are distinct enough that more optimization is possible from our state models.
 
-\begin{figure}
+\begin{figure}[t]
 \centering
 \includegraphics[scale=.59]{plots/squad_mf.pdf}
-\caption{Fitness for the marine-firebat squad controller.}
+\caption{Fitness graph for the marine-firebat squad controller.}
 \label{fig:squad_mf_exp}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[scale=.59]{plots/squad_gw.pdf}
-\caption{Fitness for the goliath-wraith squad controller.}
+\caption{Fitness graph for the goliath-wraith squad controller.}
 \label{fig:squad_gw_exp}
 \end{figure}
 
@@ -300,17 +300,17 @@ Next we combine multiple squads into a single battalion using the squad commande
 
 \begin{figure*}
 \centering
-\includegraphics[scale=.5]{figures/multiunit_labelled.png}
+\includegraphics[scale=.42]{figures/multiunit_labelled.png}
 \caption{The champion network for the multi-unit 2-marine, 1-firebat controller. Input nodes are at the top, hidden nodes in the middle, and output nodes at the bottom. Red lines represent positive connections, and blue lines represent negative connections. Green lines are used to label the grouped inputs and outputs as described in Section \ref{sec:network_struct}.}
 \label{fig:multiunit_mf_net}
 \end{figure*}
 
-In this section, we will look at the champion network from the Marine2Firebat1 multi-unit controller shown in Figure \ref{fig:multiunit_mf_net} and analyze any interesting behavior that it has evolved during training. We choose to study this network as it has the least number of nodes amongst our various approaches, making it easier to visualize and to infer behavior. Our aim in this section is to understand whether or not the better fitness is indeed due to intelligent behavior.
+In this section, we will look at the champion network from the 2-marine, 1-firebat multi-unit controller shown in Figure \ref{fig:multiunit_mf_net} and analyze any interesting behavior that it has evolved during training. We choose to study this network as it has the least number of nodes among our various approaches, making it easier to visualize and to infer behavior. Our aim in this section is to understand whether or not the better fitness is indeed due to intelligent behavior.
 
 \subsection{Network Diagram}
 \label{sec:network_struct}
 
-The network diagram in Figure \ref{fig:multiunit_mf_net} was generated from trained genomes using the SharpNEATView library \cite{sharpneat}. Node 0 is the bias, while nodes 1 to 24 and 25 to 45 are the inputs and outputs of the network respectively, arranged as per the network structure shown in Figure \ref{fig:design_multiunit}. The units in our training setup are labelled A1-A3 and E1-E3 as per Table \ref{tab:multiunit_labels}. Inputs 7 to 24 are the \{r,$\theta$\} values for the relative positions of each enemy-ally pair. The angle $\theta$ is in world co-ordinates, so that $\theta$=0 is to the right in the training setup shown in Figure \ref{fig:training_setup}. The `move' outputs in order for each ally are the move score, distance, $\theta$ and flip, as described in Section \ref{sec:multiunit_design}. We will denote a connection as \{(source node):(destination node)\} in the following subsections.
+The network diagram in Figure \ref{fig:multiunit_mf_net} was generated from trained genomes using SharpNEAT's built-in visualization library. Node 0 is the bias, while nodes 1 to 24 and 25 to 45 are the inputs and outputs of the network, respectively, arranged per the network structure shown in Figure \ref{fig:design_multiunit}. The units in our training setup are labeled A1-A3 and E1-E3 as in Table \ref{tab:multiunit_labels}. Inputs 7 to 24 are the \{r,$\theta$\} values for the relative positions of each enemy-ally pair. The angle $\theta$ is in world coordinates, so that $\theta$ = 0 is to the right in the training setup shown in Figure \ref{fig:training_setup}. The `move' outputs in order for each ally are the move score, distance, $\theta$ and flip, as described in Section \ref{sec:multiunit_design}. We denote a connection as \{(source node):(destination node)\}.
 
 \begin{table}
 \centering
@@ -331,7 +331,7 @@ The network diagram in Figure \ref{fig:multiunit_mf_net} was generated from trai
 \subsection{Network Behavior}
 \label{sec:network_behavior}
 
-Based on initial configuration in our training setup, at the beginning of a round both marines will attack E2, while the Firebat will go for E1. The Firebat's behavior is useful since the enemy marines can cause a lot of damage to it due to their long range. It is also beneficial for both marines to focus attack on a single enemy so that they can kill it early, reducing the total damage taken by the team thereafter. Connections \{1:26\}, \{0:33\}, \{7:33\} and \{13:39\} contribute to these behaviors. Further behavior is described for each unit in the following subsections.
+Based on initial configuration in our training setup, at the beginning of a round both marines will attack E2, while the Firebat will go for E1. The Firebat's behavior is useful since the enemy marines can cause a great deal of damage to it with their long-range firing capabilities. It is also beneficial for both marines to focus attack on a single enemy so that they can kill it early, reducing the total damage taken by the team thereafter. Connections \{1:26\}, \{0:33\}, \{7:33\} and \{13:39\} contribute to these behaviors. We now describe each ally's individual behaviors in more detail.
 
 \subsubsection{Marine 1 (A1)}
 \label{sec:network_out_a1}
@@ -339,19 +339,17 @@ Based on initial configuration in our training setup, at the beginning of a roun
 A1 will attack E2 as long its own health percentage is high. As its health drops after initial conflict, its preferences for enemies depend on the enemy firebat's health. If the enemy firebat is weak, A1 will attack it to kill it quickly due to \{6:27\}. If the enemy firebat is stronger than the ally firebat, A1 will instead attack E1 (\{3:25\} and \{6:25\}). This may be because E1 is the likely cause of higher damage to the ally firebat at this point as E2 should have been killed early.
 
 \subsubsection{Marine 2 (A2)}
-\label{sec:network_out_a1}
 
 A2 has a predisposition to attack E2 due to \{0:33\}. This preference is further increased if our firebat is attacking the enemy firebat, as given by the connection chain \{41:796:900:33\}. A2 can be seen as protecting the firebat from damage from E2 in this behavior. However, if E2's health is low enough and both enemy marines are away from our firebat (thereby posing no threat to it), A2 will instead attack the enemy firebat due to \{5:34\}, \{11:34\} and \{17:34\}. This is the reverse of the previous behavior, where A2 tries to take advantage of its range to attack the enemy firebat.
 
 \subsubsection{Firebat (A3)}
-\label{sec:network_out_a1}
 
-The Firebat's behavior is influenced more by the angles between allied and enemy units than it is by their health or relative distances. It can be said that A3 is more sensitive to the spatial configuration of units on the battlefield than are the marines. It is difficult to quantify this behavior due to the linear nature of the values for $\theta$ in the multi-unit controller network, as opposed to the use of discrete bins in the others. We can, however, make a guess at what these connections mean based on our observations. A3's initial tendency to attack E1 will be reduced if the enemy firebat makes a large angle to it (\{24:39\}). This is usually the case in our training setup, as the enemy firebat always spawns at the lower right corner. Due to this, A3 may have a stronger tendency either to attack E2 if it is not close to A1 (\{13:40\}), or to attack E3 if the angle between A3 and E2 is small (\{18:41\}). In most cases, the latter scenario occurs due to the way the units spawn (A3 in the lower left corner, E3 in the lower right corner and E2 somewhere above E3). We therefore observe that A3 initially attacks E1 but when the units get closer it may attack E3. In either scenario, however, the firebat will first damage an enemy marine and then the enemy firebat.
+The Firebat's behavior is influenced more by the angles between allied and enemy units than it is by their health or relative distances. It can be said that A3 is more sensitive to the spatial configuration of units on the battlefield than are the marines. It is difficult to quantify this behavior due to the linear nature of the values for $\theta$ in the multi-unit controller network, as opposed to the use of discrete bins in the others. We can, however, estimate the phenotypical expression of A3's network connections based on the behavior we observe. A3's initial tendency to attack E1 will be reduced if the enemy firebat makes a large angle to it (\{24:39\}). This is usually the case in our training setup, as the enemy firebat always spawns at the lower right corner. Due to this, A3 may have a stronger tendency either to attack E2 if it is not close to A1 (\{13:40\}), or to attack E3 if the angle between A3 and E2 is small (\{18:41\}). In most cases, the latter scenario occurs due to the way the units spawn (A3 in the lower left corner, E3 in the lower right corner and E2 somewhere above E3). We therefore observe that A3 initially attacks E1, but when the units get closer it may attack E3. In either scenario, however, the firebat will first damage an enemy marine and then the enemy firebat.
 
 \subsection{Remarks}
 \label{sec:network_remarks}
 
-While we can show signs of intelligent behavior from the champion network's structure and performance, it should be noted that the network is far from perfect. Many of the connections do not contribute to useful behavior, while many that should are not present (e.g. a marine can retreat when the enemy firebat gets close). The two hidden nodes in two layers are also redundant, as they form a chain of positive weights and can be replaced with a single connection \{41:33\}. This is because the network, while effective, was still going through the evolution process when this genome was evaluated. We stopped training the network once a reasonable level of fitness was attained due to time constraint, but further iterations through hundreds of generations may have resulted in more focussed behavior as well as higher fitness.
+While we can show signs of intelligent behavior from the champion network's structure and performance, it should be noted that the network is far from perfect. Many of the connections do not contribute to useful behavior, while many that should are not present (e.g. a marine can retreat when the enemy firebat gets close). The two hidden nodes in two layers are also redundant, as they form a chain of positive weights and can be replaced with a single connection \{41:33\}. This is because the network, while effective, was still going through the evolution process when this genome was evaluated. We stopped training the network once a reasonable level of fitness was attained due to time constraint, but further iterations through hundreds of generations may have resulted in more focused behavior, as well as higher fitness.
 
 \section{Combat Results}
 
@@ -366,7 +364,7 @@ To anchor our reported fitness scores to a practical setting, we now present res
 	Heterogeneous 20v20 & IC vs. BWAI & 1.11 & 0.21 & 1,661 - 339\\ \hline
 	Heterogeneous 20v20 & IC vs. Skynet & 0.76 & 0.24 &  160 - 1,840 \\ \hline
 	Heterogeneous 20v20 & IC\textsuperscript{$\prime$} vs. Skynet & 0.81 & 0.23 & 94 - 906 \\ \hline
-	Heterogeneous 20v20 & IC (untrained) vs. Skynet & \fillin{mean} & \fillin{stddev} & \fillin{results} \\ \hline
+	Heterogeneous 20v20 & IC (untrained) vs. Skynet & 0.60 & 0.13 & 0 - 1,000 \\ \hline
 	Heterogeneous 20v20 & IC vs. Human & 0.96 & 0.19 & 4 - 6 \\ \hline
 	Heterogeneous 20v20 & Human vs. Skynet & N/A & N/A & 4 - 6 \\ \hline
 	2-Goliath, 2-Wraith & Human vs. BWAI & N/A & N/A & 9 - 1\\ \hline
@@ -405,7 +403,7 @@ We have shown the effectiveness of three different approaches to creating small-
 \section{Future Work}
 \label{sec:future}
 
-The most obvious deficiency of our training method is the reliance upon Starcraft's built-in AI for training. This AI is rather poor at small-scale combat, and so our best genomes were only barely competitive in human trials and were easily defeated against Skynet. Training directly against a target opponent (such as Skynet) seems like a reasonable requirement at the surface, however we would prefer a system that does not rely on prior knowledge of the opponent's behaviors and tendencies. Therefore a possible remedy to this would be a competitive evolutionary setup, in which our genomes compete against one another. This would push for continual innovation, and we believe would allow for better generalization against unknown bots or human opponents. Allowing for this type of evolutionary strategy would require updates to BWAPI to allow smoother transitions between battles in a multi-instance setting. Alternatively, our system could be moved off of the BWAPI platform and onto an open-source alternative, such as ORTS \cite{orts}.
+The clearest area for improvement for our training method is the reliance upon Starcraft's built-in AI for training. This AI is rather poor at small-scale combat, and so our best genomes were only barely competitive in human trials and were easily defeated against Skynet. Training directly against a target opponent (such as Skynet) seems like a reasonable requirement at the surface, however we would prefer a system that does not rely on prior knowledge of the opponent's behaviors and tendencies. Therefore a possible remedy to this would be a competitive evolutionary setup, in which our genomes train against one another. This would push for continual innovation, and we believe would allow for better generalization against unknown bots or human opponents. Allowing for this type of evolutionary strategy would require updates to BWAPI to allow smoother transitions between battles in a multi-instance setting. Alternatively, our system could be moved off of the BWAPI platform and onto an open-source alternative, such as ORTS \cite{orts}.
 
 Another possible area of improvement lies in squad command and enemy grouping. Our current squad commander implementation relies on hard-coded heuristics for grouping squads with enemies. An alternative approach might use the neural network controlling the squad commander to make these decisions as well. Rather than ignoring enemy attributes and simply choosing to move or delegate, the commander might learn to associate enemy configurations with a library of trained squads. Squads can be trained effectively in just a few hours on a standard desktop machine, allowing for a large number of specialized squads to be created for the commander to choose from.
 

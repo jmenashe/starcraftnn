@@ -1,7 +1,7 @@
 import os
 import math
 import numpy as np
-from scipy.stats import ttest_1samp, wilcoxon, ttest_ind, mannwhitneyu
+#from scipy.stats import ttest_1samp, wilcoxon, ttest_ind, mannwhitneyu
 
 def average(s): 
 	if not s: return 0
@@ -67,7 +67,7 @@ processFile('hetero20v20_individual+_skynet.csv', 20, 1000)
 processFile('mf3v3_multiunit_builtin.csv', 3, 2000)
 processFile('mfgw20v20_squad_builtin.csv', 3, 2000)
 processFile('hetero20v20_individual.untrained_skynet.csv', 3, 2000)
-ttest('hetero20v20_individual_skynet.csv', 2000, 'hetero20v20_individual+_skynet.csv', 1000)
+#ttest('hetero20v20_individual_skynet.csv', 2000, 'hetero20v20_individual+_skynet.csv', 1000)
 # for fn in filenames:
 	# if fn[-4:] != '.csv': continue
 	# processFile(fn)
