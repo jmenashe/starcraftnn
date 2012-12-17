@@ -7,7 +7,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 \usepackage{courier}
-\usepackage[margin=1.24in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage[margin=1.23in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{multirow}
@@ -29,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-A major challenge for players and AI modules alike in the real-time strategy community is the effective control of individual units in combat scenarios. Starcraft, a real-time strategy game released by Blizzard Entertainment, provides built-in heuristics for assisting players in combat management, but these heuristics are limited in their ability to make full use of a unit's potential. We present a series of techniques for training neural networks in small-scale combat situations, and lay the groundwork for further improvements to this system. We present a neural network design for controlling combat units, which, when coupled with the NEAT evolutionary learning algorithm, is able to consistently overcome Starcraft's built-in AI. In most cases our technique outperforms the AI in less than 100 generations, and scales to large battles in a variety of unit configurations. Our system achieves an 83\% win rate against the built-in AI, and a 50\% win rate against humans. We additionally lay out the groundwork to generalize our training method for competing against arbitrary opponents.
+A major challenge for players and AI modules alike in the real-time strategy community is the effective control of individual units in combat scenarios. Starcraft, a real-time strategy game released by Blizzard Entertainment, provides built-in heuristics for assisting players in combat management, but these heuristics are limited in their ability to make full use of a unit's potential. We present a series of techniques for training neural networks in small-scale combat situations, and lay the groundwork for further improvements to this system. We present a neural network design for controlling combat units, which, when coupled with the NEAT evolutionary learning algorithm, is able to consistently overcome Starcraft's built-in AI. In most cases our technique outperforms the AI in less than 100 generations, and scales to large battles in a variety of unit configurations. Our system achieves an 83\% win rate against the built-in AI, and a 50\% win rate against humans in select scenarios. We additionally identify the particular improvements necessary for improving performance against humans and for generalizing our success to bot-versus-bot challenges.
 \end{abstract}
 
 \section{Introduction}
