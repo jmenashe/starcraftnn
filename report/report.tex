@@ -34,11 +34,11 @@ A major challenge for players and AI modules alike in the real-time strategy com
 
 \section{Introduction}
 
-Micro-management is a major component of real-time strategy (RTS) games such as Starcraft. Players must effectively move individual units around for gathering resources, constructing buildings, or for tactical combat. In the case of tactical combat, micro-management requires quick action on the part of the player and thus can be difficult to master even with a small number of units. While modern games tend to minimize the degree to which players must control units on a small scale through the implementation of batch commands, this is usually achieved with simple heuristics a significant amount of potential is sacrificed for such enhancements. For a simple example of this, consider the following scenario: a player might take a heterogeneous group of close-range and long-range units and issue a batch attack command, at which point her units will either attack at random or attack one unit at a time. A more effective strategy might be to allow ranged units to disengage and re-engage based on the enemy's response, to allow these units to keep their distance, while close-range units focus on the greatest threat to allied ranged units. In this situation, the simplicity of the batch AI has diminished the effectiveness of the player's army. Such circumstances are prevalent in modern RTS games.
+Micro-management is a major component of real-time strategy (RTS) games such as Starcraft. Players must effectively move individual units around for gathering resources, constructing buildings, or for tactical combat. In the case of tactical combat, micro-management requires quick action on the part of the player and thus can be difficult to master even with a small number of units. While modern games tend to minimize the degree to which players must control units on a small scale through the implementation of batch commands, this is usually achieved with simple heuristics and a significant amount of potential is sacrificed for such enhancements. For a simple example of this, consider the following scenario: a player might take a heterogeneous group of close-range and long-range units and issue a batch attack command, at which point her units will either attack at random or attack one unit at a time. A more effective strategy might be to allow ranged units to disengage and re-engage based on the enemy's response, to allow these units to keep their distance, while close-range units focus on the greatest threat to allied ranged units. In this situation, the simplicity of the batch AI has diminished the effectiveness of the player's army. Such circumstances are prevalent in modern RTS games.
 
 The domain of micro-management in combat environments is therefore well-suited to the application of intelligent, autonomous agents. While the best AI implementations still fall below the average competitive human player in terms of high-level planning and strategy \cite{weber2011building}, a trained unit controller agent should have little difficulty outperforming a human for any reasonably-sized army. Indeed, while an agent may potentially make hundreds of decisions and unit actions per second, even the most skilled human Starcraft players can only achieve about 5 actions per second \cite{mccoy2008integrated}.
 
-In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \cite{ai_competition}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results against the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
+In this paper we present a novel application of NEAT to small-scale combat problem, restricted to the domain of Starcraft. We devise a variety of network topologies and configurations for outperforming the game's built-in AI, as well as human players, and describe how our technique may be extended for outperforming winning bots from the Starcraft AI Competition \cite{ai_competition}. In Section \ref{sec:back} we discuss some background to AI development in real-time strategy games and specifically in Starcraft, and examine another body of work that focuses on small-scale combat. In Section \ref{sec:soft} we review the software libraries used for our analysis, and continue with a discussion of our approach to learning controller agents in Section \ref{sec:tech}. We evaluate our results against the built-in Starcraft AI, against other bots from the Starcraft AI Competition, and against other humans in Section \ref{sec:exp}. In Sections \ref{sec:conclusion} and \ref{sec:future} we conclude and discuss additional updates and improvements to our method, toward the ultimate goal of providing a general-use combat manager.
 
 \section{Background}
 \label{sec:back}
@@ -129,6 +129,7 @@ where $A$ and $E$ are the ally and enemy counts at the end of the round, respect
 \begin{figure}
 \includegraphics[scale=.34]{figures/mf_battle_small.png}
 \caption{A 3v3 battle in the 2-marine, 1-firebat training battle.}
+\label{fig:training_setup}
 \end{figure}
 
 \subsection{Network Design}
@@ -252,14 +253,6 @@ Of particular interest in this experiment is the development of interesting beha
 \label{fig:multiunit_exp}
 \end{figure}
 
-\begin{figure*}
-\centering
-\includegraphics[scale=.3]{figures/multiunit_mf.png}
-\caption{The champion network for the multi-unit 2-marine, 1-firebat controller. Input nodes are at the top, hidden nodes in the middle, and output nodes at the bottom. Red lines represent positive connections, and blue lines represent negative connections.}
-\label{fig:multiunit_mf_net}
-\end{figure*}
-
-
 \subsection{Individual Control}
 
 Our second experiment emphasizes the scalability of our individual unit controller described in Section \ref{sec:individual_design}. We use a 20-vs-20 training scenario in which each team has 5 ghosts, 5 firebats, 5 goliaths, and 5 wraiths. Figure \ref{fig:individual_exp} shows the fitness graph. This experiment differed from others in that no clear ``interesting" behavior was identified.
@@ -300,6 +293,64 @@ Next we combine multiple squads into a single battalion using the squad commande
 \caption{A fitness graph of the final squad commander network, using pretrained squad controllers from Figures \ref{fig:squad_mf_exp} and \ref{fig:squad_gw_exp}. Fitness is kept low, but increases more steadily after the initial few generations than with other controllers.}
 \label{fig:squadcommand_exp}
 \end{figure}
+
+\section{Network Analysis}
+\label{sec:network}
+
+\begin{figure*}
+\centering
+\includegraphics[scale=.5]{figures/multiunit_labelled.png}
+\caption{The champion network for the multi-unit 2-marine, 1-firebat controller. Input nodes are at the top, hidden nodes in the middle, and output nodes at the bottom. Red lines represent positive connections, and blue lines represent negative connections. Green lines are used to label the grouped inputs and outputs as described in Section \ref{sec:network_struct}.}
+\label{fig:multiunit_mf_net}
+\end{figure*}
+
+In this section, we will look at the champion network from the Marine2Firebat1 multi-unit controller shown in Figure \ref{fig:multiunit_mf_net} and analyze any interesting behavior that it has evolved during training. We choose to study this network as it has the least number of nodes amongst our various approaches, making it easier to visualize and to infer behavior. Our aim in this section is to understand whether or not the better fitness is indeed due to intelligent behavior.
+
+\subsection{Network Diagram}
+\label{sec:network_struct}
+
+The network diagram in Figure \ref{fig:multiunit_mf_net} was generated from trained genomes using the SharpNEATView library \cite{sharpneat}. Node 0 is the bias, while nodes 1 to 24 and 25 to 45 are the inputs and outputs of the network respectively, arranged as per the network structure shown in Figure \ref{fig:design_multiunit}. The units in our training setup are labelled A1-A3 and E1-E3 as per Table \ref{tab:multiunit_labels}. Inputs 7 to 24 are the \{r,$\theta$\} values for the relative positions of each enemy-ally pair. The angle $\theta$ is in world co-ordinates, so that $\theta$=0 is to the right in the training setup shown in Figure \ref{fig:training_setup}. The `move' outputs in order for each ally are the move score, distance, $\theta$ and flip, as described in Section \ref{sec:multiunit_design}. We will denote a connection as \{(source node):(destination node)\} in the following subsections.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+	\hline
+	{\bf Label} & {\bf Unit} \\ \hline
+	A1 & Marine 1 \\ \hline
+	A2 & Marine 2 \\ \hline
+	A3 & Firebat \\ \hline
+	E1 & Enemy Marine 1 \\ \hline
+	E2 & Enemy Marine 2 \\ \hline
+	E3 & Enemy Firebat \\ \hline
+\end{tabular}
+\caption{Labels for units in the network shown in Figure \ref{fig:multiunit_mf_net}.}
+\label{tab:multiunit_labels}
+\end{table}
+
+\subsection{Network Behavior}
+\label{sec:network_behavior}
+
+Based on initial configuration in our training setup, at the beginning of a round both marines will attack E2, while the Firebat will go for E1. The Firebat's behavior is useful since the enemy marines can cause a lot of damage to it due to their long range. It is also beneficial for both marines to focus attack on a single enemy so that they can kill it early, reducing the total damage taken by the team thereafter. Connections \{1:26\}, \{0:33\}, \{7:33\} and \{13:39\} contribute to these behaviors. Further behavior is described for each unit in the following subsections.
+
+\subsubsection{Marine 1 (A1)}
+\label{sec:network_out_a1}
+
+A1 will attack E2 as long its own health percentage is high. As its health drops after initial conflict, its preferences for enemies depend on the enemy firebat's health. If the enemy firebat is weak, A1 will attack it to kill it quickly due to \{6:27\}. If the enemy firebat is stronger than the ally firebat, A1 will instead attack E1 (\{3:25\} and \{6:25\}). This may be because E1 is the likely cause of higher damage to the ally firebat at this point as E2 should have been killed early.
+
+\subsubsection{Marine 2 (A2)}
+\label{sec:network_out_a1}
+
+A2 has a predisposition to attack E2 due to \{0:33\}. This preference is further increased if our firebat is attacking the enemy firebat, as given by the connection chain \{41:796:900:33\}. A2 can be seen as protecting the firebat from damage from E2 in this behavior. However, if E2's health is low enough and both enemy marines are away from our firebat (thereby posing no threat to it), A2 will instead attack the enemy firebat due to \{5:34\}, \{11:34\} and \{17:34\}. This is the reverse of the previous behavior, where A2 tries to take advantage of its range to attack the enemy firebat.
+
+\subsubsection{Firebat (A3)}
+\label{sec:network_out_a1}
+
+The Firebat's behavior is influenced more by the angles between allied and enemy units than it is by their health or relative distances. It can be said that A3 is more sensitive to the spatial configuration of units on the battlefield than are the marines. It is difficult to quantify this behavior due to the linear nature of the values for $\theta$ in the multi-unit controller network, as opposed to the use of discrete bins in the others. We can, however, make a guess at what these connections mean based on our observations. A3's initial tendency to attack E1 will be reduced if the enemy firebat makes a large angle to it (\{24:39\}). This is usually the case in our training setup, as the enemy firebat always spawns at the lower right corner. Due to this, A3 may have a stronger tendency either to attack E2 if it is not close to A1 (\{13:40\}), or to attack E3 if the angle between A3 and E2 is small (\{18:41\}). In most cases, the latter scenario occurs due to the way the units spawn (A3 in the lower left corner, E3 in the lower right corner and E2 somewhere above E3). We therefore observe that A3 initially attacks E1 but when the units get closer it may attack E3. In either scenario, however, the firebat will first damage an enemy marine and then the enemy firebat.
+
+\subsection{Remarks}
+\label{sec:network_remarks}
+
+While we can show signs of intelligent behavior from the champion network's structure and performance, it should be noted that the network is far from perfect. Many of the connections do not contribute to useful behavior, while many that should are not present (e.g. a marine can retreat when the enemy firebat gets close). The two hidden nodes in two layers are also redundant, as they form a chain of positive weights and can be replaced with a single connection \{41:33\}. This is because the network, while effective, was still going through the evolution process when this genome was evaluated. We stopped training the network once a reasonable level of fitness was attained due to time constraint, but further iterations through hundreds of generations may have resulted in more focussed behavior as well as higher fitness.
 
 \section{Combat Results}
 
