@@ -45,7 +45,7 @@ In this paper we present a novel application of NEAT to the small-scale combat p
 
 Classic AI techniques (or GOFAI) have been used on a variety of board games, such as Connect Four, Checkers, and Chess \cite{Allis94searchingfor}. Due to their simplistic and discrete state spaces, board games can often be broken down by traditional AI techniques such as alpha-beta pruning, or in some cases even brute force search. Chess pushes the limits of these techniques with a search tree complexity of at least $10^{120}$ \cite{Shannon:1988:PCP:61701.67002}, but can still benefit from the prediction value of limited search. What these games have in common is that computers maintain a significant advantage over humans stemming from their predictive abilities. As computing technology has improved, however, games have begun to take on more realistic simulations of the world and therefore rely heavily on continuous and highly complex states and actions. This increase in state-action complexity has in turn rendered traditional AI approaches ineffective at performing competitively with human opponents.
 
-Recent work has seen reasonable success at taking on the challenges of modern games and simulations, particularly in the domain of First-Person Shooters (FPS). FPS games are a genre of computer game in which the player views the world through an avatar from a first-person point of view. The point of an FPS is to navigate through the game world and kill opponents with weapons and tools found throughout the environment. Neuroevolution has been successfully applied toward the goal of producing human-like actions \cite{schrum:cig11competition}, resulting in creating bots that effectively pass the Turing test. In FPS games, creating bots that are simply better than human players can be achieved through simple physics calculations, so here the emphasis is on enabling human-like movements and downgrading combat prowess where it can be seen as unrealistic. In contrast, our work focuses on outperforming human- and AI-controlled systems alike.
+Recent work has seen reasonable success at taking on the challenges of modern games and simulations, particularly in the domain of First-Person Shooters (FPS). FPS games are a genre of computer game in which the player views the world through an avatar from a first-person point of view. The point of an FPS is to navigate through the game world and kill opponents with weapons and tools found throughout the environment. Neuroevolution has been successfully applied toward the goal of producing human-like actions \cite{schrum:cig11competition}, resulting in creating bots that effectively pass the Turing test. In FPS games, creating bots that are simply better than human players can be achieved through basic physics calculations, so here the emphasis is on enabling human-like movements and downgrading combat prowess where it can be seen as unrealistic. In contrast, our work focuses on outperforming human- and AI-controlled systems alike.
 
 There has been considerable progress toward this goal in Starcraft, primarily due to the Starcraft AI Competition. The competition pits Starcraft bots against one another to determine a winner, however this task lies parallel to that of defeating a human controller. EISBot, one of the more successful bot implementations, has been tested against skilled human players and achieved a win rate of approximately 32\% \cite{weber2011building}. Other top-performing bots from the competition have been unable to win against expert players \cite{ai_comp_2010_website}. In our work, we therefore train and evaluate our networks based on the built-in AI, with the long-term goal of competing against both bots in the competition and human players.
 
@@ -59,14 +59,14 @@ Another notable difference between our work and that of \cite{rl_small_scale_com
 Our research was enabled by the BroodWar API (BWAPI) \cite{bwapi}, BWAPI Mono-Bridge \cite{monobridge}, and Starcraft: Broodwar itself. We use SharpNEAT \cite{sharpneat}, a C\# NEAT implementation for neuroevolution. While BWAPI is natively coded in C++, we selected a C\# implementation due to the following considerations:
 
 \begin{itemize}
-	\item Our focus for this work is in testing new configurations for NEAT and new combinations with our own heuristics, so development speed is of particular importance. C\# provides many high-level language features that allow for faster development than in C++.
+	\item Our focus for this work is testing new configurations for NEAT and new network topologies with our own heuristics, so development speed is of particular importance. C\# provides many high-level language features that allow for faster development than in C++.
 	\item BWAPI only runs on Visual Studio in Windows, so there is no cross-platform or open-source advantage to using C++.
-	\item SharpNEAT is an exceptionally well-coded and well-documented NEAT implementation. Along with working quite simply out of the box, the code is modularized and easily configurable, and has built in analysis and visualization tools.
+	\item SharpNEAT is an exceptionally well-coded and well-documented NEAT implementation. Along with working quite simply out of the box, the code is modularized and easily configurable, and has built-in analysis and visualization tools. Of the C++ implementations available, one was closely coupled with the proof-of-concept experiments it included, and the other had many bugs, large blocks of inexplicably commented code, and problems with (de)serialization.
 \end{itemize}
 
 Because C\# communicates with BWAPI through a client-server interface, processing is slower than would be in the case of C++. We felt that the increased productivity more than made up for this disadvantage.
 
-It proved difficult to automate more complex training sessions due to the limitations of Starcraft and BWAPI. The Starcraft Campaign Editor has a number of bugs that prevent triggers from executing properly, forcing us to use a series of hacks to maintain quick training cycles. Automating bot-vs-bot battles was a challenge as well; the BWAPI software often crashes between battles, and is not fast enough for running the thousands of training rounds necessary for optimal results. For this reason, the majority of our training was performed against the built-in AI.
+It proved difficult to automate more complex training sessions due to the limitations of Starcraft and BWAPI. The Starcraft Campaign Editor has a number of bugs that prevent triggers from executing properly, forcing us to use a series of hacks to maintain quick training cycles. Automating bot-vs-bot battles was a challenge as well; the BWAPI software often crashes between battles, and is not fast enough for running the tens of thousands of training rounds necessary for optimal results. For this reason, the majority of our training was performed against the built-in AI.
 
 \section{Technical Approach}
 \label{sec:tech}
@@ -106,7 +106,7 @@ Properly designing the input and output nodes is critical to the performance of 
 	Connection Cycles & Enabled \\ \hline
 	Population Size & 50 \\ \hline
 \end{tabular}
-\caption{Selected NEAT evolution probabilities and parameters. Probabilities are normalized such that they sum to 1.0 upon evaluation.}
+\caption{Selected NEAT evolution probabilities and parameters. Probabilities (i.e. all floating-point values) are normalized such that they sum to 1.0 upon evaluation.}
 \label{tab:neat_params_specific}
 \end{table}
 
@@ -119,7 +119,7 @@ f = \frac{(A - E) * |(A - E)| + A_\mathrm{max}^2}{A_\mathrm{max}^2}\\
 \label{eqn:fitness}
 \end{equation}
 
-where $A$ and $E$ are the ally and enemy counts at the end of the round, respectively, and $A_\mathrm{max} = E_\mathrm{max}$ is the starting count of allies or enemies in the training scenario. Using this formulation, the fitness value is always in the range $[0,2]$, with 1 representing a tie. In practice, ties only occur when the learned network moves the allies out of the combat area, so to avoid this behavior we assign a fitness score of 0 in all scenarios where $A \neq 0$ and $E \neq 0$.
+where $A$ and $E$ are the ally and enemy counts at the end of the round, respectively, and $A_\mathrm{max} = E_\mathrm{max}$ is the starting count of allies or enemies in the training scenario. Using this formulation, the fitness value is always in the range $[0,2]$, with 1 representing a tie. In practice, ties most likely occur when the learned network moves the allies out of the combat area, so to avoid this behavior we assign a fitness score of 0 in all scenarios where $A \neq 0$ and $E \neq 0$. Legitimate ties can also occur due to slight delays with weapon fire, though this is quite rare.
 
 \begin{figure}
 \includegraphics[scale=.28]{figures/mf_setup.png}
@@ -136,7 +136,7 @@ where $A$ and $E$ are the ally and enemy counts at the end of the round, respect
 \subsection{Network Design}
 \label{sec:net_design}
 
-We attempted multiple network designs, each of which is evaluated in Section \ref{sec:exp}. In this section we make multiple references to training time in terms of hours. Training was performed on a desktop PC with Starcraft and NEAT running on a single core at 3.07 GHz. 
+We attempted multiple network designs, each of which is evaluated in Section \ref{sec:exp}. In this section we make references to training time in terms of computation time on our training machines. Training was performed on desktop PCs, each running Starcraft and NEAT on a single core at 3.07 GHz.
 
 \subsubsection{Multi-Unit Control}
 \label{sec:multiunit_design}
@@ -149,13 +149,13 @@ We now begin with the multi-unit control network design in Figure \ref{fig:desig
 \label{fig:design_multiunit}
 \end{figure}
 
-This design represents our initial attempt at a network design. Inputs to the network include health percentages for each ally and each enemy in the training session, as well as the distances and angles of each enemy relative to each ally. Outputs include one score for each ally/enemy pair, as well as move score, distance, angle, and flip values for each ally. Flips are added as a way to differentiate between different extremes of the output range of the movement angle node. Originally we attempted a direct mapping of $\theta = 2 \cdot \pi \cdot o_\theta$, where $o_\theta \in [0,1]$ is the value of the movement angle output node. This has the effect that the extremes 0 and 1 map to the same movement. Thus, we instead use the following formulation:
+This design represents our initial attempt at a small-scale combat network. Inputs to the network include health percentages for each ally and each enemy in the training session, as well as the distances and angles of each enemy relative to each ally. Outputs include one score for each ally/enemy pair, as well as move score, distance, angle, and flip values for each ally. Flips are added as a way to differentiate between different extremes of the output range of the movement angle node. Originally we attempted a direct mapping of $\theta = 2 \cdot \pi \cdot o(\theta)$, where $o(\theta) \in [0,1]$ is the value of the movement angle output node. This has the effect that the extremes 0 and 1 map to the same movement. Thus, we instead use the following formulation:
 
  \begin{displaymath}
    \theta = \left\{
      \begin{array}{lr}
-       o_\theta \cdot \pi & : f > 0.5\\
-       o_\theta \cdot -\pi & : f \leq 0.5\\
+       o(\theta) \cdot \pi & : f > 0.5\\
+       o(\theta) \cdot -\pi & : f \leq 0.5\\
      \end{array}
    \right.
 \end{displaymath}
@@ -167,7 +167,15 @@ Using this network design, our units were able to achieve reasonable fitness lev
 \subsubsection{Individual Control}
 \label{sec:individual_design}
 
-Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of allied units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. In this way, we allow for arbitrary configurations of heterogeneous enemy combatants. To reduce the number of output nodes, we use a small set of nodes for action selection, where the action with the highest score is selected. We then use another cluster of nodes for bin selection so that the highest-scoring action is applied to the target bin. Actions are defined in Table \ref{tab:actions}. Finally, to ensure that all values are normalized to the range $[0,1]$, each I/O value represents a percentage. Ally/Enemy counts are relative to the entire battle, so a bin with 7 enemies out of a total of 10 on the battlefield would have any enemy count value of 0.7, and a bin with all of the flying enemy units would have a \texttt{HasFlyer} value of 1.
+Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. The idea behind this approach is that the angular position of two units is more relevant when the units are close than when they're far away. Our close-range units can damage multiple enemies in their line of fire at one time, so there is an advantage to knowing the precise location of nearby units, but the advantage tapers off outside of the unit's weapon range. 
+
+\begin{figure}
+\centering
+\includegraphics[scale=.3]{figures/logpolar.png}
+\caption{An example of a log-polar mapping, where distance and angle ranges allow for discretized unit locations. Image courtesy of Wikipedia \cite{logpolar}.}
+\end{figure}
+
+By organizing locations into bins and enemies into attribute classes, we allow for arbitrary configurations of heterogeneous enemy combatants. To reduce the number of output nodes, we use a small set of nodes for action selection, where the action with the highest score is selected. We then use another cluster of nodes for bin selection so that the highest-scoring action is applied to the target bin. Actions are defined in Table \ref{tab:actions}. Finally, to ensure that all values are normalized to the range $[0,1]$, each I/O value represents a percentage. Ally/Enemy counts are relative to the entire battle, so a bin with 7 enemies out of a total of 10 on the battlefield would have any enemy count value of 0.7, and a bin with all of the flying enemy units would have a \texttt{HasFlyer} value of 1.
 
 \begin{figure}
 \input{designs/individualcontroller}
