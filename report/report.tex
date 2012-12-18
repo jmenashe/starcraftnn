@@ -29,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-A major challenge for players and AI modules alike in the real-time strategy community is the effective control of individual units in combat scenarios. Starcraft, a real-time strategy game released by Blizzard Entertainment, provides built-in heuristics for assisting players in combat management, but these heuristics are limited in their ability to make full use of a unit's potential. We present a series of techniques for training neural networks in small-scale combat situations, and lay the groundwork for further improvements to this system. We present a neural network design for controlling combat units, which, when coupled with the NEAT evolutionary learning algorithm, is able to consistently overcome Starcraft's built-in AI. In most cases our technique outperforms the AI in less than 100 generations, and scales to large battles in a variety of unit configurations. Our system achieves an 83\% win rate against the built-in AI, and a 50\% win rate against humans in select scenarios. We additionally identify the particular improvements necessary for improving performance against humans and for generalizing our success to bot-versus-bot challenges.
+A major challenge for players and AI modules alike in the real-time strategy community is the effective control of individual units in combat scenarios. Starcraft, a real-time strategy game released by Blizzard Entertainment, provides built-in heuristics for assisting players in combat management, but these heuristics are limited in their ability to make full use of a unit's potential. We present a series of techniques for training neural networks in small-scale combat situations, and lay the groundwork for further improvements to this system. We present a neural network design for controlling combat units, which, when coupled with the NEAT evolutionary learning algorithm, is able to consistently overcome Starcraft's built-in AI. In most cases our technique outperforms the AI in less than 100 generations, and scales to large battles in a variety of unit configurations. Our system achieves an 83\% win rate against the built-in AI, and a 50\% win rate against humans in select scenarios. We additionally identify the particular improvements necessary for boosting performance against humans and for generalizing our success to bot-versus-bot challenges.
 \end{abstract}
 
 \section{Introduction}
@@ -53,7 +53,7 @@ Typical approaches to Starcraft bots include case-based reasoning \cite{weber200
 
 Another notable difference between our work and that of \cite{rl_small_scale_combat} is our use of NEAT (see Section \ref{sec:neat}) for learning unit controllers. We select NEAT for a number of reasons. First, as we will describe in Section \ref{sec:net_design}, our state space is continuous and high-dimensional. Neural networks are naturally well-designed for parsing continuous state spaces and determining their value. Second, due to the computational cost of communicating with and executing commands on the Starcraft runtime, we are restricted in the number of iterations we may perform to learn this state space. NEAT has been shown to significantly outperform traditional reinforcement learning methods under these circumstances \cite{Stanley:2004:EEN:1048234}. Finally, while we can accurately determine the value of a match, we cannot predict what intermediate behaviors might be optimal for our overall goal of achieving combat prowess. We therefore rely on NEAT to discover these innovations in the form of connections and connection weights in an efficient manner.
 
-There are many parallels between our work and the NERO game \cite{stanley:ieeetec05}. In NERO, players train units for combat using NEAT as the learning algorithm, selecting particular fitness configurations and battle scenarios to refine their units' skills. NERO combatants are heterogeneous in their abilities (though not necessarily in their network topologies). Units share sensing ranges, accuracy/distance curves, health and power. In contrast, Starcraft units each have different health, attack power, skills, sensing abilities, and auxiliary attriutes. Units can travel at different speeds, can output high damage against particular types of units and low damage against others, and can use special abilities such as turning invisible or attacking large numbers of enemies simultaneously. Additionally, NERO is driven by simplified melee battles, while the Starcraft Campaign Editor can incorporate a variety of state-based rules to create intricate combat simulations. The vast heterogeneity of Starcraft and the possibilities allowed by the Campaign Editor therefore present an interesting platform for combat research that is significantly distinct from NERO in many respects.
+There are many parallels between our work and the NERO game \cite{stanley:ieeetec05}. In NERO, players train units for combat using NEAT as the learning algorithm, selecting particular fitness configurations and battle scenarios to refine their units' skills. NERO combatants are homogeneous in their abilities (though not necessarily in their network topologies), as units share sensing ranges, accuracy/distance curves, health, and power. In contrast, Starcraft units each have different health, attack power, skills, sensing abilities, and auxiliary attributes. Units can travel at different speeds, can output high damage against particular types of units and low damage against others, and can use special abilities such as turning invisible or attacking large numbers of enemies simultaneously. Additionally, NERO is driven by simplified melee battles, while the Starcraft Campaign Editor can incorporate a variety of state-based rules to create intricate combat simulations. The vast heterogeneity of Starcraft and the possibilities allowed by the Campaign Editor therefore present an interesting platform for combat research that can be distinct from NERO in many respects.
 
 \section{Software}
 \label{sec:soft}
@@ -63,12 +63,12 @@ Our research was enabled by the BroodWar API (BWAPI) \cite{bwapi}, BWAPI Mono-Br
 \begin{itemize}
 	\item Our focus for this work is testing new configurations for NEAT and new network topologies with our own heuristics, so development speed is of particular importance. C\# provides many high-level language features that allow for faster development than in C++.
 	\item BWAPI only runs on Visual Studio in Windows, so there is no cross-platform or open-source advantage to using C++.
-	\item SharpNEAT is an exceptionally well-coded and well-documented NEAT implementation. Along with working quite simply out of the box, the code is modularized and easily configurable, and has built-in analysis and visualization tools. Of the C++ implementations available, one was closely coupled with the proof-of-concept experiments it included, and the other had many bugs, large blocks of inexplicably commented code, and problems with (de)serialization.
+	\item SharpNEAT is an exceptionally well-coded and well-documented NEAT implementation. Along with working quite simply out of the box, the code is modularized and easily configurable, and has built-in analysis and visualization tools. Of the C++ implementations we found online, one was closely coupled with the proof-of-concept experiments it included, and the other had many bugs, large blocks of inexplicably commented code, and problems with (de)serialization.
 \end{itemize}
 
-Because C\# communicates with BWAPI through a client-server interface, processing is slower than would be in the case of C++. We felt that the increased productivity more than made up for this disadvantage.
+Because the C\# runtime communicates with BWAPI through a client-server interface, processing is slower than would be in the case of pure C++. We felt that the increased productivity more than made up for this disadvantage.
 
-It proved difficult to automate more complex training sessions due to the limitations of Starcraft and BWAPI. The Starcraft Campaign Editor has a number of bugs that prevent triggers from executing properly, forcing us to use a series of hacks to maintain quick training cycles. Automating bot-vs-bot battles was a challenge as well; the BWAPI software often crashes between battles, and is not fast enough for running the tens of thousands of training rounds necessary for optimal results. For this reason, the majority of our training was performed against the built-in AI.
+It proved difficult to automate more complex training sessions due to the limitations of Starcraft and BWAPI. The Starcraft Campaign Editor has a number of bugs that prevent triggers from executing properly, which forced us to use a series of hacks to maintain quick training cycles. Automating bot-vs-bot battles was a challenge as well; the BWAPI software often crashes between battles, and is not fast enough for running the tens of thousands of training rounds necessary for optimal results. For this reason, the majority of our training was performed against the built-in AI.
 
 \section{Technical Approach}
 \label{sec:tech}
@@ -125,13 +125,13 @@ where $A$ and $E$ are the ally and enemy counts at the end of the round, respect
 
 \begin{figure}
 \includegraphics[scale=.28]{figures/mf_setup.png}
-\caption{A screenshot of the Starcraft Campaign Editor setup for a 3v3 2-marine, 1-firebat training battle.}
+\caption{A screenshot of the Starcraft Campaign Editor setup for a 3v3 2-marine, 1-firebat training scenario.}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics[scale=.34]{figures/mf_battle_small.png}
-\caption{A 3v3 battle in the 2-marine, 1-firebat training battle.}
+\caption{A 3v3 battle in the 2-marine, 1-firebat training scenario.}
 \label{fig:training_setup}
 \end{figure}
 
@@ -169,12 +169,13 @@ Using this network design, our units were able to achieve reasonable fitness lev
 \subsubsection{Individual Control}
 \label{sec:individual_design}
 
-Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. The idea behind this approach is that the angular position of two units is more relevant when the units are close than when they're far away. Our close-range units can damage multiple enemies in their line of fire at one time, so there is an advantage to knowing the precise location of nearby units, but the advantage tapers off outside of the unit's weapon range. 
+Our next attempt takes its inspiration from NERO \cite{stanley:ieeetec05}, where we use a single neural network design to control each combat unit individually. This allowed us to create more complex designs with the knowledge that we would not be restricted by the number of units in the training scenario. As we see in Figure \ref{fig:design_individual}, unit attributes are encoded into the inputs to allow for simultaneous learning on heterogeneous unit types. We furthermore use a polar map based on the idea of log-polar bins to represent enemy positions, health, and attributes. The idea behind this approach is that the angular position of two units is more relevant when the units are close than when they're far away. Our close-range units can damage multiple enemies in their line of fire at one time, so there is an advantage to knowing the precise location of nearby units, but the advantage tapers off outside of the unit's weapon range. Figure \ref{fig:logpolar} gives an example of a log-polar graph. In practice, we manually specified distance ranges and angle bins to increase resolution near the center and minimize total bin count. We used 12 angle bins and 3 distance ranges ([0-50), [50,300), and [300,$\infty$)) for 36 bins total. Ranges are relative to map coordinates; to give perspective to these ranges, a small combat unit's width is about 10.
 
 \begin{figure}
 \centering
 \includegraphics[scale=.3]{figures/logpolar.png}
 \caption{An example of a log-polar mapping, where distance and angle ranges allow for discretized unit locations. Image courtesy of Wikipedia \cite{logpolar}.}
+\label{fig:logpolar}
 \end{figure}
 
 By organizing locations into bins and enemies into attribute classes, we allow for arbitrary configurations of heterogeneous enemy combatants. To reduce the number of output nodes, we use a small set of nodes for action selection, where the action with the highest score is selected. We then use another cluster of nodes for bin selection so that the highest-scoring action is applied to the target bin. Actions are defined in Table \ref{tab:actions}. Finally, to ensure that all values are normalized to the range $[0,1]$, each I/O value represents a percentage. Ally/Enemy counts are relative to the entire battle, so a bin with 7 enemies out of a total of 10 on the battlefield would have an enemy count value of 0.7, and a bin with all of the flying enemy units would have a \texttt{HasFlyer} value of 1.
@@ -214,7 +215,7 @@ This network design performed well in a variety of scenarios, from small (3v3) b
 \label{fig:squad_design}
 \end{figure}
 
-In Figure \ref{fig:squad_design} we see the basic design for the squad controller. The idea behind this design is to take a small number of predefined unit types and teach them to work together, so that they can be organized into a larger battalion with a squad commander. The network design is essentially a mix of the ideas from the multi-unit and individual-unit controllers: ally and enemy statistics are captured per bin (with respect to the squad's centroid), and action/bin scores are calculated for each ally. With 4 allies in one squad and 15 bins, this results in 105 input nodes and 80 output nodes.
+In Figure \ref{fig:squad_design} we see the basic design for the squad controller. The idea behind this design is to take a small number of predefined unit types and teach them to work together, so that they can be organized into a larger battalion with a squad commander. The network design is essentially a mix of the ideas from the multi-unit and individual-unit controllers: ally and enemy statistics are captured per bin (with respect to the squad's centroid), and action/bin scores are calculated for each ally. With 4 allies in one squad and 15 bins (5 angle bins and 3 distance ranges), this results in 105 input nodes and 80 output nodes.
 
 \begin{figure}
 \input{designs/squadcommander}
@@ -296,7 +297,7 @@ Motivated by our search for interesting behaviors, we now consider the squad con
 \label{fig:squad_gw_exp}
 \end{figure}
 
-Next we combined multiple squads into a single battalion using the squad commander network. We used a larger battle with 8 marines, 4 firebats, 4 goliaths, and 4 wraiths, to create 4 squads of 2-marine, 2-firebat groups, and 2 squads of 2-goliath, 2-wraith groups. The results are shown in Figure \ref{fig:squadcommand_exp}. While the squad controllers took approximately 6 hours for 300 generations, the squad commander required over 3 days for 200 generations. The fitness graph closely follows a logarithmic trendline however, and extrapolation based on the trendline tells us that the genome will achieve a fitness score of 1.01 at 300 generations. This indicates more wins than losses, but is still behind the individual controller.
+Next we combined multiple squads into a single battalion using the squad commander network. We used a larger battle with 8 marines, 4 firebats, 4 goliaths, and 4 wraiths, to create 4 squads of 2-marine, 2-firebat groups, and 2 squads of 2-goliath, 2-wraith groups. The results are shown in Figure \ref{fig:squadcommand_exp}. While the squad controllers took approximately 1 day for 300 generations, the squad commander required over 3 days for 200 generations. The fitness graph closely follows a logarithmic trendline however, and extrapolation based on the trendline tells us that the genome will achieve a fitness score of 1.01 at 300 generations. This indicates more wins than losses, but is still behind the individual controller.
 
 \begin{figure}
 \centering
@@ -337,7 +338,7 @@ To anchor our reported fitness scores to a practical setting, we now present res
 	\mrow{2}{\small \url{http://youtu.be/OeMwC0bexlo}} & \mrow{2}{MUC vs. BWAI} & 3v3 battle with 2 marines and \\
 	&& 1 firebat on each team\\ \hline
 	\mrow{2}{\small \url{http://youtu.be/zHyUqjc55Bc}} & \mrow{2}{IC vs. BWAI} & 20v20 battle with heterogeneous \\
-	&& units, using an individual controller. \\ \hline
+	&& units. \\ \hline
 	\mrow{2}{\small \url{http://youtu.be/07mQnSVvytU}} & \mrow{2}{IC\textsuperscript{$\prime$} vs. Skynet} & 20v20 battle against Skynet with \\
 	&& heterogeneous units. \\ \hline
 	\mrow{2}{\small \url{http://youtu.be/2IKllwxzlGA}} & \mrow{2}{SC vs. BWAI} & 20v20 battle against BWAI with the \\
@@ -347,7 +348,7 @@ To anchor our reported fitness scores to a practical setting, we now present res
 \label{tab:videos}
 \end{table*}
 
-The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't generalize to human players or the Skynet bot. To improve performance against Skynet, we then attempted to train our individual controller population against it. This training session was exceptionally processor-intensive. While 3v3 scenarios trained at approximately 12.5 generations per hour, we were able to achieve less than one generation per hour against Skynet. We therefore trained the IC controller for just 15 additional generations against the Skynet bot. The fitness improvement is small but significant ($p < .001$), indicating that learning is taking place and that our network could potentially overcome the Skynet bot given weeks of training.
+The results show that while our bots do indeed perform well against the built-in AI, this expertise doesn't entirely generalize to human players or the Skynet bot. To improve performance against Skynet, we then attempted to train our individual controller population against it. This training session was exceptionally processor-intensive. While 3v3 scenarios trained at approximately 12.5 generations per hour, we were able to achieve less than one generation per hour against Skynet. We therefore trained the IC controller for just 15 additional generations against the Skynet bot. The fitness improvement is small but significant ($p < .001$), indicating that learning is taking place and that our network could potentially overcome the Skynet bot given weeks of training.
 
 \section{Network Analysis}
 \label{sec:network}
@@ -405,10 +406,10 @@ The Firebat's behavior is influenced more by the angles between allied and enemy
 
 While we can show signs of intelligent behavior from the champion network's structure and performance, it should be noted that the network is far from perfect. Many of the connections do not contribute to useful behavior, while many that should are not present (e.g. a marine can retreat when the enemy firebat gets close). The two hidden nodes in two layers are also redundant, as they form a chain of positive weights and can be replaced with a single connection \{41:33\}. This is because the network, while effective, was still going through the evolution process when this genome was evaluated. We stopped training the network once a reasonable level of fitness was attained due to time constraints, but further iterations through hundreds of generations may have resulted in more focused behavior and higher fitness.
 
-\section{Conclusions}
+\section{Conclusion}
 \label{sec:conclusion}
 
-We have shown the effectiveness of three different approaches to creating small-scale combat controllers using neural networks and NEAT to learn control techniques. In each case we have shown that given the proper training setup, these designs are capable of performing well against the built-in AI. We additionally show that our method is competitive against a human player, and while the top-ranking AI still outperforms our most successful genome, it's possible that continued training against Skynet could change these results. We discuss this and further modifications to our methods in the final section.
+We have shown the effectiveness of three different approaches to creating small-scale combat controllers using neural networks and NEAT to learn control techniques. In each case we have shown that given the proper training setup, these designs are capable of performing well against the built-in AI. We have additionally shown that our method is competitive against a human player, and while the top-ranking AI still outperforms our most successful genome, it's possible that continued training against Skynet could change these results. We discuss this and further modifications to our methods in the final section.
 
 \section{Future Work}
 \label{sec:future}
