@@ -1,0 +1,1 @@
+This is the home of StarcraftNN, a C# NEAT implementation for Starcraft unit controllers. For more information on the project please see our project report: https://starcraftnn.googlecode.com/git/report/report.pdf
